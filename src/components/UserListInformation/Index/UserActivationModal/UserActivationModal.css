@@ -1,0 +1,18 @@
+.modal-title{
+    letter-spacing: .8px;
+}
+.list-group{
+    border:2px solid #CBF3F0
+}
+
+.list-group .active{
+    background: #CBF3F0;
+    color:#000;
+    border:none;
+    font-size:20px;
+    letter-spacing: .8px;
+}
+.list-group .active:hover{
+    background: #CBF3F0;
+    color:#000;
+}

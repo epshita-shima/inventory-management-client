@@ -1,0 +1,38 @@
+
+.modal-header{
+    justify-content: end;
+    width: 100%;
+    padding: 10px;
+}
+.modal-title{
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+.close:hover{
+    background:#F5F5F5;
+}
+.close {
+    float: right;
+    font-size: 21px;
+    line-height: 1;
+    color: #000;
+    height: 36px;
+    width: 36px;
+    border-radius: 50px;
+  margin-left: 20px;
+}
+
+
+.thead-darks{
+    background-color: #CBF3F0 !important;
+    letter-spacing: .8px;
+    font-size: 14px !important;
+    color:#313541 !important;
+}
+.single-data{
+    color:#000;
+    font-size: 13px;
+    letter-spacing: .8px;
+}
+

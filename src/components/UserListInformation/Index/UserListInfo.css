@@ -1,0 +1,43 @@
+.nav-item{
+    padding-left: 15px;
+    padding-right: 15px;
+
+}
+
+.nav-item:not(:first-child):hover{
+    background-color: #AFF0DE;
+    border-radius: 15px;
+}
+.nav-link{
+    font-size: 13px;
+    font-weight: 900;
+   text-decoration: none !important;
+   padding: 8px !important;
+}
+.nav-button-active{
+    background: #0a203f;
+    border:none;
+    color: white;
+    border-radius: 15px;
+}
+.nav-button-active a{
+    color: white !important;
+}
+.nav-button-active:hover{
+    color: white;
+}
+.cardbox{
+    padding:  10px 10px 6px 14px;
+}
+.table-head-summary p{
+    color: #313541;
+    font-size: 16px;
+    letter-spacing: .5px;
+}
+.table-head-icon{
+    font-size: 24px;
+    color:#00B987
+}
+.action-icon{
+    font-size: 16px;
+}
