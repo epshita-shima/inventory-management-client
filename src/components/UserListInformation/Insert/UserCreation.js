@@ -5,13 +5,20 @@ import {
   faUserAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useState } from "react";
 import { Form, InputGroup } from "react-bootstrap";
 import Select from "react-select";
 import { useGetUserRoleQuery } from "../../../redux/api/apiSlice";
+import UserRoleEntryModal from "../../UserRoleInformation/Insert/UserRoleEntryModal";
 const UserCreation = () => {
   const { data } = useGetUserRoleQuery(undefined);
-
+const [firstname,setFirstname]=useState('')
+const [lastname,setLastname]=useState('')
+const [username,setUsername]=useState('')
+const [mobileNo,setMobileNo]=useState('')
+const [password,setPassword]=useState('')
+const [isActive,setIsActive]=useState(true)
+const [roleId,setRoleId]=useState('')
   const handleCreateUser = () => {};
   const options = data?.map(({ _id, user_role_name }) => ({
     value: _id,
@@ -78,7 +85,7 @@ const UserCreation = () => {
                       required
                       aria-label="Recipient's username"
                       aria-describedby="basic-addon2"
-                      //   value={email} onChange={(e) => setEmail(e.target.value)}
+                        value={firstname} onChange={(e) => setFirstname(e.target.value)}
                       style={{ border: "1px solid #00B987" }}
                     />
                   </InputGroup>
@@ -95,8 +102,7 @@ const UserCreation = () => {
                       required
                       aria-label="Recipient's username"
                       aria-describedby="basic-addon2"
-                      //   value={email} onChange={(e) => setEmail(e.target.value)}
-
+                        value={lastname} onChange={(e) => setLastname(e.target.value)}
                       style={{ border: "1px solid #00B987" }}
                     />
                   </InputGroup>
@@ -112,12 +118,29 @@ const UserCreation = () => {
                       required
                       aria-label="Recipient's username"
                       aria-describedby="basic-addon2"
-                      //   value={email} onChange={(e) => setEmail(e.target.value)}
+                        value={mobileNo} onChange={(e) => setMobileNo(e.target.value)}
                       style={{ border: "1px solid #00B987" }}
                     />
                   </InputGroup>
                 </div>
                 <div className="w-100 ms-2">
+                  <Form.Label htmlFor="inputPassword5" className="text-dark">
+                    Password
+                  </Form.Label>
+                  <InputGroup className="mb-3">
+                    <Form.Control
+                      placeholder="User's mobile no"
+                      name="password"
+                      required
+                      aria-label="Recipient's username"
+                      aria-describedby="basic-addon2"
+                        value={password} onChange={(e) => setPassword(e.target.value)}
+                      style={{ border: "1px solid #00B987" }}
+                    />
+                  </InputGroup>
+                </div>
+                <div className="d-flex justify-content-between align-items-center w-100 ms-2">
+                  <div className="w-100">
                   <Form.Label htmlFor="inputPassword5" className="text-dark">
                     User role
                   </Form.Label>
@@ -145,9 +168,14 @@ const UserCreation = () => {
                     // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
                     onChange={(e) => {
                         console.log(e.value)
+                        setRoleId(e.value)
                       //   itemInformation.itemType = e.value;
                     }}
                   ></Select>
+                  </div>
+                  <div className="mt-3 ms-2">
+                    <FontAwesomeIcon className="border align-middle text-center p-2 fs-3 rounded-5 text-light" style={{background:'#00B987'}} icon={faPlus} data-toggle="modal" data-target="#exampleModal"/>
+                  </div>
                 </div>
               </div>
             </Form>
@@ -182,6 +210,7 @@ const UserCreation = () => {
           </div>
         </div>
       </div>
+      <UserRoleEntryModal></UserRoleEntryModal>
     </div>
   );
 };
