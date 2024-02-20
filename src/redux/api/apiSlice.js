@@ -21,10 +21,10 @@ export const api = createApi({
     getUser:builder.query({
       query: () => '/getuser',
     }),
-    getUserRole:builder.query({
-      query:()=>"/get-user-role"
-    })
+    // getUserRole:builder.query({
+    //   query:()=>"/get-user-role"
+    // })
   }),
 });
 
-export const { useAddNewUserMutation, useUserLoginMutation,useGetUserQuery,useGetUserRoleQuery } = api;
+export const { useAddNewUserMutation, useUserLoginMutation,useGetUserQuery } = api;

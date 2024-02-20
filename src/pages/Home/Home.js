@@ -205,9 +205,201 @@ const Home = () => {
     
   // ];
   console.log(data)
+  const navbarData=[
+    {
+        "_id": "65d1a288f98ea6dd01974174",
+        "label": "Home",
+        "link": "#",
+        "active": true
+    },
+    {
+        "_id": "65d1a288f98ea6dd01974175",
+        "label": "Link",
+        "link": "#",
+        "active": false
+    },
+    {
+        "_id": "65d1a288f98ea6dd01974176",
+        "label": "User Setting",
+        "link": "#",
+        "dropdown": [
+            {
+                "label": "User Role",
+                "link": "#"
+            },
+            {
+                "label": "User Profile",
+                "link": "#"
+            },
+            {
+                "label": "User List",
+                "link": "/user-list-data"
+            },
+            {
+                "label": "Create User",
+                "link": "#"
+            }
+        ]
+    },
+      {
+      label: 'Departments',
+      link: '#',
+      dropdown: [            
+        {
+          label: 'Accounts Department',
+          link: '#',
+          dropdown: [                
+            {
+              label: 'Purchase Department',
+              link: '#'                  
+            },
+            {
+              label: 'Sales Department',
+              link: '#',
+              dropdown: [                
+                {
+                  label: 'Purchase Department',
+                  link: '#'                  
+                },
+                {
+                  label: 'Sales Department',
+                  link: '#'                  
+                },
+                {
+                  label: 'Loan Department',
+                  link: '#'                  
+                },
+                {
+                  label: 'All Reports',
+                  link: '#'                  
+                }
+              ]                  
+            },
+            {
+              label: 'Loan Department',
+              link: '#'                  
+            },
+            {
+              label: 'All Reports',
+              link: '#'                  
+            }
+          ]
+        },
+         {
+          label: 'Commercial Department',
+          link: '#',
+          dropdown: [                
+            {
+              label: 'Export Department',
+              link: '#'                  
+            },
+            {
+              label: 'Local Department',
+              link: '#'                  
+            },
+            {
+              label: 'All Department Reports',
+              link: '#',
+              dropdown: [                
+                {
+                  label: 'Purchase Department',
+                  link: '#'                  
+                },
+                {
+                  label: 'Sales Department',
+                  link: '#'                  
+                },
+                {
+                  label: 'Loan Department',
+                  link: '#',
+                  dropdown: [                
+                    {
+                      label: 'Purchase Department',
+                      link: '#'                  
+                    },
+                    {
+                      label: 'Sales Department',
+                      link: '#'                  
+                    },
+                    {
+                      label: 'Loan Department',
+                      link: '#',
+                      dropdown: [                
+                        {
+                          label: 'Purchase Department',
+                          link: '#'                  
+                        },
+                        {
+                          label: 'Sales Department',
+                          link: '#'                  
+                        },
+                        {
+                          label: 'Loan Department',
+                          link: '#'                  
+                        },
+                        {
+                          label: 'All Reports',
+                          link: '#' ,
+                          dropdown: [                
+                            {
+                              label: 'Purchase Department',
+                              link: '#'                  
+                            },
+                            {
+                              label: 'Sales Department',
+                              link: '#'                  
+                            },
+                            {
+                              label: 'Loan Department',
+                              link: '#',
+                              dropdown: [                
+                                {
+                                  label: 'Purchase Department',
+                                  link: '#'                  
+                                },
+                                {
+                                  label: 'Sales Department',
+                                  link: '#'                  
+                                },
+                                {
+                                  label: 'Loan Department',
+                                  link: '#'                  
+                                },
+                                {
+                                  label: 'All Reports',
+                                  link: '#'                  
+                                }
+                              ]                                    
+                            },
+                            {
+                              label: 'All Reports',
+                              link: '#'                  
+                            }
+                          ]                  
+                        }
+                      ]                   
+                    },
+                    {
+                      label: 'All Reports',
+                      link: '#'                  
+                    }
+                  ]                   
+                },
+                {
+                  label: 'All Reports',
+                  link: '#'                  
+                }
+              ]                  
+            }
+          ]
+        }
+      ]
+    },
+]
+
   return (
     <div>
-      <Navbar data={data}></Navbar>
+      <Navbar data={navbarData}></Navbar>
       {/* <DynamicNestedDropdown></DynamicNestedDropdown> */}
     </div>
   )

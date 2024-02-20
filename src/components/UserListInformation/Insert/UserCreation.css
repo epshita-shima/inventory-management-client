@@ -1,0 +1,7 @@
+.input-with-bottom-border {
+    border: none;
+    border-bottom: 1px solid #00B987; /* Color of the bottom border */
+    border-radius: 0; /* Optional: Remove border radius */
+    outline: none; /* Optional: Remove outline on focus */
+    box-shadow: none; /* Optional: Remove box shadow */
+  }
