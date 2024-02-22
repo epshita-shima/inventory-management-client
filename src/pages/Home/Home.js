@@ -219,161 +219,225 @@ const Home = () => {
         "active": false
     },
     {
-        "_id": "65d1a288f98ea6dd01974176",
+      
         "label": "User Setting",
-        "link": "#",
+        "url": '#',
+        "permissions": [],
         "dropdown": [
             {
                 "label": "User Role",
-                "link": "#"
+                "url": '#',
+                "permissions": [],
+                "dropdown":[]
             },
             {
+             
                 "label": "User Profile",
-                "link": "#"
+                "url": '#',
+                "permissions": [],
+                "dropdown":[]
             },
             {
+             
                 "label": "User List",
-                "link": "/user-list-data"
+                "url": "/user-list-data",
+                "permissions": [],
+                "dropdown":[]
             },
             {
+             
                 "label": "Create User",
-                "link": "#"
+                "url": '#',
+                "permissions": [],
+                "dropdown":[]
             }
         ]
     },
       {
       label: 'Departments',
-      link: '#',
+      "url": '#',
+      "permissions": [],
       dropdown: [            
         {
           label: 'Accounts Department',
-          link: '#',
+          "url": '#',
+          "permissions": [],
           dropdown: [                
             {
               label: 'Purchase Department',
-              link: '#'                  
+              "url": '#',
+                "permissions": [],                 
             },
             {
               label: 'Sales Department',
-              link: '#',
+              "url": '#',
+                "permissions": [],
               dropdown: [                
                 {
                   label: 'Purchase Department',
-                  link: '#'                  
+                  "url": '#',
+                "permissions": [], 
+                "dropdown":[]               
                 },
                 {
                   label: 'Sales Department',
-                  link: '#'                  
+                  "url": '#',
+                  "permissions": [], 
+                  "dropdown":[]                 
                 },
                 {
                   label: 'Loan Department',
-                  link: '#'                  
+                  "url": '#',
+                  "permissions": [], 
+                  "dropdown":[]                  
                 },
                 {
                   label: 'All Reports',
-                  link: '#'                  
+                  "url": '#',
+                "permissions": [], 
+                "dropdown":[]                 
                 }
               ]                  
             },
             {
               label: 'Loan Department',
-              link: '#'                  
+              "url": '#',
+                "permissions": [], 
+                "dropdown":[]                 
             },
             {
               label: 'All Reports',
-              link: '#'                  
+              "url": '#',
+                "permissions": [], 
+                "dropdown":[]                
             }
           ]
         },
          {
           label: 'Commercial Department',
-          link: '#',
+          "url": '#',
+          "permissions": [],
           dropdown: [                
             {
               label: 'Export Department',
-              link: '#'                  
+              "url": '#',
+                "permissions": [],                 
             },
             {
               label: 'Local Department',
-              link: '#'                  
+              "url": '#',
+                "permissions": [],                 
             },
             {
               label: 'All Department Reports',
-              link: '#',
+              "url": '#',
+                "permissions": [],
               dropdown: [                
                 {
                   label: 'Purchase Department',
-                  link: '#'                  
+                  "url": '#',
+                "permissions": [],
+                "dropdown":[]             
                 },
                 {
                   label: 'Sales Department',
-                  link: '#'                  
+                  "url": '#',
+                "permissions": [],
+                "dropdown":[]                   
                 },
                 {
                   label: 'Loan Department',
-                  link: '#',
+                  "url": '#',
+                  "permissions": [],
                   dropdown: [                
                     {
                       label: 'Purchase Department',
-                      link: '#'                  
+                      "url": '#',
+                      "permissions": [],
+                      "dropdown":[]               
                     },
                     {
                       label: 'Sales Department',
-                      link: '#'                  
+                      "url": '#',
+                      "permissions": [],
+                      "dropdown":[]               
                     },
                     {
                       label: 'Loan Department',
-                      link: '#',
+                      "url": '#',
+                      "permissions": [],
                       dropdown: [                
                         {
                           label: 'Purchase Department',
-                          link: '#'                  
+                          "url": '#',
+                          "permissions": [],
+                          "dropdown":[]                
                         },
                         {
                           label: 'Sales Department',
-                          link: '#'                  
+                          "url": '#',
+                          "permissions": [],
+                          "dropdown":[]                  
                         },
                         {
                           label: 'Loan Department',
-                          link: '#'                  
+                          "url": '#',
+                          "permissions": [],
+                          "dropdown":[]                  
                         },
                         {
                           label: 'All Reports',
-                          link: '#' ,
+                          "url": '#',
+                          "permissions": [],
                           dropdown: [                
                             {
                               label: 'Purchase Department',
-                              link: '#'                  
+                              "url": '#',
+                              "permissions": [],
+                              "dropdown":[]                  
                             },
                             {
                               label: 'Sales Department',
-                              link: '#'                  
+                              "url": '#',
+                              "permissions": [],
+                              "dropdown":[]                 
                             },
                             {
                               label: 'Loan Department',
-                              link: '#',
+                              "url": '#',
+                              "permissions": [],
                               dropdown: [                
                                 {
                                   label: 'Purchase Department',
-                                  link: '#'                  
+                                  "url": '#',
+                              "permissions": [],
+                              "dropdown":[]                  
                                 },
                                 {
                                   label: 'Sales Department',
-                                  link: '#'                  
+                                  "url": '#',
+                              "permissions": [],
+                              "dropdown":[]                    
                                 },
                                 {
                                   label: 'Loan Department',
-                                  link: '#'                  
+                                  "url": '#',
+                              "permissions": [],
+                              "dropdown":[]                 
                                 },
                                 {
                                   label: 'All Reports',
-                                  link: '#'                  
+                                  "url": '#',
+                              "permissions": [],
+                              "dropdown":[]                  
                                 }
                               ]                                    
                             },
                             {
                               label: 'All Reports',
-                              link: '#'                  
+                              "url": '#',
+                              "permissions": [],
+                              "dropdown":[]                   
                             }
                           ]                  
                         }
@@ -381,13 +445,17 @@ const Home = () => {
                     },
                     {
                       label: 'All Reports',
-                      link: '#'                  
+                      "url": '#',
+                      "permissions": [],
+                      "dropdown":[]                   
                     }
                   ]                   
                 },
                 {
                   label: 'All Reports',
-                  link: '#'                  
+                  "url": '#',
+                              "permissions": [],
+                              "dropdown":[]                   
                 }
               ]                  
             }

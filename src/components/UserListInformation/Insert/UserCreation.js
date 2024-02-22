@@ -11,20 +11,27 @@ import Select from "react-select";
 import "./UserCreation.css";
 import UserRoleEntryModal from "../../UserRoleInformation/Insert/UserRoleEntryModal";
 import { useGetUserRoleQuery } from "../../../redux/features/userrole/userroleApi";
+import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
+import Menu from "./Menu";
+
 
 const UserCreation = () => {
-  const { data } = useGetUserRoleQuery(undefined);
+  const { data: userRoleData, isError: userRoleIsError, isLoading: userRoleIsLoading } = useGetUserRoleQuery();
+  const { data: menuItems, isError: menuItemsIsError, isLoading: menuItemsIsLoading } = useGetAllMenuItemsQuery();
+
+  const [password, setPassword] = useState("LC00");
+  const [validated, setValidated] = useState(false);
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
     mobileNo: '',
+    password:'LC00',
+    roleId:''
   });
-console.log(formData)
-  const [password, setPassword] = useState("LC00");
-  const [isActive, setIsActive] = useState(true);
-  const [roleId, setRoleId] = useState("");
-  const [validated, setValidated] = useState(false);
-  console.log(validated)
+  if(menuItemsIsLoading){
+    return <p>Loading...</p>
+  }
+console.log(menuItems)
   const handleCreateUser = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -41,14 +48,20 @@ console.log(formData)
     // Handle form submission, for example, send data to backend
     console.log('Form submitted:', formData);
   };
-  
+
   const handleChange = (e) => {
-    const values = formData;
-    values[e.target.name] = e.target.value;
-    setFormData(values);
+    const { name, value } = e.target;
+    if (!(name in formData)) {
+      console.error(`Field "${name}" does not exist in formData state.`);
+      return;
+    }
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const options = data?.map(({ _id, userrolename }) => ({
+  const options = userRoleData?.map(({ _id, userrolename }) => ({
     value: _id,
     label: userrolename,
   }));
@@ -102,53 +115,72 @@ console.log(formData)
           <div className="mt-5">
             <Form  validated={validated} onSubmit={handleCreateUser}>
               <div className="d-flex justify-content-between align-items-center">
-                <div className="w-100 ">
-                  <Form.Group controlId="formInput" className="mb-3">
+                <div className="w-100">
+                  <div >
+                  <Form.Group controlId="formInput">
                     <Form.Control
                       type="text"
+                      name='firstname'
                       placeholder="User's first name"
                       className="input-with-bottom-border"
                       value={formData.firstname}
                       onChange={(e)=>handleChange(e)}
+                      isInvalid={validated && formData.firstname === ''}
                     />
-                    <Form.Control.Feedback type="invalid">Please provide a firstname.</Form.Control.Feedback>
+                    <Form.Control.Feedback className="mt-2" type="invalid">Please provide a firstname.</Form.Control.Feedback>
+                    {validated && formData.lastname === '' && <div style={{ height: '0px' }}></div>}
                   </Form.Group>
+                  </div>
+                  {/* <div className="">
+                  {validated && formData.firstname === '' && <p className="text-danger ">{`Firstname is required.`}</p>}
+                  </div> */}
                 </div>
 
                 <div className="w-100 ms-2">
-                  <Form.Group controlId="formInput" className="mb-3">
+                  <div>
+                  <Form.Group controlId="formInput" >
                     <Form.Control
                       type="text"
+                      name='lastname'
                       placeholder="User's last name"
                       className="input-with-bottom-border"
                       value={formData.lastname}
                       onChange={handleChange}
+                      isInvalid={validated && formData.lastname === ''}
                     />
-                    <Form.Control.Feedback type="invalid">Please provide a lastname.</Form.Control.Feedback>
+                    <Form.Control.Feedback  type="invalid">Please provide a lastname.</Form.Control.Feedback>
+                    {validated && formData.lastname === '' && <div style={{ height: '0px' }}></div>}
                   </Form.Group>
+                  </div>
+                  
                 </div>
                 <div className="w-100 ms-2">
-                  <Form.Group controlId="formInput" className="mb-3">
+                  <Form.Group controlId="formInput">
                     <Form.Control
                       type="text"
+                      name='mobileNo'
                       placeholder="Mobile no"
                       className="input-with-bottom-border"
                       value={formData.mobileNo}
                       onChange={handleChange}
+                      isInvalid={validated && formData.lastname === ''}
                     />
                      <Form.Control.Feedback type="invalid">Please provide a mobile.</Form.Control.Feedback>
+                     {/* {validated && formData.lastname === '' && <div style={{ height: '20px' }}></div>} */}
                   </Form.Group>
+                 
                 </div>
                 <div className="w-100 ms-2">
-                  <Form.Group controlId="formInput" className="mb-3">
+                  <Form.Group controlId="formInput">
                     <Form.Control
                       type="text"
                       placeholder="Password"
                       className="input-with-bottom-border"
                       value={password}
                       style={{background:'transparent'}}
-                      // onChange={(e) => setPassword(e.target.value)}
+                      isInvalid={validated && formData.password === ''}
                     />
+                    <Form.Control.Feedback type="invalid">Please provide a password.</Form.Control.Feedback>
                   </Form.Group>
                 </div>
                 <div className="d-flex justify-content-between align-items-center w-100 ms-2">
@@ -178,13 +210,15 @@ console.log(formData)
                       // style={{ border: "1px solid #00B987" }}
                       // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
                       onChange={(e) => {
-                        console.log(e.value);
-                        setRoleId(e.value);
-                        //   itemInformation.itemType = e.value;
+                        setFormData({...formData,['roleId']:e.value})
                       }}
                     ></Select>
+                    
+                     <div className="">
+                  {validated && formData.roleId === '' && <p className="text-danger ">{`User role is required.`}</p>}
                   </div>
-                  <div className="mt-3 ms-2">
+                  </div>
+                  <div className=" ms-2">
                     <FontAwesomeIcon
                       className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
                       style={{ background: "#00B987" }}
@@ -194,15 +228,21 @@ console.log(formData)
                     />
                   </div>
                 </div>
-                {validated && Object.entries(formData).map(([fieldName, value]) => (
-        value === '' && <p key={fieldName} className="text-danger ">{`${fieldName} is required.`}</p>
-      ))}
+               
               </div>
            
             </Form>
           </div>
-       
+          <div className="mt-5">
+<h4 className="fw-bold">Select Menu</h4>
+<div className="accordion">
+      {menuItems.map((item, index) => (
+        <Menu key={index} item={item} />
+      ))}
+    </div>
         </div>
+        </div>
+      
         <div className="d-flex justify-content-end mt-5">
           <div className="d-flex justify-content-end">
             <button
@@ -215,7 +255,7 @@ console.log(formData)
               }}
             >
               Reset
-            </button>{" "}
+            </button>
             &nbsp;&nbsp;&nbsp;
             <button
               className="btn text-uppercase rounded-4"
