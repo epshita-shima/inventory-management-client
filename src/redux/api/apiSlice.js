@@ -21,10 +21,13 @@ export const api = createApi({
     getUser:builder.query({
       query: () => '/getuser',
     }),
+    getSerialNo:builder.query({
+      query:()=>'/serial-getdata'
+    })
     // getUserRole:builder.query({
     //   query:()=>"/get-user-role"
     // })
   }),
 });
 
-export const { useAddNewUserMutation, useUserLoginMutation,useGetUserQuery } = api;
+export const { useAddNewUserMutation, useUserLoginMutation,useGetUserQuery,useGetSerialNoQuery } = api;

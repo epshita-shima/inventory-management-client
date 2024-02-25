@@ -467,7 +467,7 @@ const Home = () => {
 
   return (
     <div>
-      <Navbar data={navbarData}></Navbar>
+      <Navbar data={data}></Navbar>
       {/* <DynamicNestedDropdown></DynamicNestedDropdown> */}
     </div>
   )

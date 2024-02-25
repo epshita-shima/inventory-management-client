@@ -5,7 +5,7 @@ import {
   faUserAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, InputGroup } from "react-bootstrap";
 import Select from "react-select";
 import "./UserCreation.css";
@@ -13,12 +13,21 @@ import UserRoleEntryModal from "../../UserRoleInformation/Insert/UserRoleEntryMo
 import { useGetUserRoleQuery } from "../../../redux/features/userrole/userroleApi";
 import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
 import Menu from "./Menu";
+import MenuItem from "./MenuItem";
+import { useGetSerialNoQuery } from "../../../redux/api/apiSlice";
 
 
 const UserCreation = () => {
+  const[ clickedCheckboxes,setClickedCheckboxes] = useState([]);
+  console.log(clickedCheckboxes)
   const { data: userRoleData, isError: userRoleIsError, isLoading: userRoleIsLoading } = useGetUserRoleQuery();
   const { data: menuItems, isError: menuItemsIsError, isLoading: menuItemsIsLoading } = useGetAllMenuItemsQuery();
-
+  const {data:serialNo}=useGetSerialNoQuery(undefined)
+  console.log(serialNo)
+  const maxSerialNoObject = serialNo?.reduce((max, current) => {
+    return current.serialNo > max.serialNo ? current : max;
+  });
+  console.log(maxSerialNoObject?.serialNo);
   const [password, setPassword] = useState("LC00");
   const [validated, setValidated] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,8 +35,22 @@ const UserCreation = () => {
     lastname: '',
     mobileNo: '',
     password:'LC00',
-    roleId:''
+    roleId:'',
+    username:'',
+    isactive:true,
+    menulist:[]
   });
+
+  useEffect(() => {
+    const username = formData.firstname + '-0'+ maxSerialNoObject?.serialNo;
+    // Update menulist in formData whenever clickedCheckboxes changes
+    setFormData(prev => ({
+      ...prev,
+      username:username,
+      menulist: clickedCheckboxes
+    }));
+  }, [clickedCheckboxes,maxSerialNoObject?.serialNo,formData.firstname]);
+
   if(menuItemsIsLoading){
     return <p>Loading...</p>
   }
@@ -47,6 +70,7 @@ console.log(menuItems)
     }
     // Handle form submission, for example, send data to backend
     console.log('Form submitted:', formData);
+
   };
 
   const handleChange = (e) => {
@@ -236,9 +260,13 @@ console.log(menuItems)
           <div className="mt-5">
 <h4 className="fw-bold">Select Menu</h4>
 <div className="accordion">
-      {menuItems.map((item, index) => (
-        <Menu key={index} item={item} />
-      ))}
+      {menuItems?.map((item, index) => {
+         console.log(clickedCheckboxes,item)
+         return(
+       
+        <Menu key={index} index={index} item={item} clickedCheckboxes={clickedCheckboxes} setClickedCheckboxes={setClickedCheckboxes} />
+      )})}
+      {/* {<MenuItem></MenuItem>} */}
     </div>
         </div>
         </div>
