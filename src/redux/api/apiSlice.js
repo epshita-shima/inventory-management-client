@@ -23,11 +23,18 @@ export const api = createApi({
     }),
     getSerialNo:builder.query({
       query:()=>'/serial-getdata'
-    })
+    }),
+    createSerialNo:builder.mutation({
+      query: (payload) => ({
+        url: "/serial-create",
+        method: "POST",
+        body: payload,
+      }),
+    }),
     // getUserRole:builder.query({
     //   query:()=>"/get-user-role"
     // })
   }),
 });
 
-export const { useAddNewUserMutation, useUserLoginMutation,useGetUserQuery,useGetSerialNoQuery } = api;
+export const { useAddNewUserMutation, useUserLoginMutation,useGetUserQuery,useGetSerialNoQuery ,useCreateSerialNoMutation} = api;

@@ -204,7 +204,8 @@ const Home = () => {
   //   // },
     
   // ];
-  console.log(data)
+ 
+  console.log(JSON.stringify(data))
   const navbarData=[
     {
         "_id": "65d1a288f98ea6dd01974174",

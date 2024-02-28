@@ -16,85 +16,39 @@ import UserListModal from "./UserListModal/UserListModal";
 import UserActivationModal from "./UserActivationModal/UserActivationModal";
 import { useGetUserQuery } from "../../../redux/api/apiSlice";
 import { useNavigate } from "react-router-dom";
+import { useGetAllUserQuery, useGetSingleUserQuery } from "../../../redux/features/user/userApi";
 
 const UserListInfo = () => {
 // const {data}=useGetUserQuery(undefined)
+const [userId, setUserId] = useState(null);
+const {data:user}=useGetAllUserQuery(undefined)
+console.log(user)
+const {data:singleUser}=useGetSingleUserQuery(userId)
+console.log(singleUser)
 // console.log(data)
 const navigate=useNavigate()
-const data = [
-  {
-    id: 1,
-    name: "John Doe",
-    mobile_no: "123-456-7890",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    mobile_no: "987-654-3210",
-  },
-  {
-    id: 3,
-    name: "Michael Johnson",
-    mobile_no: "555-555-5555",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    mobile_no: "111-222-3333",
-  },
-  {
-    id: 5,
-    name: "David Wilson",
-    mobile_no: "444-444-4444",
-  },
-  {
-    id: 6,
-    name: "Sarah Brown",
-    mobile_no: "777-777-7777",
-  },
-  {
-    id: 7,
-    name: "Daniel Martinez",
-    mobile_no: "888-888-8888",
-  },
-  {
-    id: 8,
-    name: "Lisa Taylor",
-    mobile_no: "999-999-9999",
-  },
-  {
-    id: 9,
-    name: "Christopher Lee",
-    mobile_no: "333-333-3333",
-  },
-  {
-    id: 10,
-    name: "Jessica Clark",
-    mobile_no: "666-666-6666",
-  },
-  {
-    id: 11,
-    name: "Jessica Clark",
-    mobile_no: "666-666-6666",
-  },
-];
+const activeUser=user?.filter((user)=>user.isactive==true)
+console.log(activeUser)
+const handleActiveStatus=(id)=>{
+  setUserId(id)
+}
   const columns = [
     {
       name: "Sl.",
-      selector: (data, index) => index + 1,
+      selector: (user, index) => index + 1,
       center: true,
       width: "60px",
     },
     {
       name: "Name",
-      selector: (data) => data?.name,
+      selector: (user) => user?.firstname,
       sortable: true,
       center: true,
 		filterable: true,
     },
     {
       name: "Year",
-      selector: (data) => data?.mobile_no,
+      selector: (user) => user?.mobileNo,
       sortable: true,
       center: true,
     },
@@ -104,7 +58,7 @@ const data = [
       button: true,
       width: "200px",
       grow: 2,
-      cell: (data) => (
+      cell: (user) => (
         <div className="d-flex justify-content-between align-content-center">
           <a
             target="_blank"
@@ -122,7 +76,9 @@ const data = [
             style={{color:'#56CCAD',border:'2px solid #56CCAD',padding:'3px', borderRadius:'5px',marginLeft: "10px" }}
             // href={`UpdateGroupName/${data?.GroupId}`}
           >
-            <FontAwesomeIcon icon={faPenToSquare} ></FontAwesomeIcon>
+            <FontAwesomeIcon icon={faPenToSquare} onClick={()=>{
+              handleActiveStatus(user?._id)
+            }}></FontAwesomeIcon>
           </a>
           <a
             target="_blank"
@@ -161,7 +117,7 @@ const data = [
   const [filterText, setFilterText] = React.useState("");
   const [resetPaginationToggle, setResetPaginationToggle] =
   React.useState(false);
-  const filteredItems = data?.filter(
+  const filteredItems = user?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==
       -1
@@ -263,7 +219,7 @@ const subHeaderComponent = useMemo(() => {
                   class="card-text"
                   style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
                 >
-                  1
+                {user?.length}
                 </h5>
               </div>
             </div>
@@ -288,7 +244,8 @@ const subHeaderComponent = useMemo(() => {
                   class="card-text"
                   style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
                 >
-                  1
+                 {
+                 activeUser?.length}
                 </h5>
               </div>
             </div>
@@ -341,7 +298,7 @@ const subHeaderComponent = useMemo(() => {
         </div>
       </div>
   
-<UserListModal></UserListModal>
+<UserListModal user={user}></UserListModal>
 <UserActivationModal></UserActivationModal>
 
     </div>

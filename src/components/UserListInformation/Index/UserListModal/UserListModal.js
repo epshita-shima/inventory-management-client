@@ -5,89 +5,50 @@ import FilterComponent from "../FilterComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDownload,
-  faEye,
-  faPenToSquare,
-  faRefresh,
-  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import DataTable from "react-data-table-component";
-const UserListModal = () => {
-  const data = [
-    {
-      id: 1,
-      name: "John Doe",
-      mobile_no: "123-456-7890",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      mobile_no: "987-654-3210",
-    },
-    {
-      id: 3,
-      name: "Michael Johnson",
-      mobile_no: "555-555-5555",
-    },
-    {
-      id: 4,
-      name: "Emily Davis",
-      mobile_no: "111-222-3333",
-    },
-    {
-      id: 5,
-      name: "David Wilson",
-      mobile_no: "444-444-4444",
-    },
-    {
-      id: 6,
-      name: "Sarah Brown",
-      mobile_no: "777-777-7777",
-    },
-    {
-      id: 7,
-      name: "Daniel Martinez",
-      mobile_no: "888-888-8888",
-    },
-    {
-      id: 8,
-      name: "Lisa Taylor",
-      mobile_no: "999-999-9999",
-    },
-    {
-      id: 9,
-      name: "Christopher Lee",
-      mobile_no: "333-333-3333",
-    },
-    {
-      id: 10,
-      name: "Jessica Clark",
-      mobile_no: "666-666-6666",
-    },
-    {
-      id: 11,
-      name: "Jessica Clark",
-      mobile_no: "666-666-6666",
-    },
-  ];
+const UserListModal = ({user}) => {
+
   const columns = [
     {
       name: "Sl.",
-      selector: (data, index) => index + 1,
+      selector: (user, index) => index + 1,
       center: true,
       width: "60px",
     },
     {
       name: "Name",
-      selector: (data) => data?.name,
+      selector: (user) => user?.firstname,
       sortable: true,
       center: true,
       filterable: true,
     },
     {
-      name: "Year",
-      selector: (data) => data?.mobile_no,
+      name: "Mobile No",
+      selector: (user) => user?.mobileNo,
       sortable: true,
       center: true,
+    },
+    {
+      name: "Status",
+      button: true,
+      width: "200px",
+      grow: 2,
+      cell: (user) => (
+        <div className="d-flex justify-content-between align-content-center">
+          <a
+            target="_blank"
+            className="action-icon"
+           style={{textDecoration:'none',color:'#000',fontSize:'14px',textAlign:'center'}}
+            // href={`UpdateGroupName/${data?.GroupId}`}
+          >
+           {
+            user?.isactive==true ? (<p>Active</p>): (<p>InActive</p>)
+          }
+          </a> 
+ 
+        </div>
+      ),
     },
   ];
   const customStyles = {
@@ -120,7 +81,7 @@ const UserListModal = () => {
   const [filterText, setFilterText] = React.useState("");
   const [resetPaginationToggle, setResetPaginationToggle] =
     React.useState(false);
-  const filteredItems = data?.filter(
+  const filteredItems = user?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==
       -1

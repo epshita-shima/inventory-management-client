@@ -14,47 +14,64 @@ import { useGetUserRoleQuery } from "../../../redux/features/userrole/userroleAp
 import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
 import Menu from "./Menu";
 import MenuItem from "./MenuItem";
-import { useGetSerialNoQuery } from "../../../redux/api/apiSlice";
-
+import {
+  useCreateSerialNoMutation,
+  useGetSerialNoQuery,
+} from "../../../redux/api/apiSlice";
+import { useCreateUserMutation } from "../../../redux/features/user/userApi";
+import swal from "sweetalert";
+import TreeView from "./TreeView";
+import DynamicTreeTable from "./DynamicTreeTable";
 
 const UserCreation = () => {
-  const[ clickedCheckboxes,setClickedCheckboxes] = useState([]);
-  console.log(clickedCheckboxes)
-  const { data: userRoleData, isError: userRoleIsError, isLoading: userRoleIsLoading } = useGetUserRoleQuery();
-  const { data: menuItems, isError: menuItemsIsError, isLoading: menuItemsIsLoading } = useGetAllMenuItemsQuery();
-  const {data:serialNo}=useGetSerialNoQuery(undefined)
-  console.log(serialNo)
+  const [clickedCheckboxes, setClickedCheckboxes] = useState([]);
+  console.log(clickedCheckboxes);
+  const {
+    data: userRoleData,
+    isError: userRoleIsError,
+    isLoading: userRoleIsLoading,
+  } = useGetUserRoleQuery();
+  const {
+    data: menuItems,
+    isError: menuItemsIsError,
+    isLoading: menuItemsIsLoading,
+  } = useGetAllMenuItemsQuery();
+  const { data: serialNo } = useGetSerialNoQuery(undefined);
+  const [createSerialNo] = useCreateSerialNoMutation();
+  const [createNewUser] = useCreateUserMutation();
   const maxSerialNoObject = serialNo?.reduce((max, current) => {
     return current.serialNo > max.serialNo ? current : max;
   });
-  console.log(maxSerialNoObject?.serialNo);
+
   const [password, setPassword] = useState("LC00");
   const [validated, setValidated] = useState(false);
+  const parentIds = [];
   const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
-    mobileNo: '',
-    password:'LC00',
-    roleId:'',
-    username:'',
-    isactive:true,
-    menulist:[]
+    firstname: "",
+    lastname: "",
+    mobileNo: "",
+    password: "LC00",
+    roleId: "",
+    username: "",
+    isactive: true,
+    menulist: [],
   });
 
   useEffect(() => {
-    const username = formData.firstname + '-0'+ maxSerialNoObject?.serialNo;
+    const username =
+      formData.firstname + "-0" + maxSerialNoObject?.serialNo;
     // Update menulist in formData whenever clickedCheckboxes changes
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      username:username,
-      menulist: clickedCheckboxes
+      username: username,
+      menulist: clickedCheckboxes,
     }));
-  }, [clickedCheckboxes,maxSerialNoObject?.serialNo,formData.firstname]);
+  }, [clickedCheckboxes, maxSerialNoObject?.serialNo, formData.firstname]);
 
-  if(menuItemsIsLoading){
-    return <p>Loading...</p>
+  if (menuItemsIsLoading) {
+    return <p>Loading...</p>;
   }
-console.log(menuItems)
+
   const handleCreateUser = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -62,15 +79,27 @@ console.log(menuItems)
       e.stopPropagation();
     }
     setValidated(true);
-
+    const serialData = {
+      serialNo:maxSerialNoObject?.serialNo,
+      type: "user",
+      year: "2024",
+      makeby: "shima",
+      updateby: "",
+    };
     // Check if any field is empty
-    const isEmpty = Object.values(formData).some(value => value === '');
+    const isEmpty = Object.values(formData).some(
+      (value) => value === "" || value.length === 0
+    );
     if (isEmpty) {
+      swal("Not possible", "Please fill up form correctly", "warning");
       return;
+    } else {
+      createSerialNo(serialData);
+      createNewUser(formData);
+      swal("Done", "Data Save Successfully", "success");
     }
     // Handle form submission, for example, send data to backend
-    console.log('Form submitted:', formData);
-
+    console.log("Form submitted:", JSON.stringify(formData));
   };
 
   const handleChange = (e) => {
@@ -137,23 +166,27 @@ console.log(menuItems)
             </p>
           </div>
           <div className="mt-5">
-            <Form  validated={validated} onSubmit={handleCreateUser}>
+            <Form validated={validated} onSubmit={handleCreateUser}>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="w-100">
-                  <div >
-                  <Form.Group controlId="formInput">
-                    <Form.Control
-                      type="text"
-                      name='firstname'
-                      placeholder="User's first name"
-                      className="input-with-bottom-border"
-                      value={formData.firstname}
-                      onChange={(e)=>handleChange(e)}
-                      isInvalid={validated && formData.firstname === ''}
-                    />
-                    <Form.Control.Feedback className="mt-2" type="invalid">Please provide a firstname.</Form.Control.Feedback>
-                    {validated && formData.lastname === '' && <div style={{ height: '0px' }}></div>}
-                  </Form.Group>
+                  <div>
+                    <Form.Group controlId="formInput">
+                      <Form.Control
+                        type="text"
+                        name="firstname"
+                        placeholder="User's first name"
+                        className="input-with-bottom-border"
+                        value={formData.firstname}
+                        onChange={(e) => handleChange(e)}
+                        isInvalid={validated && formData.firstname === ""}
+                      />
+                      <Form.Control.Feedback className="mt-2" type="invalid">
+                        Please provide a firstname.
+                      </Form.Control.Feedback>
+                      {validated && formData.lastname === "" && (
+                        <div style={{ height: "0px" }}></div>
+                      )}
+                    </Form.Group>
                   </div>
                   {/* <div className="">
                   {validated && formData.firstname === '' && <p className="text-danger ">{`Firstname is required.`}</p>}
@@ -162,37 +195,41 @@ console.log(menuItems)
 
                 <div className="w-100 ms-2">
                   <div>
-                  <Form.Group controlId="formInput" >
-                    <Form.Control
-                      type="text"
-                      name='lastname'
-                      placeholder="User's last name"
-                      className="input-with-bottom-border"
-                      value={formData.lastname}
-                      onChange={handleChange}
-                      isInvalid={validated && formData.lastname === ''}
-                    />
-                    <Form.Control.Feedback  type="invalid">Please provide a lastname.</Form.Control.Feedback>
-                    {validated && formData.lastname === '' && <div style={{ height: '0px' }}></div>}
-                  </Form.Group>
+                    <Form.Group controlId="formInput">
+                      <Form.Control
+                        type="text"
+                        name="lastname"
+                        placeholder="User's last name"
+                        className="input-with-bottom-border"
+                        value={formData.lastname}
+                        onChange={handleChange}
+                        isInvalid={validated && formData.lastname === ""}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        Please provide a lastname.
+                      </Form.Control.Feedback>
+                      {validated && formData.lastname === "" && (
+                        <div style={{ height: "0px" }}></div>
+                      )}
+                    </Form.Group>
                   </div>
-                  
                 </div>
                 <div className="w-100 ms-2">
                   <Form.Group controlId="formInput">
                     <Form.Control
                       type="text"
-                      name='mobileNo'
+                      name="mobileNo"
                       placeholder="Mobile no"
                       className="input-with-bottom-border"
                       value={formData.mobileNo}
                       onChange={handleChange}
-                      isInvalid={validated && formData.lastname === ''}
+                      isInvalid={validated && formData.lastname === ""}
                     />
-                     <Form.Control.Feedback type="invalid">Please provide a mobile.</Form.Control.Feedback>
-                     {/* {validated && formData.lastname === '' && <div style={{ height: '20px' }}></div>} */}
+                    <Form.Control.Feedback type="invalid">
+                      Please provide a mobile.
+                    </Form.Control.Feedback>
+                    {/* {validated && formData.lastname === '' && <div style={{ height: '20px' }}></div>} */}
                   </Form.Group>
-                 
                 </div>
                 <div className="w-100 ms-2">
                   <Form.Group controlId="formInput">
@@ -201,10 +238,12 @@ console.log(menuItems)
                       placeholder="Password"
                       className="input-with-bottom-border"
                       value={password}
-                      style={{background:'transparent'}}
-                      isInvalid={validated && formData.password === ''}
+                      style={{ background: "transparent" }}
+                      isInvalid={validated && formData.password === ""}
                     />
-                    <Form.Control.Feedback type="invalid">Please provide a password.</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">
+                      Please provide a password.
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </div>
                 <div className="d-flex justify-content-between align-items-center w-100 ms-2">
@@ -234,13 +273,15 @@ console.log(menuItems)
                       // style={{ border: "1px solid #00B987" }}
                       // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
                       onChange={(e) => {
-                        setFormData({...formData,['roleId']:e.value})
+                        setFormData({ ...formData, ["roleId"]: e.value });
                       }}
                     ></Select>
-                    
-                     <div className="">
-                  {validated && formData.roleId === '' && <p className="text-danger ">{`User role is required.`}</p>}
-                  </div>
+
+                    <div className="">
+                      {validated && formData.roleId === "" && (
+                        <p className="text-danger ">{`User role is required.`}</p>
+                      )}
+                    </div>
                   </div>
                   <div className=" ms-2">
                     <FontAwesomeIcon
@@ -252,25 +293,22 @@ console.log(menuItems)
                     />
                   </div>
                 </div>
-               
               </div>
-           
             </Form>
           </div>
           <div className="mt-5">
-<h4 className="fw-bold">Select Menu</h4>
-<div className="accordion">
-      {menuItems?.map((item, index) => {
-         console.log(clickedCheckboxes,item)
-         return(
-       
-        <Menu key={index} index={index} item={item} clickedCheckboxes={clickedCheckboxes} setClickedCheckboxes={setClickedCheckboxes} />
-      )})}
-      {/* {<MenuItem></MenuItem>} */}
-    </div>
+            <h4 className="fw-bold">Select Menu</h4>
+            {
+              <TreeView
+                data={menuItems}
+                clickedCheckboxes={clickedCheckboxes}
+                setClickedCheckboxes={setClickedCheckboxes}
+                parentIds={parentIds}
+              />
+            }
+          </div>
         </div>
-        </div>
-      
+
         <div className="d-flex justify-content-end mt-5">
           <div className="d-flex justify-content-end">
             <button
