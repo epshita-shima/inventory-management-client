@@ -8,6 +8,7 @@ const userApi = api.injectEndpoints({
       method: "POST",
       body: payload,
     }),
+   
   }),
   getAllUser:builder.query({
     query: () => "/get-user",
@@ -15,6 +16,16 @@ const userApi = api.injectEndpoints({
   getSingleUser:builder.query({
     query: (id) => `/user/${id}`,
   }),
+  updateUser: builder.mutation({
+    query: (updatedData) => (
+      {
+      url: `/user/update/${updatedData._id}`,
+      method: 'PUT',
+      body: updatedData,
+    }
+    ),
+ 
+  }),
   }),
 });
-export const {useCreateUserMutation,useGetAllUserQuery,useGetSingleUserQuery}=userApi;
+export const {useCreateUserMutation,useGetAllUserQuery,useGetSingleUserQuery,useUpdateUserMutation}=userApi;

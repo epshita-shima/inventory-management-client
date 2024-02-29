@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./UserListInfo.css";
 import DataTable from "react-data-table-component";
 import FilterComponent from "./FilterComponent";
@@ -14,24 +14,26 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import UserListModal from "./UserListModal/UserListModal";
 import UserActivationModal from "./UserActivationModal/UserActivationModal";
-import { useGetUserQuery } from "../../../redux/api/apiSlice";
+
 import { useNavigate } from "react-router-dom";
-import { useGetAllUserQuery, useGetSingleUserQuery } from "../../../redux/features/user/userApi";
+import { useGetAllUserQuery, useGetSingleUserQuery, useUpdateUserMutation } from "../../../redux/features/user/userApi";
 
 const UserListInfo = () => {
-// const {data}=useGetUserQuery(undefined)
 const [userId, setUserId] = useState(null);
 const {data:user}=useGetAllUserQuery(undefined)
-console.log(user)
+const [updateUserData]=useUpdateUserMutation()
 const {data:singleUser}=useGetSingleUserQuery(userId)
-console.log(singleUser)
+
 // console.log(data)
+
+
 const navigate=useNavigate()
 const activeUser=user?.filter((user)=>user.isactive==true)
-console.log(activeUser)
+console.log(singleUser?.isactive)
 const handleActiveStatus=(id)=>{
   setUserId(id)
 }
+
   const columns = [
     {
       name: "Sl.",
@@ -66,7 +68,9 @@ const handleActiveStatus=(id)=>{
             style={{color:'#56CCAD',border:'2px solid #56CCAD',padding:'3px',borderRadius:'5px'}}
             // href={`UpdateGroupName/${data?.GroupId}`}
           >
-            <FontAwesomeIcon  data-toggle="modal" data-target="#exampleModalLong" icon={faEye} ></FontAwesomeIcon>
+            <FontAwesomeIcon  data-toggle="modal" data-target="#exampleModalLong" icon={faEye} onClick={()=>{
+              handleActiveStatus(user?._id)
+            }} ></FontAwesomeIcon>
           </a> 
         
        
@@ -76,9 +80,7 @@ const handleActiveStatus=(id)=>{
             style={{color:'#56CCAD',border:'2px solid #56CCAD',padding:'3px', borderRadius:'5px',marginLeft: "10px" }}
             // href={`UpdateGroupName/${data?.GroupId}`}
           >
-            <FontAwesomeIcon icon={faPenToSquare} onClick={()=>{
-              handleActiveStatus(user?._id)
-            }}></FontAwesomeIcon>
+            <FontAwesomeIcon icon={faPenToSquare} ></FontAwesomeIcon>
           </a>
           <a
             target="_blank"
@@ -131,6 +133,7 @@ const subHeaderComponent = useMemo(() => {
       setFilterText("");
     }
   };
+
   return (
     <>
 
@@ -299,7 +302,7 @@ const subHeaderComponent = useMemo(() => {
       </div>
   
 <UserListModal user={user}></UserListModal>
-<UserActivationModal></UserActivationModal>
+<UserActivationModal singleUser={singleUser} userId={userId}></UserActivationModal>
 
     </div>
   );

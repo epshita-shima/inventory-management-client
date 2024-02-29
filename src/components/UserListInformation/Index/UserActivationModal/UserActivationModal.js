@@ -2,7 +2,10 @@ import React from "react";
 import "./UserActivationModal.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-const UserActivationModal = () => {
+import { useUpdateUserMutation } from "../../../../redux/features/user/userApi";
+const UserActivationModal = ({singleUser}) => {
+  console.log(singleUser)
+  const [updateData] = useUpdateUserMutation();
   return (
     <div
       class="modal fade"
@@ -57,9 +60,22 @@ const UserActivationModal = () => {
                       <td>
                         <input
                           type="text"
-                          class="form-control bg-light"
+                          class="form-control bg-light text-center"
                           placeholder=""
                           aria-label=""
+                          readOnly
+                          value={singleUser?.firstname}
+                          aria-describedby="basic-addon1"
+                        />
+                        
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          class="form-control bg-light text-center"
+                          placeholder=""
+                          aria-label=""
+                          value={singleUser?.lastname}
                           readOnly
                           aria-describedby="basic-addon1"
                         />
@@ -67,19 +83,10 @@ const UserActivationModal = () => {
                       <td>
                         <input
                           type="text"
-                          class="form-control bg-light"
+                          class="form-control bg-light text-center"
                           placeholder=""
                           aria-label=""
-                          readOnly
-                          aria-describedby="basic-addon1"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          class="form-control bg-light"
-                          placeholder=""
-                          aria-label=""
+                          value={singleUser?.mobileNo}
                           readOnly
                           aria-describedby="basic-addon1"
                         />
@@ -87,7 +94,14 @@ const UserActivationModal = () => {
                       <td className="align-middle ">
                         <input
                           type="checkbox"
+                   
                           aria-label="Checkbox for following text input"
+                          onClick={async(e)=>{
+                            const {checked}=e.target
+                            const updatedUserData = { ...singleUser, isactive: false };
+                            const response = updateData(updatedUserData);
+                            console.log('Data updated successfully:', response);
+                          }}
                         />
 
                         {/* <FontAwesomeIcon style={{color:'#00B987'}} icon={faEyeSlash}/> */}
