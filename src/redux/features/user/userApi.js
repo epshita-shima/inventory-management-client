@@ -8,10 +8,11 @@ const userApi = api.injectEndpoints({
       method: "POST",
       body: payload,
     }),
-   
+    invalidatesTags: ['createuser'],
   }),
   getAllUser:builder.query({
     query: () => "/get-user",
+    providesTags:['createuser','changestatus','deleteuser','changesmanytatus']
   }),
   getSingleUser:builder.query({
     query: (id) => `/user/${id}`,
@@ -24,8 +25,23 @@ const userApi = api.injectEndpoints({
       body: updatedData,
     }
     ),
- 
+    invalidatesTags: ['changestatus'],
+  }),
+  updateMultipleUserStatus: builder.mutation({
+    query: (dataToUpdate) => ({
+      url: 'user/updatestatus/updateMultiple',
+      method: 'PUT',
+      body: dataToUpdate,
+    }),
+    invalidatesTags: ['changesmanytatus'],
+  }),
+  deleteUser: builder.mutation({
+    query: (id) => ({
+      url: `user/delete/${id}`,
+      method: 'DELETE',
+    }),
+    invalidatesTags: ['deleteuser'],
   }),
   }),
 });
-export const {useCreateUserMutation,useGetAllUserQuery,useGetSingleUserQuery,useUpdateUserMutation}=userApi;
+export const {useCreateUserMutation,useGetAllUserQuery,useGetSingleUserQuery,useUpdateUserMutation,useDeleteUserMutation,useUpdateMultipleUserStatusMutation}=userApi;

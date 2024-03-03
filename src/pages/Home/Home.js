@@ -465,6 +465,27 @@ const Home = () => {
       ]
     },
 ]
+// const updatePermissions = (apiData, nestedData) => {
+//   // Iterate through the API data
+//   for (const apiItem of apiData) {
+//     // Find the matching item in the nested data
+//     const nestedItem = nestedData.find((item) => item.label === apiItem.label);
+    
+//     // If a matching item is found, update its permissions
+//     if (nestedItem) {
+//       // If the item has a dropdown, recursively update its permissions
+//       if (apiItem.dropdown && nestedItem.dropdown) {
+//         updatePermissions(apiItem.dropdown, nestedItem.dropdown);
+//       }
+      
+//       // Update the item's permissions
+//       apiItem.permissions = nestedItem.permissions;
+//     }
+//   }
+// };
+
+// // Call the function to update the permissions
+// updatePermissions(apiData, nestedData);
 
   return (
     <div>

@@ -142,30 +142,7 @@ const UserListModal = ({user}) => {
               </button>
             </div>
             <div class="modal-body">
-              {/* <table class="table border shadow-lg text-center">
-                <thead>
-                  <tr  class="text-center">
-                    <th className="text-center thead-darks"  scope="col">Sl.</th>
-                    <th className="text-center thead-darks" scope="col">Name</th>
-                    <th className="text-center thead-darks" scope="col">Mobile</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    data.map((data,index)=>{
-                      return(
-                        <tr key={index}>
-                        <td className="single-data">{index+1}</td>
-                        <td className="single-data">{data.name}</td>
-                        <td className="single-data">{data.mobile_no}</td>
-                      </tr>
-                      )
-                    })
-                  }
-                 
-                
-                </tbody>
-              </table> */}
+
               <DataTable
                 columns={columns}
                 data={filteredItems}

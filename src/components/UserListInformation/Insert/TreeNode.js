@@ -5,14 +5,15 @@ const TreeNode = ({
   node,
   clickedCheckboxes,
   setClickedCheckboxes,
-  parentIds,
+  parentIds,singleUserData,isUpdate
 }) => {
+  console.log(node)
   const [isOpen, setIsOpen] = useState(false);
   const [isParentChecked, setIsParentChecked] = useState(false);
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
-
+console.log(JSON.stringify(singleUserData))
   const handleCheckboxClick = (subNode) => {
     const isDuplicate = clickedCheckboxes?.some(
       (check) => check?.itemId === subNode?._id
@@ -51,7 +52,8 @@ const TreeNode = ({
 
   return (
     <div style={{ position: "relative" }}>
-      <table className="table table-bordered">
+     
+         <table className="table table-bordered">
         <tbody>
           <tr className="">
             <td
@@ -80,6 +82,8 @@ const TreeNode = ({
                         clickedCheckboxes={clickedCheckboxes}
                         setClickedCheckboxes={setClickedCheckboxes}
                         parentIds={[...parentIds, node._id]}
+                        isUpdate={isUpdate}
+                        singleUserData={singleUserData}
                       />
                     ) : (
                       <>
@@ -88,6 +92,7 @@ const TreeNode = ({
                           id={`${subNode?._id}`}
                           name="check"
                           className="form-check-input border-success me-2"
+                          
                           onClick={(e) => {
                             const { checked } = e.target;
                             if (checked) {
@@ -311,6 +316,8 @@ const TreeNode = ({
           )}
         </tbody>
       </table>
+        
+     
     </div>
   );
 };

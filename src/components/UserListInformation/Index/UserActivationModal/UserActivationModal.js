@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import "./UserActivationModal.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { useUpdateUserMutation } from "../../../../redux/features/user/userApi";
-const UserActivationModal = ({singleUser}) => {
-  console.log(singleUser)
+import { useGetSingleUserQuery, useUpdateUserMutation } from "../../../../redux/features/user/userApi";
+import swal from "sweetalert";
+const UserActivationModal = ({userId}) => {
+  console.log(userId)
+  const { data: singleUser } = useGetSingleUserQuery(userId);
   const [updateData] = useUpdateUserMutation();
+  const [ updateUserStatus,setUpdateUserStatus]=useState([])
+  console.log(updateUserStatus)
+  console.log(singleUser)
   return (
     <div
       class="modal fade"
@@ -32,7 +37,7 @@ const UserActivationModal = ({singleUser}) => {
           </div>
           <div class="modal-body">
             <ul class="list-group rounded-4">
-              <li class="list-group-item active">User Activation</li>
+              <li class="list-group-item active">User Information</li>
               <div className="mt-4">
                 <table class="table">
                   <thead>
@@ -98,9 +103,10 @@ const UserActivationModal = ({singleUser}) => {
                           aria-label="Checkbox for following text input"
                           onClick={async(e)=>{
                             const {checked}=e.target
-                            const updatedUserData = { ...singleUser, isactive: false };
-                            const response = updateData(updatedUserData);
-                            console.log('Data updated successfully:', response);
+                            const updatedUserData = { ...singleUser, isactive:false };
+                            setUpdateUserStatus(updatedUserData)
+                            // 
+                            // console.log('Data updated successfully:', response);
                           }}
                         />
 
@@ -131,12 +137,17 @@ const UserActivationModal = ({singleUser}) => {
             <button
               type="button"
               class="btn"
+              data-dismiss="modal"
               style={{
                 background: "#00B987",
                 color: "white",
                 fontSize: "16px",
                 borderRadius: "10px",
                 textTransform: "uppercase",
+              }}
+              onClick={()=>{
+               updateData(updateUserStatus);
+                swal("Done", "Update Successfully", "success");
               }}
             >
               Update

@@ -73,6 +73,7 @@ function App() {
         {/* <Route path="/login" element={<Login></Login>}></Route> */}
         <Route path="/project" element={<Home></Home>}></Route>
         <Route path="/user-creation" element={<UserCreation></UserCreation>}></Route>
+        <Route path="/user-creation/:id" element={<UserCreation></UserCreation>}></Route>
         <Route path="/user-list-data" element={<UserListInfo></UserListInfo>}></Route>
       </Routes>
     </div>

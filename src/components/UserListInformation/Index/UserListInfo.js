@@ -16,41 +16,57 @@ import UserListModal from "./UserListModal/UserListModal";
 import UserActivationModal from "./UserActivationModal/UserActivationModal";
 
 import { useNavigate } from "react-router-dom";
-import { useGetAllUserQuery, useGetSingleUserQuery, useUpdateUserMutation } from "../../../redux/features/user/userApi";
+import {
+  useDeleteUserMutation,
+  useGetAllUserQuery,
+  useGetSingleUserQuery,
+  useUpdateUserMutation,
+} from "../../../redux/features/user/userApi";
+import UserActiveListModal from "./UserActiveListModal/UserActiveListModal";
+import swal from "sweetalert";
 
 const UserListInfo = () => {
-const [userId, setUserId] = useState(null);
-const {data:user}=useGetAllUserQuery(undefined)
-const [updateUserData]=useUpdateUserMutation()
-const {data:singleUser}=useGetSingleUserQuery(userId)
+  const [userId, setUserId] = useState(null);
+  const { data: user } = useGetAllUserQuery(undefined);
+  const [updateUserData] = useUpdateUserMutation();
+ 
+  const [activeUserModal, setActiveUserModal] = useState(false);
+  const [inActiveUserModal, setInActiveUserModal] = useState(false);
+  // console.log(data)
+  const [deleteUser, { isLoading, isSuccess, isError }] = useDeleteUserMutation();
 
-// console.log(data)
-
-
-const navigate=useNavigate()
-const activeUser=user?.filter((user)=>user.isactive==true)
-console.log(singleUser?.isactive)
-const handleActiveStatus=(id)=>{
-  setUserId(id)
-}
+  const navigate = useNavigate();
+  const activeUser = user?.filter((user) => user.isactive == true);
+  const inActiveUser = user?.filter((user) => user.isactive == false);
+  console.log(user);
+  const handleActiveStatus = (id) => {
+    setUserId(id);
+  };
 
   const columns = [
     {
       name: "Sl.",
-      selector: (user, index) => index + 1,
+      selector: (activeUser, index) => index + 1,
       center: true,
       width: "60px",
     },
     {
       name: "Name",
-      selector: (user) => user?.firstname,
+      selector: (activeUser) => activeUser?.firstname,
       sortable: true,
       center: true,
-		filterable: true,
+      filterable: true,
     },
     {
-      name: "Year",
-      selector: (user) => user?.mobileNo,
+      name: "User Name",
+      selector: (activeUser) => activeUser?.username,
+      sortable: true,
+      center: true,
+      filterable: true,
+    },
+    {
+      name: "Mobile No",
+      selector: (activeUser) => activeUser?.mobileNo,
       sortable: true,
       center: true,
     },
@@ -60,37 +76,79 @@ const handleActiveStatus=(id)=>{
       button: true,
       width: "200px",
       grow: 2,
-      cell: (user) => (
+      cell: (activeUser) => (
         <div className="d-flex justify-content-between align-content-center">
           <a
             target="_blank"
             className="action-icon"
-            style={{color:'#56CCAD',border:'2px solid #56CCAD',padding:'3px',borderRadius:'5px'}}
-            // href={`UpdateGroupName/${data?.GroupId}`}
+            style={{
+              color: "#56CCAD",
+              border: "2px solid #56CCAD",
+              padding: "3px",
+              borderRadius: "5px",
+            }}
           >
-            <FontAwesomeIcon  data-toggle="modal" data-target="#exampleModalLong" icon={faEye} onClick={()=>{
-              handleActiveStatus(user?._id)
-            }} ></FontAwesomeIcon>
-          </a> 
-        
-       
+            <FontAwesomeIcon
+              data-toggle="modal"
+              data-target="#exampleModalLong"
+              icon={faEye}
+              onClick={() => {
+                handleActiveStatus(activeUser?._id);
+              }}
+            ></FontAwesomeIcon>
+          </a>
+
           <a
             target="_blank"
             className="action-icon"
-            style={{color:'#56CCAD',border:'2px solid #56CCAD',padding:'3px', borderRadius:'5px',marginLeft: "10px" }}
-            // href={`UpdateGroupName/${data?.GroupId}`}
+            style={{
+              color: "#56CCAD",
+              border: "2px solid #56CCAD",
+              padding: "3px",
+              borderRadius: "5px",
+              marginLeft: "10px",
+            }}
+            onClick={() => {
+              window.open(
+                `user-creation/${activeUser?._id}`
+              );
+              // handleActiveStatus(activeUser?._id);
+            }}
           >
-            <FontAwesomeIcon icon={faPenToSquare} ></FontAwesomeIcon>
+            <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
           </a>
           <a
             target="_blank"
             className="action-icon "
-            style={{color:'red',border:'2px solid red',padding:'3px', borderRadius:'5px', marginLeft: "10px" }}
-            // href={`UpdateGroupName/${data?.GroupId}`}
+            style={{
+              color: "red",
+              border: "2px solid red",
+              padding: "3px",
+              borderRadius: "5px",
+              marginLeft: "10px",
+            }}
+            onClick={()=>{
+              swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this data!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+              })
+              .then((willDelete) => {
+                if (willDelete) {
+                  deleteUser(activeUser?._id)
+                  swal("Poof! Your data has been deleted!", {
+                    icon: "success",
+                  });
+                } else {
+                  swal("Your data is safe!");
+                }
+              });
+            }}
           >
-           <FontAwesomeIcon icon={faTrash} ></FontAwesomeIcon>
+            <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
           </a>
-           
         </div>
       ),
     },
@@ -107,7 +165,7 @@ const handleActiveStatus=(id)=>{
         color: "#000",
         fontWeight: "bold",
         textAlign: "center",
-        letterSpacing:'0.8px'
+        letterSpacing: "0.8px",
       },
     },
     cells: {
@@ -118,46 +176,43 @@ const handleActiveStatus=(id)=>{
   };
   const [filterText, setFilterText] = React.useState("");
   const [resetPaginationToggle, setResetPaginationToggle] =
-  React.useState(false);
-  const filteredItems = user?.filter(
+    React.useState(false);
+  const filteredItems = activeUser?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==
       -1
   );
 
-const subHeaderComponent = useMemo(() => {
- 
-  const handleClear = () => {
-    if (filterText) {
-      setResetPaginationToggle(!resetPaginationToggle);
-      setFilterText("");
-    }
-  };
+  const subHeaderComponent = useMemo(() => {
+    const handleClear = () => {
+      if (filterText) {
+        setResetPaginationToggle(!resetPaginationToggle);
+        setFilterText("");
+      }
+    };
 
-  return (
-    <>
+    return (
+      <>
+        <div className="d-flex justify-content-end align-items-center">
+          <div className="table-head-icon">
+            <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp;
+            <FontAwesomeIcon icon={faDownload}></FontAwesomeIcon>
+          </div>
+        </div>{" "}
+        &nbsp;
+        <FilterComponent
+          onFilter={(e) => setFilterText(e.target.value)}
+          onClear={handleClear}
+          filterText={filterText}
+        />
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {/* <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"/> */}
+        </div>
+      </>
+    );
+  }, [filterText, resetPaginationToggle]);
 
-    <div className="d-flex justify-content-end align-items-center">
-              <div className="table-head-icon">
-                <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp;
-                <FontAwesomeIcon icon={faDownload}></FontAwesomeIcon>
-              </div>
-            </div> &nbsp;
-    <FilterComponent
-      onFilter={(e) => setFilterText(e.target.value)}
-      onClear={handleClear}
-      filterText={filterText}
-    />
-     <div style={{ display: 'flex', alignItems: 'center' }}>
-
-{/* <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"/> */}
   
-
-</div>
-    </>
-  );
-}, [filterText, resetPaginationToggle]);
-
   return (
     <div className="container-fluid p-0 m-0">
       <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
@@ -168,11 +223,7 @@ const subHeaderComponent = useMemo(() => {
           >
             <ul class="navbar-nav ">
               <li class="nav-item nav-button-active">
-                <a
-                  class="active nav-link text-uppercase"
-                >
-                  Product List
-                </a>
+                <a class="active nav-link text-uppercase">Product List</a>
               </li>
               <li class="nav-item">
                 <a
@@ -195,8 +246,15 @@ const subHeaderComponent = useMemo(() => {
               </li>
             </ul>
             <form class="form-inline my-2 my-lg-0">
-      <button class="btn text-light bg-dark my-2 my-sm-0" onClick={()=>{navigate('/user-creation')}}>Create User</button>
-    </form>
+              <button
+                class="btn text-light bg-dark my-2 my-sm-0"
+                onClick={() => {
+                  navigate("/user-creation");
+                }}
+              >
+                Create User
+              </button>
+            </form>
           </div>
         </div>
       </nav>
@@ -205,9 +263,13 @@ const subHeaderComponent = useMemo(() => {
           <div class="col-sm-3">
             <div
               class="cardbox shadow-lg"
-              style={{ borderLeft: "12px solid #000", borderRadius: "10px" }}
+              style={{ borderLeft: "12px solid #1EDFBD", borderRadius: "10px" }}
             >
-              <div class="card-body"  data-toggle="modal" data-target="#exampleModal">
+              <div
+                class="card-body"
+                data-toggle="modal"
+                data-target="#exampleModal"
+              >
                 <p
                   class="card-title"
                   style={{
@@ -222,7 +284,7 @@ const subHeaderComponent = useMemo(() => {
                   class="card-text"
                   style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
                 >
-                {user?.length}
+                  {user?.length}
                 </h5>
               </div>
             </div>
@@ -230,9 +292,16 @@ const subHeaderComponent = useMemo(() => {
           <div class="col-sm-3">
             <div
               class="cardbox shadow-lg"
-              style={{ borderLeft: "12px solid #1EDFBD", borderRadius: "10px" }}
+              style={{ borderLeft: "12px solid  #CBF3F0", borderRadius: "10px" }}
             >
-              <div class="card-body">
+              <div
+                class="card-body"
+                data-toggle="modal"
+                data-target="#exampleModalCenter"
+                onClick={() => {
+                  setActiveUserModal(true);
+                }}
+              >
                 <p
                   class="card-title"
                   style={{
@@ -247,8 +316,7 @@ const subHeaderComponent = useMemo(() => {
                   class="card-text"
                   style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
                 >
-                 {
-                 activeUser?.length}
+                  {activeUser?.length}
                 </h5>
               </div>
             </div>
@@ -256,9 +324,16 @@ const subHeaderComponent = useMemo(() => {
           <div class="col-sm-3">
             <div
               class="cardbox shadow-lg"
-              style={{ borderLeft: "12px solid #F0C873", borderRadius: "10px" }}
+              style={{ borderLeft: "12px solid red", borderRadius: "10px" }}
             >
-              <div class="card-body">
+              <div
+                class="card-body"
+                data-toggle="modal"
+                data-target="#exampleModalCenter"
+                onClick={() => {
+                  setInActiveUserModal(true);
+                }}
+              >
                 <p
                   class="card-title"
                   style={{
@@ -273,7 +348,7 @@ const subHeaderComponent = useMemo(() => {
                   class="card-text"
                   style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
                 >
-                  1
+                  {inActiveUser?.length}
                 </h5>
               </div>
             </div>
@@ -283,27 +358,37 @@ const subHeaderComponent = useMemo(() => {
       <div class="container mt-5">
         <div class="row">
           <div className="col">
-            
             <div className="shadow-lg overflow-x-auto flex-nowarp">
-
-      <DataTable
-        columns={columns}
-        data={filteredItems}
-        defaultSortField="name"
-        customStyles={customStyles}
-        striped
-        pagination
-        subHeader
-        subHeaderComponent={subHeaderComponent}
-      />
-    </div>
+              <DataTable
+                columns={columns}
+                data={filteredItems}
+                defaultSortField="name"
+                customStyles={customStyles}
+                striped
+                pagination
+                subHeader
+                subHeaderComponent={subHeaderComponent}
+              />
+            </div>
           </div>
         </div>
       </div>
-  
-<UserListModal user={user}></UserListModal>
-<UserActivationModal singleUser={singleUser} userId={userId}></UserActivationModal>
 
+      <UserListModal user={user}></UserListModal>
+      <UserActivationModal
+       
+        userId={userId}
+      ></UserActivationModal>
+      {activeUserModal ? (
+        <UserActiveListModal user={activeUser} activeUserModal={activeUserModal} setActiveUserModal={setActiveUserModal}></UserActiveListModal>
+      ) : (
+        ""
+      )}
+      {inActiveUserModal ? (
+        <UserActiveListModal user={inActiveUser} inActiveUserModal={inActiveUserModal} setInActiveUserModal={setInActiveUserModal}></UserActiveListModal>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

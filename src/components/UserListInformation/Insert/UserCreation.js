@@ -12,20 +12,28 @@ import "./UserCreation.css";
 import UserRoleEntryModal from "../../UserRoleInformation/Insert/UserRoleEntryModal";
 import { useGetUserRoleQuery } from "../../../redux/features/userrole/userroleApi";
 import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
-import Menu from "./Menu";
-import MenuItem from "./MenuItem";
+
 import {
   useCreateSerialNoMutation,
   useGetSerialNoQuery,
 } from "../../../redux/api/apiSlice";
-import { useCreateUserMutation } from "../../../redux/features/user/userApi";
+import {
+  useCreateUserMutation,
+  useGetSingleUserQuery,
+} from "../../../redux/features/user/userApi";
 import swal from "sweetalert";
 import TreeView from "./TreeView";
-import DynamicTreeTable from "./DynamicTreeTable";
+
+import { useNavigate, useParams } from "react-router-dom";
 
 const UserCreation = () => {
+  const { id } = useParams();
+  var [isUpdate] = useState(id ? true : false);
   const [clickedCheckboxes, setClickedCheckboxes] = useState([]);
-  console.log(clickedCheckboxes);
+  const [singleUserData, setSingleUserData] = useState([]);
+  const { data: singleUser, isLoading: singleUSerLoading } =useGetSingleUserQuery(id);
+    
+
   const {
     data: userRoleData,
     isError: userRoleIsError,
@@ -39,6 +47,7 @@ const UserCreation = () => {
   const { data: serialNo } = useGetSerialNoQuery(undefined);
   const [createSerialNo] = useCreateSerialNoMutation();
   const [createNewUser] = useCreateUserMutation();
+  const navigate = useNavigate();
   const maxSerialNoObject = serialNo?.reduce((max, current) => {
     return current.serialNo > max.serialNo ? current : max;
   });
@@ -56,22 +65,30 @@ const UserCreation = () => {
     isactive: true,
     menulist: [],
   });
+  console.log(singleUserData);
 
   useEffect(() => {
-    const username =
-      formData.firstname + "-0" + maxSerialNoObject?.serialNo;
+    const username = formData.firstname + "-0" + maxSerialNoObject?.serialNo;
     // Update menulist in formData whenever clickedCheckboxes changes
     setFormData((prev) => ({
       ...prev,
       username: username,
       menulist: clickedCheckboxes,
     }));
-  }, [clickedCheckboxes, maxSerialNoObject?.serialNo, formData.firstname]);
+    setSingleUserData(singleUser);
+  }, [
+    clickedCheckboxes,
+    maxSerialNoObject?.serialNo,
+    formData.firstname,
+    singleUser
+  ]);
 
   if (menuItemsIsLoading) {
     return <p>Loading...</p>;
   }
-
+  if (singleUSerLoading) {
+    return <p>single user loading...</p>;
+  }
   const handleCreateUser = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -80,7 +97,7 @@ const UserCreation = () => {
     }
     setValidated(true);
     const serialData = {
-      serialNo:maxSerialNoObject?.serialNo,
+      serialNo: maxSerialNoObject?.serialNo,
       type: "user",
       year: "2024",
       makeby: "shima",
@@ -97,6 +114,7 @@ const UserCreation = () => {
       createSerialNo(serialData);
       createNewUser(formData);
       swal("Done", "Data Save Successfully", "success");
+      navigate("/user-list-data");
     }
     // Handle form submission, for example, send data to backend
     console.log("Form submitted:", JSON.stringify(formData));
@@ -104,14 +122,26 @@ const UserCreation = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (!(name in formData)) {
-      console.error(`Field "${name}" does not exist in formData state.`);
-      return;
+    if (isUpdate) {
+      console.log(e.target.value);
+      if (!(name in singleUserData)) {
+        console.error(`Field "${name}" does not exist in formData state.`);
+        return;
+      }
+      setSingleUserData({
+        ...singleUserData,
+        [name]: value,
+      });
+    } else {
+      if (!(name in formData)) {
+        console.error(`Field "${name}" does not exist in formData state.`);
+        return;
+      }
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
     }
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
   };
 
   const options = userRoleData?.map(({ _id, userrolename }) => ({
@@ -137,7 +167,7 @@ const UserCreation = () => {
           "
                   href="#"
                 >
-                  Add User(s)
+                  {isUpdate ? "Update User" : "Add User(s)"}
                 </a>
               </li>
             </ul>
@@ -176,7 +206,11 @@ const UserCreation = () => {
                         name="firstname"
                         placeholder="User's first name"
                         className="input-with-bottom-border"
-                        value={formData.firstname}
+                        value={
+                          isUpdate
+                            ? singleUserData?.firstname
+                            : formData.firstname
+                        }
                         onChange={(e) => handleChange(e)}
                         isInvalid={validated && formData.firstname === ""}
                       />
@@ -201,7 +235,11 @@ const UserCreation = () => {
                         name="lastname"
                         placeholder="User's last name"
                         className="input-with-bottom-border"
-                        value={formData.lastname}
+                        value={
+                          isUpdate
+                            ? singleUserData?.lastname
+                            : formData.lastname
+                        }
                         onChange={handleChange}
                         isInvalid={validated && formData.lastname === ""}
                       />
@@ -221,7 +259,9 @@ const UserCreation = () => {
                       name="mobileNo"
                       placeholder="Mobile no"
                       className="input-with-bottom-border"
-                      value={formData.mobileNo}
+                      value={
+                        isUpdate ? singleUserData?.mobileNo : formData.mobileNo
+                      }
                       onChange={handleChange}
                       isInvalid={validated && formData.lastname === ""}
                     />
@@ -237,7 +277,7 @@ const UserCreation = () => {
                       type="text"
                       placeholder="Password"
                       className="input-with-bottom-border"
-                      value={password}
+                      value={isUpdate ? singleUserData?.password : password}
                       style={{ background: "transparent" }}
                       isInvalid={validated && formData.password === ""}
                     />
@@ -270,10 +310,24 @@ const UserCreation = () => {
                           primary: "#00B987",
                         },
                       })}
+                      value={
+                        isUpdate
+                          ? options.find(
+                              (x) => x.value == singleUserData?.roleId
+                            )
+                          : options.find((x) => x.value == formData.roleId)
+                      }
                       // style={{ border: "1px solid #00B987" }}
                       // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
                       onChange={(e) => {
-                        setFormData({ ...formData, ["roleId"]: e.value });
+                        if (isUpdate) {
+                          setSingleUserData({
+                            ...singleUserData,
+                            ["roleId"]: e.value,
+                          });
+                        } else {
+                          setFormData({ ...formData, ["roleId"]: e.value });
+                        }
                       }}
                     ></Select>
 
@@ -300,6 +354,8 @@ const UserCreation = () => {
             <h4 className="fw-bold">Select Menu</h4>
             {
               <TreeView
+              isUpdate={isUpdate}
+              singleUserData={singleUserData?.menulist}
                 data={menuItems}
                 clickedCheckboxes={clickedCheckboxes}
                 setClickedCheckboxes={setClickedCheckboxes}
