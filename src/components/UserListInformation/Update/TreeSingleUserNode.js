@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import swal from "sweetalert";
 
-const TreeNode = ({
+const TreeSingleUserNode = ({
   node,
   clickedCheckboxes,
   setClickedCheckboxes,
   parentIds,
   singleUserData,
-  isUpdate,
+ 
  data
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -145,12 +145,11 @@ console.log(clickedCheckboxes.parentIds)
                 <tr key={subNode._id}>
                   <td>
                     {subNode.dropdown ? (
-                      <TreeNode
+                      <TreeSingleUserNode
                         node={subNode}
                         clickedCheckboxes={clickedCheckboxes}
                         setClickedCheckboxes={setClickedCheckboxes}
                         parentIds={[...parentIds, node._id]}
-                        isUpdate={isUpdate}
                         singleUserData={singleUserData}
                       />
                     ) : (
@@ -395,4 +394,4 @@ console.log(updatedData)
   );
 };
 
-export default TreeNode;
+export default TreeSingleUserNode;

@@ -110,7 +110,7 @@ const UserListInfo = () => {
             }}
             onClick={() => {
               window.open(
-                `user-creation/${activeUser?._id}`
+                `user-update/${activeUser?._id}`
               );
               // handleActiveStatus(activeUser?._id);
             }}

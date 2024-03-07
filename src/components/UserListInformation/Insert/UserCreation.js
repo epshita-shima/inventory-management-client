@@ -31,8 +31,7 @@ const UserCreation = () => {
   var [isUpdate] = useState(id ? true : false);
   const [clickedCheckboxes, setClickedCheckboxes] = useState([]);
   const [singleUserData, setSingleUserData] = useState([]);
-  const { data: singleUser, isLoading: singleUSerLoading } =useGetSingleUserQuery(id);
-    
+const [serialValue, setSerialValue]=useState([])
 
   const {
     data: userRoleData,
@@ -47,10 +46,20 @@ const UserCreation = () => {
   const { data: serialNo } = useGetSerialNoQuery(undefined);
   const [createSerialNo] = useCreateSerialNoMutation();
   const [createNewUser] = useCreateUserMutation();
+
   const navigate = useNavigate();
-  const maxSerialNoObject = serialNo?.reduce((max, current) => {
-    return current.serialNo > max.serialNo ? current : max;
-  });
+  useEffect(()=>{
+    if( serialNo && serialNo.length > 0){
+      const maxSerialNoObject = serialNo?.reduce((max, current) => {
+        return current.serialNo > max.serialNo ? current : max;
+      })
+      setSerialValue(maxSerialNoObject)
+    }
+  },[serialNo])
+
+  console.log(serialNo,serialValue) 
+  
+ 
 
   const [password, setPassword] = useState("LC00");
   const [validated, setValidated] = useState(false);
@@ -65,78 +74,190 @@ const UserCreation = () => {
     isactive: true,
     menulist: [],
   });
-  console.log(singleUserData);
 
-  useEffect(() => {
-    const username = formData.firstname + "-0" + maxSerialNoObject?.serialNo;
-    // Update menulist in formData whenever clickedCheckboxes changes
-    setFormData((prev) => ({
-      ...prev,
-      username: username,
-      menulist: clickedCheckboxes,
-    }));
-    setSingleUserData(singleUser);
-  }, [
-    clickedCheckboxes,
-    maxSerialNoObject?.serialNo,
-    formData.firstname,
-    singleUser
-  ]);
+
+  function mergePermissions(mainData, permissionsData) {
+    // Helper function to merge permissions for dropdown items recursively
+    console.log(permissionsData)
+    function mergeDropdownPermissions(mainDropdown, permissionsDropdown) {
+      if (!mainDropdown || !permissionsDropdown.length===0) {
+        return [];
+      }
+      return mainDropdown.map((mainItem) => {
+        const permissionsItem = permissionsDropdown?.find(
+          (permItem) => permItem && permItem._id === mainItem._id
+        );
+        if (permissionsItem) {
+          // Merge permissions for the current dropdown item
+          return { ...mainItem, ...permissionsItem };
+        }
+        if (mainItem.dropdown && permissionsItem && permissionsItem.dropdown) {
+          // If dropdown items exist in both datasets, merge permissions recursively
+          return {
+            ...mainItem,
+            dropdown: mergeDropdownPermissions(
+              mainItem.dropdown,
+              permissionsItem.dropdown
+            ),
+          };
+        }
+        return mainItem;
+      });
+    }
+
+    return mainData?.map((mainItem) => {
+      console.log(mainItem)
+      const permissionsItem = permissionsData?.find(
+        (permItem) =>((permItem.parentIds).reduce((acc, key) => {
+           // You can set any default value here
+          return key===mainItem._id;
+      }, {}))
+        //  permItem && permItem.parentIds === mainItem._id
+      );
+      console.log(permissionsItem)
+      if (permissionsItem && mainItem.dropdown && permissionsItem.dropdown) {
+        // Merge permissions for the current main item's dropdown items
+        return {
+          ...mainItem,
+          dropdown: mergeDropdownPermissions(
+            mainItem.dropdown,
+            permissionsItem
+          ),
+        };
+      }
+      return mainItem;
+    });
+  }
+
+  const mergedData = mergePermissions(menuItems,  formData?.menulist );
+  console.log(mergedData);
 
   if (menuItemsIsLoading) {
     return <p>Loading...</p>;
   }
-  if (singleUSerLoading) {
-    return <p>single user loading...</p>;
+ 
+  function convertToNestedObject(clickedCheckboxes, parentNode) {
+    const nestedObject = [];
+  
+    parentNode?.forEach(parent => {
+      const traverseNodes = (node) => {
+        const nestedNode = {
+         trackId: node._id,
+          label: node.label,
+          url: node.url,
+          permissions: [],
+          dropdown: [],
+          parentIds:[]
+        };
+  
+        if (node.dropdown && node.dropdown.length > 0) {
+          node.dropdown.forEach((subNode) => {
+            const childCheckboxes = clickedCheckboxes.filter(checkbox =>
+              checkbox.childId === subNode._id && checkbox.parentIds.includes(node._id)
+            //  { console.log(checkbox.childId , subNode._id)
+            //   console.log(checkbox.parentIds.includes(node._id))}
+            );
+  console.log(childCheckboxes)
+            const nestedDropdown = {
+              trackId: subNode._id,
+              label: subNode.label,
+              url: subNode.url,
+              permissions: [],
+              isChecked: childCheckboxes.length > 0 ? childCheckboxes[0].isChecked : false,
+              insert: childCheckboxes.length > 0 ? childCheckboxes[0].insert : false,
+              update: childCheckboxes.length > 0 ? childCheckboxes[0].update : false,
+              pdf: childCheckboxes.length > 0 ? childCheckboxes[0].pdf : false,
+              delete: childCheckboxes.length > 0 ? childCheckboxes[0].delete : false,
+              dropdown: [],
+              parentIds:childCheckboxes.length > 0 ? childCheckboxes[0]?.parentIds : childCheckboxes[0]?.parentIds
+            };
+  
+            if (subNode.dropdown && subNode.dropdown.length > 0) {
+              nestedDropdown.dropdown = traverseNodes(subNode);
+            }
+  
+            nestedNode.dropdown.push(nestedDropdown);
+          });
+        }
+  
+        return nestedNode;
+      };
+  
+      nestedObject.push(traverseNodes(parent));
+    });
+  
+    return nestedObject;
   }
+
+  const nestedObject = convertToNestedObject(clickedCheckboxes, mergedData);
+  console.log(nestedObject);
+
+
   const handleCreateUser = (e) => {
     e.preventDefault();
+  
+    const dataWithoutMenulistId = {
+      ...formData,username:formData.firstname + "-0" + serialValue?.serialNo,
+      menulist: nestedObject.map(item => {
+        const { _id, ...itemWithoutId } = item;
+        const dropdownWithoutIds = item.dropdown.map(d => {
+                console.log(d)
+                const { _id, ...dropdownItemWithoutId } = d;
+                return dropdownItemWithoutId;
+              });
+              console.log(dropdownWithoutIds)
+        return itemWithoutId;
+      })
+    };
+    
+
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
       e.stopPropagation();
     }
     setValidated(true);
+
     const serialData = {
-      serialNo: maxSerialNoObject?.serialNo,
+      serialNo: serialNo?.serialNo,
       type: "user",
       year: "2024",
       makeby: "shima",
       updateby: "",
     };
     // Check if any field is empty
-    const isEmpty = Object.values(formData).some(
-      (value) => value === "" || value.length === 0
+    const isEmpty = Object.values(dataWithoutMenulistId ).some(
+      (value) => value === "" || value?.length === 0
     );
+  
     if (isEmpty) {
       swal("Not possible", "Please fill up form correctly", "warning");
       return;
     } else {
       createSerialNo(serialData);
-      createNewUser(formData);
+      createNewUser(dataWithoutMenulistId);
       swal("Done", "Data Save Successfully", "success");
       navigate("/user-list-data");
     }
     // Handle form submission, for example, send data to backend
-    console.log("Form submitted:", JSON.stringify(formData));
+    console.log("Form submitted:", JSON.stringify(dataWithoutMenulistId ));
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (isUpdate) {
-      console.log(e.target.value);
-      if (!(name in singleUserData)) {
-        console.error(`Field "${name}" does not exist in formData state.`);
-        return;
-      }
-      setSingleUserData({
-        ...singleUserData,
-        [name]: value,
-      });
+      // if (!(name in singleUserData)) {
+      //   console.error(`Field "${name}" does not exist in formData state.`);
+      //   return;
+      // }
+      // setSingleUserData({
+      //   ...singleUserData,
+      //   [name]: value,
+      // });
     } else {
-      if (!(name in formData)) {
-        console.error(`Field "${name}" does not exist in formData state.`);
-        return;
-      }
+      // if (!(name in formData)) {
+      //   console.error(`Field "${name}" does not exist in formData state.`);
+      //   return;
+      // }
       setFormData({
         ...formData,
         [name]: value,
@@ -148,6 +269,9 @@ const UserCreation = () => {
     value: _id,
     label: userrolename,
   }));
+  
+
+
 
   return (
     <div className="container-fluid p-0 m-0">
@@ -187,8 +311,14 @@ const UserCreation = () => {
                 icon={faPlus}
               />
               &nbsp;
-              <span style={{ color: "#000", fontWeight: "700" }}>
-                Add user(s)
+              <span
+                style={{
+                  color: "#000",
+                  fontWeight: "700",
+                  letterSpacing: ".5px",
+                }}
+              >
+                {isUpdate ? "Update user" : "Add user(s)"}
               </span>
             </p>
             <p style={{ fontSize: "20px", color: "red" }}>
@@ -312,10 +442,10 @@ const UserCreation = () => {
                       })}
                       value={
                         isUpdate
-                          ? options.find(
+                          ? options?.find(
                               (x) => x.value == singleUserData?.roleId
                             )
-                          : options.find((x) => x.value == formData.roleId)
+                          : options?.find((x) => x.value == formData.roleId)
                       }
                       // style={{ border: "1px solid #00B987" }}
                       // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
@@ -354,12 +484,14 @@ const UserCreation = () => {
             <h4 className="fw-bold">Select Menu</h4>
             {
               <TreeView
-              isUpdate={isUpdate}
-              singleUserData={singleUserData?.menulist}
-                data={menuItems}
+                isUpdate={isUpdate}
+                singleUserData={singleUserData?.menulist}
+                data={mergedData}
+                // userUPdateData={userUPdateData}
                 clickedCheckboxes={clickedCheckboxes}
                 setClickedCheckboxes={setClickedCheckboxes}
                 parentIds={parentIds}
+              
               />
             }
           </div>

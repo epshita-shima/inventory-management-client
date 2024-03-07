@@ -12,6 +12,8 @@ import SignUpMongodb from "./pages/SignUp/SignUpMongodb";
 import LoginWithMongodb from "./pages/Login/LoginWithMongodb";
 import UserListInfo from "./components/UserListInformation/Index/UserListInfo";
 import UserCreation from "./components/UserListInformation/Insert/UserCreation";
+import SingleUserDisplay from "./components/UserListInformation/Update/SingleUserDisplay";
+
 
 function App() {
   const dispatch = useDispatch();
@@ -73,7 +75,7 @@ function App() {
         {/* <Route path="/login" element={<Login></Login>}></Route> */}
         <Route path="/project" element={<Home></Home>}></Route>
         <Route path="/user-creation" element={<UserCreation></UserCreation>}></Route>
-        <Route path="/user-creation/:id" element={<UserCreation></UserCreation>}></Route>
+        <Route path="/user-update/:id" element={<SingleUserDisplay></SingleUserDisplay>}></Route>
         <Route path="/user-list-data" element={<UserListInfo></UserListInfo>}></Route>
       </Routes>
     </div>
