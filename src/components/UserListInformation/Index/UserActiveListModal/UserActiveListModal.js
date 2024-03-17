@@ -28,8 +28,8 @@ const UserActiveListModal = ({
         return [...prevSelectedData, dataItem];
       }
     });
-  
   };
+  
   const handleUpdate = async () => {
     try {
       // Update the isactive field to true for all selected data items

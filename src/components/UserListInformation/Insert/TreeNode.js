@@ -172,7 +172,7 @@ console.log(clickedCheckboxes.parentIds)
                               const updatedData = clickedCheckboxes.filter(
                                 (item) => item?.childId !== subNode?._id
                               );
-console.log(updatedData)
+                              console.log(updatedData)
                               setClickedCheckboxes(updatedData);
                             }
                           }}

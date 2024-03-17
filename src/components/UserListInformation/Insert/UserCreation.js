@@ -74,7 +74,7 @@ const [serialValue, setSerialValue]=useState([])
     isactive: true,
     menulist: [],
   });
-
+console.log(menuItems)
 
   function mergePermissions(mainData, permissionsData) {
     // Helper function to merge permissions for dropdown items recursively
@@ -130,83 +130,115 @@ const [serialValue, setSerialValue]=useState([])
   }
 
   const mergedData = mergePermissions(menuItems,  formData?.menulist );
-  console.log(mergedData);
+  console.log(JSON.stringify(mergedData));
 
   if (menuItemsIsLoading) {
     return <p>Loading...</p>;
   }
  
-  function convertToNestedObject(clickedCheckboxes, parentNode) {
-    const nestedObject = [];
+ 
+  //   const mergeCheckboxIntoDropdown = (dropdown, clickedCheckboxes) => {
+  //     return dropdown.map(item => {
+  //       const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
+  //       if (clickedCheckbox) {
+  //         // Merge the clicked checkbox data into the dropdown item
+  //         return {
+  //           ...item,
+  //           trackId: clickedCheckbox.childId,
+  //           permissions: [],
+  //           insert: clickedCheckbox.insert,
+  //           update: clickedCheckbox.update,
+  //           pdf: clickedCheckbox.pdf,
+  //           delete: clickedCheckbox.delete,
+  //           isChecked: clickedCheckbox.isChecked,
+  //           parentIds: clickedCheckbox.parentIds
+  //         };
+  //       } else if (item.dropdown) {
+  //         // Recursively merge into nested dropdowns
+  //         return {
+  //           ...item,
+  //           dropdown: mergeCheckboxIntoDropdown(item.dropdown, clickedCheckboxes)
+  //         };
+  //       }
+  //       return item;
+  //     });
+  //   };
   
-    parentNode?.forEach(parent => {
-      const traverseNodes = (node) => {
-        const nestedNode = {
-         trackId: node._id,
-          label: node.label,
-          url: node.url,
-          permissions: [],
-          dropdown: [],
-          parentIds:[]
-        };
+  //   const clickedCheckboxe = clickedCheckboxes.filter(checkbox => checkbox.parentIds.includes(dataItem._id));
   
-        if (node.dropdown && node.dropdown.length > 0) {
-          node.dropdown.forEach((subNode) => {
-            const childCheckboxes = clickedCheckboxes.filter(checkbox =>
-              checkbox.childId === subNode._id && checkbox.parentIds.includes(node._id)
-            //  { console.log(checkbox.childId , subNode._id)
-            //   console.log(checkbox.parentIds.includes(node._id))}
-            );
-  console.log(childCheckboxes)
-            const nestedDropdown = {
-              trackId: subNode._id,
-              label: subNode.label,
-              url: subNode.url,
-              permissions: [],
-              isChecked: childCheckboxes.length > 0 ? childCheckboxes[0].isChecked : false,
-              insert: childCheckboxes.length > 0 ? childCheckboxes[0].insert : false,
-              update: childCheckboxes.length > 0 ? childCheckboxes[0].update : false,
-              pdf: childCheckboxes.length > 0 ? childCheckboxes[0].pdf : false,
-              delete: childCheckboxes.length > 0 ? childCheckboxes[0].delete : false,
-              dropdown: [],
-              parentIds:childCheckboxes.length > 0 ? childCheckboxes[0]?.parentIds : childCheckboxes[0]?.parentIds
-            };
-  
-            if (subNode.dropdown && subNode.dropdown.length > 0) {
-              nestedDropdown.dropdown = traverseNodes(subNode);
-            }
-  
-            nestedNode.dropdown.push(nestedDropdown);
-          });
+  //   if (clickedCheckboxe.length > 0) {
+  //     // Clone dataItem to avoid modifying the original array
+  //     const clonedDataItem = { ...dataItem };
+  //     // Merge the checkbox data into the dropdown array
+  //     clonedDataItem.dropdown = mergeCheckboxIntoDropdown(clonedDataItem.dropdown, clickedCheckboxe);
+  //     return clonedDataItem;
+  //   }
+  //   return dataItem;
+  // });
+  const mergedArray = mergedData.map(dataItem => {
+    const mergeCheckboxIntoDropdown = (dropdown, clickedCheckboxes) => {
+      return dropdown.map(item => {
+        const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
+        const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
+        const insert = clickedCheckbox ? clickedCheckbox.insert : false;
+        const update = clickedCheckbox ? clickedCheckbox.update : false;
+        const pdf = clickedCheckbox ? clickedCheckbox.pdf : false;
+        const del = clickedCheckbox ? clickedCheckbox.delete : false;
+        const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
+        const trackId= clickedCheckbox ? clickedCheckbox.childId :item._id
+        if (item.dropdown) {
+          return {
+            ...item,
+            trackId,
+            isChecked,
+            insert,
+            update,
+            pdf,
+            delete: del,
+            parentIds,
+            dropdown: mergeCheckboxIntoDropdown(item.dropdown, clickedCheckboxes)
+          };
         }
   
-        return nestedNode;
-      };
+        return {
+          ...item,
+          trackId,
+          isChecked,
+          insert,
+          update,
+          pdf,
+          delete: del,
+          parentIds
+        };
+      });
+    };
   
-      nestedObject.push(traverseNodes(parent));
-    });
+    const clickedCheckboxe = clickedCheckboxes.filter(checkbox => checkbox.parentIds.includes(dataItem._id));
   
-    return nestedObject;
-  }
-
-  const nestedObject = convertToNestedObject(clickedCheckboxes, mergedData);
-  console.log(nestedObject);
-
+    return {
+      ...dataItem,
+      dropdown: mergeCheckboxIntoDropdown(dataItem.dropdown, clickedCheckboxe)
+    };
+  });
 
   const handleCreateUser = (e) => {
     e.preventDefault();
   
     const dataWithoutMenulistId = {
-      ...formData,username:formData.firstname + "-0" + serialValue?.serialNo,
-      menulist: nestedObject.map(item => {
-        const { _id, ...itemWithoutId } = item;
-        const dropdownWithoutIds = item.dropdown.map(d => {
-                console.log(d)
-                const { _id, ...dropdownItemWithoutId } = d;
-                return dropdownItemWithoutId;
-              });
-              console.log(dropdownWithoutIds)
-        return itemWithoutId;
+      ...formData,
+      username: formData.firstname + "-0" + serialValue?.serialNo,
+      menulist: mergedArray.map(item => {
+        const { _id, dropdown, ...itemWithoutId } = item;
+    
+        const dropdownWithoutIds = dropdown.map(d => {
+          const { _id, ...dropdownItemWithoutId } = d;
+          return dropdownItemWithoutId;
+        });
+    
+        return {
+          ...itemWithoutId,
+          dropdown: dropdownWithoutIds
+        };
       })
     };
     

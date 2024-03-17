@@ -23,22 +23,57 @@ import {
   useUpdateUserMutation,
 } from "../../../redux/features/user/userApi";
 import UserActiveListModal from "./UserActiveListModal/UserActiveListModal";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  PDFViewer,
+  StyleSheet,
+  Image,
+  Font,
+} from "@react-pdf/renderer";
+
+import { saveAs } from "file-saver";
 import swal from "sweetalert";
+import html2pdf from "html2pdf.js";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import logoImage from '../../../assets/images/logo-1933884_640.webp'
 
 const UserListInfo = () => {
   const [userId, setUserId] = useState(null);
   const { data: user } = useGetAllUserQuery(undefined);
-  const [updateUserData] = useUpdateUserMutation();
- 
+
   const [activeUserModal, setActiveUserModal] = useState(false);
   const [inActiveUserModal, setInActiveUserModal] = useState(false);
   // console.log(data)
-  const [deleteUser, { isLoading, isSuccess, isError }] = useDeleteUserMutation();
+  const [deleteUser, { isLoading, isSuccess, isError }] =
+    useDeleteUserMutation();
 
   const navigate = useNavigate();
   const activeUser = user?.filter((user) => user.isactive == true);
   const inActiveUser = user?.filter((user) => user.isactive == false);
-  console.log(user);
+  const [extractedData, setExtractedData] = useState([]);
+
+  // Extracting specific fields from the initial data and updating the state
+  useEffect(() => {
+    const activeUsers = user?.filter((user) => user.isactive == true);
+    const extractedFields = activeUsers?.map((item) => ({
+      firstname: item.firstname,
+      mobileNo: item.mobileNo,
+      username: item.username,
+    }));
+    setExtractedData(extractedFields);
+  }, [user]);
+
+  Font.register({
+    family: "Oswald",
+    src: "https://fonts.gstatic.com/s/oswald/v13/Y_TKV6o8WovbUd3m_X9aAA.ttf",
+  });
+
+  console.log(extractedData);
+
   const handleActiveStatus = (id) => {
     setUserId(id);
   };
@@ -109,9 +144,7 @@ const UserListInfo = () => {
               marginLeft: "10px",
             }}
             onClick={() => {
-              window.open(
-                `user-update/${activeUser?._id}`
-              );
+              window.open(`user-update/${activeUser?._id}`);
               // handleActiveStatus(activeUser?._id);
             }}
           >
@@ -127,17 +160,16 @@ const UserListInfo = () => {
               borderRadius: "5px",
               marginLeft: "10px",
             }}
-            onClick={()=>{
+            onClick={() => {
               swal({
                 title: "Are you sure?",
                 text: "Once deleted, you will not be able to recover this data!",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
-              })
-              .then((willDelete) => {
+              }).then((willDelete) => {
                 if (willDelete) {
-                  deleteUser(activeUser?._id)
+                  deleteUser(activeUser?._id);
                   swal("Poof! Your data has been deleted!", {
                     icon: "success",
                   });
@@ -194,9 +226,38 @@ const UserListInfo = () => {
     return (
       <>
         <div className="d-flex justify-content-end align-items-center">
-          <div className="table-head-icon">
-            <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp;
-            <FontAwesomeIcon icon={faDownload}></FontAwesomeIcon>
+          <div className="table-head-icon d-flex">
+            <div>
+              <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp;
+            </div>
+            <div class="dropdown">
+              <button
+                class="btn btn-secondary dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton1"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <FontAwesomeIcon icon={faDownload}></FontAwesomeIcon>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li>
+                  <a class="dropdown-item" href="#">
+                    PDF
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">
+                    Excel
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">
+                    Word
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>{" "}
         &nbsp;
@@ -212,7 +273,90 @@ const UserListInfo = () => {
     );
   }, [filterText, resetPaginationToggle]);
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+
+    // Header
+   
+    // Set headers
   
+    doc.autoTable({ 
+      html: '#my-table', 
+      startY: 60, 
+      margin: { top: 60 }, 
+      headerStyles: { 
+        fillColor: [41, 128, 185], // Header background color
+        textColor: [255, 255, 255], // Header text color
+      }, 
+      theme: 'grid',
+      tableLineWidth: 0.5, // Border width for the whole table
+      styles: {
+        lineColor: [0, 0, 0], // Color for all borders
+        textColor: [0, 0, 0], // All text color
+      },
+      didParseCell: function(data) {
+        data.cell.styles.halign = 'center'; // Align all cell content to center
+      }
+    });
+    // Add footer text to each page
+    const pageCount = doc.internal.getNumberOfPages(); // Get the total number of pages
+    const logoWidthPercentage = 0.15; // 15% of page width for the logo
+    const detailsWidthPercentage = 0.80;
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i); // Go to page i
+    
+      const pageWidth = doc.internal.pageSize.width;
+      const pageHeight = doc.internal.pageSize.height;
+      const lineHeight = 7; // Adjust this value for line height
+      const headerY = 10;
+      const footerY = pageHeight - 10;
+    
+      // Header content
+     
+      const logoWidth = pageWidth * logoWidthPercentage;
+      const logoHeight = logoWidth * (40 / 40);
+      doc.addImage(logoImage, 'PNG', 10, headerY, logoWidth,logoHeight);
+
+      const companyName = 'Maliha ECO Bricks & Concrete Product';
+      const companyDetails1 = 'House No: 57, Sector:14, Gausul Azam Avenue, Uttara, Dhaka-1230';
+      const companyDetails2 = 'Contact No: +88 01713030927, Tel: +88 02-55093715';
+      const companyDetails3 = 'Email: malihaecobricks@gmail.com';
+      const companyNameUpper = companyName.toUpperCase();
+      const detailsX = logoWidth + 20;
+
+      const companyDetailsWidth =  pageWidth * detailsWidthPercentage;
+      doc.setFont('times', 'italic');
+      doc.setFontSize(14);
+      doc.setTextColor(100, 100, 100);
+      // doc.setFont("helvetica"); // Set font to helvetica (or any other font you prefer)
+      doc.text(companyNameUpper, doc.internal.pageSize.width / 2, headerY + 7,{ align: "center", width: companyDetailsWidth});
+
+      
+  doc.setFont('normal'); // Reset font style
+  doc.setFontSize(12); // Reset font size
+      doc.text(companyDetails1, doc.internal.pageSize.width / 2, headerY + 14, { align: "center",width: companyDetailsWidth });
+      doc.text(companyDetails2, doc.internal.pageSize.width / 2, headerY + 21, { align: "center",width: companyDetailsWidth });
+      doc.text(companyDetails3, doc.internal.pageSize.width / 2, headerY + 28, { align: "center",width: companyDetailsWidth });
+    
+      // Footer content
+      doc.text("Page " + i + " of " + pageCount, pageWidth - 20, footerY, { align: "right" });
+      doc.text(
+        "Factory Address: Paragaon (Borochala), Union: 10 No Hobir Bari, Seed Store, Valuka, Mymensingh",
+        pageWidth / 2,
+        footerY - 22,
+        { align: "center" }
+      );
+      doc.text(
+        "Contact No: +88 01613450736, +88 0173372064",
+        pageWidth / 2,
+        footerY - 15,
+        { align: "center" }
+      );
+    }
+  
+    // Save the PDF
+    doc.save("data.pdf");
+  };
   return (
     <div className="container-fluid p-0 m-0">
       <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
@@ -248,9 +392,11 @@ const UserListInfo = () => {
             <form class="form-inline my-2 my-lg-0">
               <button
                 class="btn text-light bg-dark my-2 my-sm-0"
-                onClick={() => {
-                  navigate("/user-creation");
-                }}
+                onClick={
+                  // navigate("/user-creation");
+                  // generatePDF
+                  downloadPDF
+                }
               >
                 Create User
               </button>
@@ -292,7 +438,10 @@ const UserListInfo = () => {
           <div class="col-sm-3">
             <div
               class="cardbox shadow-lg"
-              style={{ borderLeft: "12px solid  #CBF3F0", borderRadius: "10px" }}
+              style={{
+                borderLeft: "12px solid  #CBF3F0",
+                borderRadius: "10px",
+              }}
             >
               <div
                 class="card-body"
@@ -373,19 +522,43 @@ const UserListInfo = () => {
           </div>
         </div>
       </div>
-
+      <table id="my-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>First name</th>
+            <th>User Name</th>
+            <th>Mobile No</th>
+          </tr>
+        </thead>
+        <tbody>
+          {extractedData?.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.firstname}</td>
+              <td>{item.username}</td>
+              <td>{item.mobileNo}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <UserListModal user={user}></UserListModal>
-      <UserActivationModal
-       
-        userId={userId}
-      ></UserActivationModal>
+      <UserActivationModal userId={userId}></UserActivationModal>
       {activeUserModal ? (
-        <UserActiveListModal user={activeUser} activeUserModal={activeUserModal} setActiveUserModal={setActiveUserModal}></UserActiveListModal>
+        <UserActiveListModal
+          user={activeUser}
+          activeUserModal={activeUserModal}
+          setActiveUserModal={setActiveUserModal}
+        ></UserActiveListModal>
       ) : (
         ""
       )}
       {inActiveUserModal ? (
-        <UserActiveListModal user={inActiveUser} inActiveUserModal={inActiveUserModal} setInActiveUserModal={setInActiveUserModal}></UserActiveListModal>
+        <UserActiveListModal
+          user={inActiveUser}
+          inActiveUserModal={inActiveUserModal}
+          setInActiveUserModal={setInActiveUserModal}
+        ></UserActiveListModal>
       ) : (
         ""
       )}
