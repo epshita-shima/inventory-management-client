@@ -1,0 +1,21 @@
+.p-menubar.p-component{
+    background-color: white !important;
+    border-bottom: none !important;
+}
+.p-menubar-root-list{
+    margin: 10px;
+}
+.p-menuitem-content a{
+    text-decoration: none;
+    margin: 8px;
+    /* width: 150px; */
+    color:black;
+    padding: 5px;
+    text-align: center;
+}
+.p-menuitem-content a:hover{
+    color: aliceblue;
+    background-color: orangered;
+   
+    border-radius: 10px;
+}

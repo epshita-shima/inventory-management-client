@@ -3,10 +3,17 @@ import Navbar from '../Navbar/Navbar'
 import '../../components/NestedDropdown.css'
 import { useGetNavbarQuery } from '../../redux/features/user/navbar/navbarApi'
 import DynamicNestedDropdown from '../../components/DynamicNestedDropdown'
-
+import { useGetAllUserQuery } from '../../redux/features/user/userApi'
+import { useEffect, useState } from 'react'
+import { Menubar } from 'primereact/menubar';
+import  './Home.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 const Home = () => {
+const getMenulistData=sessionStorage.getItem('menulist')
+const menuListData=(JSON.parse(getMenulistData))
 
- const {data}=useGetNavbarQuery(undefined)
+console.log(JSON.stringify(menuListData))
   // const navbarData = [
   //   {
   //     label: 'Home',
@@ -21,7 +28,7 @@ const Home = () => {
   //   {
   //     label: 'User Setting',
   //     link: '#',
-  //     dropdown: [                
+  //     items: [                
   //       {
   //         label: 'User Role',
   //         link: '#'                  
@@ -30,7 +37,7 @@ const Home = () => {
   //       {
   //         label: 'User Profile',
   //         link: '#',
-  //         dropdown: [                
+  //         items: [                
   //           {
   //             label: 'User List',
   //             link: '/user-list-data'                  
@@ -51,11 +58,11 @@ const Home = () => {
   //   // {
   //   //   label: 'Departments',
   //   //   link: '#',
-  //   //   dropdown: [            
+  //   //   items: [            
   //   //     {
   //   //       label: 'Accounts Department',
   //   //       link: '#',
-  //   //       dropdown: [                
+  //   //       items: [                
   //   //         {
   //   //           label: 'Purchase Department',
   //   //           link: '#'                  
@@ -63,7 +70,7 @@ const Home = () => {
   //   //         {
   //   //           label: 'Sales Department',
   //   //           link: '#',
-  //   //           dropdown: [                
+  //   //           items: [                
   //   //             {
   //   //               label: 'Purchase Department',
   //   //               link: '#'                  
@@ -95,7 +102,7 @@ const Home = () => {
   //   //      {
   //   //       label: 'Commercial Department',
   //   //       link: '#',
-  //   //       dropdown: [                
+  //   //       items: [                
   //   //         {
   //   //           label: 'Export Department',
   //   //           link: '#'                  
@@ -107,7 +114,7 @@ const Home = () => {
   //   //         {
   //   //           label: 'All Department Reports',
   //   //           link: '#',
-  //   //           dropdown: [                
+  //   //           items: [                
   //   //             {
   //   //               label: 'Purchase Department',
   //   //               link: '#'                  
@@ -119,7 +126,7 @@ const Home = () => {
   //   //             {
   //   //               label: 'Loan Department',
   //   //               link: '#',
-  //   //               dropdown: [                
+  //   //               items: [                
   //   //                 {
   //   //                   label: 'Purchase Department',
   //   //                   link: '#'                  
@@ -131,7 +138,7 @@ const Home = () => {
   //   //                 {
   //   //                   label: 'Loan Department',
   //   //                   link: '#',
-  //   //                   dropdown: [                
+  //   //                   items: [                
   //   //                     {
   //   //                       label: 'Purchase Department',
   //   //                       link: '#'                  
@@ -147,7 +154,7 @@ const Home = () => {
   //   //                     {
   //   //                       label: 'All Reports',
   //   //                       link: '#' ,
-  //   //                       dropdown: [                
+  //   //                       items: [                
   //   //                         {
   //   //                           label: 'Purchase Department',
   //   //                           link: '#'                  
@@ -159,7 +166,7 @@ const Home = () => {
   //   //                         {
   //   //                           label: 'Loan Department',
   //   //                           link: '#',
-  //   //                           dropdown: [                
+  //   //                           items: [                
   //   //                             {
   //   //                               label: 'Purchase Department',
   //   //                               link: '#'                  
@@ -204,8 +211,308 @@ const Home = () => {
   //   // },
     
   // ];
- 
-  console.log(JSON.stringify(data))
+const menulits=[
+  {
+      "label": "User Setting",
+      "url": "#",
+      "permissions": [],
+      "parentIds": [],
+      "items": [
+          {
+              "label": "User Role",
+              "url": "#",
+              "permissions": [],
+              "isChecked": true,
+              "items": [],
+              "trackId": "usersubitem-11",
+              "insert": true,
+              "update": false,
+              "delete": false,
+              "pdf": false,
+              "_id": "65f169d9dda5e6e0b7089a2e"
+          },
+          {
+              "label": "User Profile",
+              "url": "#",
+              "permissions": [],
+              "isChecked": true,
+              "items": [
+                  {
+                      "label": "User List",
+                      "url": "/user-list-data",
+                      "permissions": [],
+                      "_id": "usersubitem-121",
+                      "isParent": "false",
+                      "trackId": "usersubitem-121",
+                      "isChecked": true,
+                      "insert": true,
+                      "update": false,
+                      "pdf": false,
+                      "delete": false,
+                      "parentIds": [
+                          "65d9795d342fe067c0232fbb",
+                          "usersubitem-12"
+                      ]
+                  },
+                  {
+                      "label": "Create User",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-122",
+                      "isParent": "false",
+                      "trackId": "usersubitem-122",
+                      "isChecked": true,
+                      "insert": true,
+                      "update": false,
+                      "pdf": false,
+                      "delete": false,
+                      "parentIds": [
+                          "65d9795d342fe067c0232fbb",
+                          "usersubitem-12"
+                      ]
+                  }
+              ],
+              "trackId": "usersubitem-12",
+              "insert": false,
+              "update": false,
+              "delete": false,
+              "pdf": false,
+              "_id": "65f169d9dda5e6e0b7089a2f"
+          }
+      ],
+      "isChecked":true,
+      "insert": false,
+      "update": false,
+      "delete": false,
+      "pdf": false,
+      "_id": "65f169d9dda5e6e0b7089a2d"
+  },
+  {
+      "label": "Departments",
+      "url": "#",
+      "permissions": [],
+      "parentIds": [],
+      "items": [
+          {
+              "label": "Accounts Department",
+              "url": "#",
+              "permissions": [],
+              "isChecked": true,
+              "items": [
+                  {
+                      "label": "Purchase Department",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-211",
+                      "isParent": "false",
+                      "trackId": "usersubitem-211",
+                      "isChecked": true,
+                      "insert": false,
+                      "update": false,
+                      "pdf": false,
+                      "delete": false,
+                      "parentIds": [
+                          "65d9795d342fe067c0232fbc",
+                          "usersubitem-21"
+                      ]
+                  },
+                  {
+                      "label": "Sales Department",
+                      "url": "#",
+                      "permissions": [],
+                      "items": [
+                          {
+                              "label": "Purchase Department",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-212-1",
+                              "isParent": "false",
+                              "trackId": "usersubitem-212-1",
+                              "isChecked": true,
+                              "insert": true,
+                              "update": false,
+                              "pdf": false,
+                              "delete": false,
+                              "parentIds": [
+                                  "65d9795d342fe067c0232fbc",
+                                  "usersubitem-21",
+                                  "usersubitem-212"
+                              ]
+                          },
+                          {
+                              "label": "Sales Department",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-212-2",
+                              "trackId": "usersubitem-212-2",
+                              "isChecked": false,
+                              "insert": false,
+                              "update": false,
+                              "pdf": false,
+                              "delete": false,
+                              "parentIds": []
+                          },
+                          {
+                              "label": "Loan Department",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-212-3",
+                              "trackId": "usersubitem-212-3",
+                              "isChecked": true,
+                              "insert": true,
+                              "update": true,
+                              "pdf": true,
+                              "delete": true,
+                              "parentIds": "usersubitem-212"
+                          },
+                          {
+                              "label": "All Reports",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-212-4",
+                              "trackId": "usersubitem-212-4",
+                              "isChecked": false,
+                              "insert": false,
+                              "update": false,
+                              "pdf": false,
+                              "delete": false,
+                              "parentIds": []
+                          }
+                      ],
+                      "_id": "usersubitem-212",
+                      "isParent": "true",
+                      "trackId": "usersubitem-212",
+                      "isChecked": true,
+                      "insert": false,
+                      "update": false,
+                      "pdf": false,
+                      "delete": false,
+                      "parentIds": []
+                  },
+                  {
+                      "label": "All Reports",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-213",
+                      "trackId": "usersubitem-213",
+                      "isChecked": false,
+                      "insert": false,
+                      "update": false,
+                      "pdf": false,
+                      "delete": false,
+                      "parentIds": []
+                  }
+              ],
+              "trackId": "usersubitem-21",
+              "insert": false,
+              "update": false,
+              "delete": false,
+              "pdf": false,
+              "_id": "65f169d9dda5e6e0b7089a31"
+          },
+          {
+              "label": "Commercial Department",
+              "url": "#",
+              "permissions": [],
+              "isChecked": false,
+              "items": [
+                  {
+                      "label": "Export Department",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-221",
+                      "trackId": "usersubitem-221",
+                      "isChecked": false,
+                      "insert": false,
+                      "update": false,
+                      "pdf": false,
+                      "delete": false,
+                      "parentIds": []
+                  },
+                  {
+                      "label": "Local Department",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-222",
+                      "trackId": "usersubitem-222",
+                      "isChecked": false,
+                      "insert": false,
+                      "update": false,
+                      "pdf": false,
+                      "delete": false,
+                      "parentIds": []
+                  },
+                  {
+                      "label": "All Department Reports",
+                      "url": "#",
+                      "permissions": [],
+                      "items": [
+                          {
+                              "label": "Purchase Department",
+                              "url": "#",
+                              "_id": "usersubitem-223-1",
+                              "trackId": "usersubitem-223-1",
+                              "isChecked": false,
+                              "insert": false,
+                              "update": false,
+                              "pdf": false,
+                              "delete": false,
+                              "parentIds": []
+                          },
+                          {
+                              "label": "Sales Department",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-223-2",
+                              "trackId": "usersubitem-223-2",
+                              "isChecked": false,
+                              "insert": false,
+                              "update": false,
+                              "pdf": false,
+                              "delete": false,
+                              "parentIds": []
+                          }
+                      ],
+                      "_id": "usersubitem-223",
+                      "trackId": "usersubitem-223",
+                      "isChecked": false,
+                      "insert": false,
+                      "update": false,
+                      "pdf": false,
+                      "delete": false,
+                      "parentIds": []
+                  }
+              ],
+              "trackId": "usersubitem-22",
+              "insert": false,
+              "update": false,
+              "delete": false,
+              "pdf": false,
+              "_id": "65f169d9dda5e6e0b7089a32"
+          },
+          {
+              "label": "All Reports",
+              "url": "#",
+              "permissions": [],
+              "isChecked": false,
+              "items": [],
+              "trackId": "usersubitem-23",
+              "insert": false,
+              "update": false,
+              "delete": false,
+              "pdf": false,
+              "_id": "65f169d9dda5e6e0b7089a33"
+          }
+      ],
+      "isChecked": true,
+      "insert": false,
+      "update": false,
+      "delete": false,
+      "pdf": false,
+      "_id": "65f169d9dda5e6e0b7089a30"
+  }
+]
+
   const navbarData=[
     {
         "_id": "65d1a288f98ea6dd01974174",
@@ -224,33 +531,33 @@ const Home = () => {
         "label": "User Setting",
         "url": '#',
         "permissions": [],
-        "dropdown": [
+        "items": [
             {
                 "label": "User Role",
                 "url": '#',
                 "permissions": [],
-                "dropdown":[]
+                "items":[]
             },
             {
              
                 "label": "User Profile",
                 "url": '#',
                 "permissions": [],
-                "dropdown":[]
+                "items":[]
             },
             {
              
                 "label": "User List",
                 "url": "/user-list-data",
                 "permissions": [],
-                "dropdown":[]
+                "items":[]
             },
             {
              
                 "label": "Create User",
                 "url": '#',
                 "permissions": [],
-                "dropdown":[]
+                "items":[]
             }
         ]
     },
@@ -258,12 +565,12 @@ const Home = () => {
       label: 'Departments',
       "url": '#',
       "permissions": [],
-      dropdown: [            
+      items: [            
         {
           label: 'Accounts Department',
           "url": '#',
           "permissions": [],
-          dropdown: [                
+          items: [                
             {
               label: 'Purchase Department',
               "url": '#',
@@ -273,30 +580,30 @@ const Home = () => {
               label: 'Sales Department',
               "url": '#',
                 "permissions": [],
-              dropdown: [                
+              items: [                
                 {
                   label: 'Purchase Department',
                   "url": '#',
                 "permissions": [], 
-                "dropdown":[]               
+                "items":[]               
                 },
                 {
                   label: 'Sales Department',
                   "url": '#',
                   "permissions": [], 
-                  "dropdown":[]                 
+                  "items":[]                 
                 },
                 {
                   label: 'Loan Department',
                   "url": '#',
                   "permissions": [], 
-                  "dropdown":[]                  
+                  "items":[]                  
                 },
                 {
                   label: 'All Reports',
                   "url": '#',
                 "permissions": [], 
-                "dropdown":[]                 
+                "items":[]                 
                 }
               ]                  
             },
@@ -304,13 +611,13 @@ const Home = () => {
               label: 'Loan Department',
               "url": '#',
                 "permissions": [], 
-                "dropdown":[]                 
+                "items":[]                 
             },
             {
               label: 'All Reports',
               "url": '#',
                 "permissions": [], 
-                "dropdown":[]                
+                "items":[]                
             }
           ]
         },
@@ -318,7 +625,7 @@ const Home = () => {
           label: 'Commercial Department',
           "url": '#',
           "permissions": [],
-          dropdown: [                
+          items: [                
             {
               label: 'Export Department',
               "url": '#',
@@ -333,104 +640,104 @@ const Home = () => {
               label: 'All Department Reports',
               "url": '#',
                 "permissions": [],
-              dropdown: [                
+              items: [                
                 {
                   label: 'Purchase Department',
                   "url": '#',
                 "permissions": [],
-                "dropdown":[]             
+                "items":[]             
                 },
                 {
                   label: 'Sales Department',
                   "url": '#',
                 "permissions": [],
-                "dropdown":[]                   
+                "items":[]                   
                 },
                 {
                   label: 'Loan Department',
                   "url": '#',
                   "permissions": [],
-                  dropdown: [                
+                  items: [                
                     {
                       label: 'Purchase Department',
                       "url": '#',
                       "permissions": [],
-                      "dropdown":[]               
+                      "items":[]               
                     },
                     {
                       label: 'Sales Department',
                       "url": '#',
                       "permissions": [],
-                      "dropdown":[]               
+                      "items":[]               
                     },
                     {
                       label: 'Loan Department',
                       "url": '#',
                       "permissions": [],
-                      dropdown: [                
+                      items: [                
                         {
                           label: 'Purchase Department',
                           "url": '#',
                           "permissions": [],
-                          "dropdown":[]                
+                          "items":[]                
                         },
                         {
                           label: 'Sales Department',
                           "url": '#',
                           "permissions": [],
-                          "dropdown":[]                  
+                          "items":[]                  
                         },
                         {
                           label: 'Loan Department',
                           "url": '#',
                           "permissions": [],
-                          "dropdown":[]                  
+                          "items":[]                  
                         },
                         {
                           label: 'All Reports',
                           "url": '#',
                           "permissions": [],
-                          dropdown: [                
+                          items: [                
                             {
                               label: 'Purchase Department',
                               "url": '#',
                               "permissions": [],
-                              "dropdown":[]                  
+                              "items":[]                  
                             },
                             {
                               label: 'Sales Department',
                               "url": '#',
                               "permissions": [],
-                              "dropdown":[]                 
+                              "items":[]                 
                             },
                             {
                               label: 'Loan Department',
                               "url": '#',
                               "permissions": [],
-                              dropdown: [                
+                              items: [                
                                 {
                                   label: 'Purchase Department',
                                   "url": '#',
                               "permissions": [],
-                              "dropdown":[]                  
+                              "items":[]                  
                                 },
                                 {
                                   label: 'Sales Department',
                                   "url": '#',
                               "permissions": [],
-                              "dropdown":[]                    
+                              "items":[]                    
                                 },
                                 {
                                   label: 'Loan Department',
                                   "url": '#',
                               "permissions": [],
-                              "dropdown":[]                 
+                              "items":[]                 
                                 },
                                 {
                                   label: 'All Reports',
                                   "url": '#',
                               "permissions": [],
-                              "dropdown":[]                  
+                              "items":[]                  
                                 }
                               ]                                    
                             },
@@ -438,7 +745,7 @@ const Home = () => {
                               label: 'All Reports',
                               "url": '#',
                               "permissions": [],
-                              "dropdown":[]                   
+                              "items":[]                   
                             }
                           ]                  
                         }
@@ -448,7 +755,7 @@ const Home = () => {
                       label: 'All Reports',
                       "url": '#',
                       "permissions": [],
-                      "dropdown":[]                   
+                      "items":[]                   
                     }
                   ]                   
                 },
@@ -456,7 +763,7 @@ const Home = () => {
                   label: 'All Reports',
                   "url": '#',
                               "permissions": [],
-                              "dropdown":[]                   
+                              "items":[]                   
                 }
               ]                  
             }
@@ -473,9 +780,9 @@ const Home = () => {
     
 //     // If a matching item is found, update its permissions
 //     if (nestedItem) {
-//       // If the item has a dropdown, recursively update its permissions
-//       if (apiItem.dropdown && nestedItem.dropdown) {
-//         updatePermissions(apiItem.dropdown, nestedItem.dropdown);
+//       // If the item has a items, recursively update its permissions
+//       if (apiItem.items && nestedItem.items) {
+//         updatePermissions(apiItem.items, nestedItem.items);
 //       }
       
 //       // Update the item's permissions
@@ -486,12 +793,135 @@ const Home = () => {
 
 // // Call the function to update the permissions
 // updatePermissions(apiData, nestedData);
+const items = [
+  {
+      label: 'Home',
+      icon: 'pi pi-home'
+  },
+  {
+      label: 'Features',
+      icon: 'pi pi-star',
+      items: [
+        {
+            label: 'Apollo',
+            icon: 'pi pi-palette'
+        },
+        {
+            label: 'Ultima',
+            icon: 'pi pi-palette'
+        }
+    ]
+  },
+  {
+      label: 'Projects',
+      icon: 'pi pi-search',
+      items: [
+          {
+              label: 'Components',
+              icon: 'pi pi-bolt'
+          },
+          {
+              label: 'Blocks',
+              icon: 'pi pi-server'
+          },
+          {
+              label: 'UI Kit',
+              icon: 'pi pi-pencil',
+              
+          },
+          {
+              label: 'Templates',
+              icon: 'pi pi-palette',
+              items: [
+                  {
+                      label: 'Apollo',
+                      icon: 'pi pi-palette'
+                  },
+                  {
+                      label: 'Ultima',
+                      icon: 'pi pi-palette',
+                      items: [
+                        {
+                            label: 'Apollo',
+                            icon: 'pi pi-palette'
+                        },
+                        {
+                            label: 'Ultima',
+                            icon: 'pi pi-palette'
+                        }
+                    ]
+                  }
+              ]
+          }
+      ]
+  },
+  {
+      label: 'Contact',
+      icon: 'pi pi-envelope'
+  }
+];
+const cardStyle = {
+  border: '1px solid #ccc',
+  borderRadius: '5px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  backgroundColor: '#fff',
+};
 
+// Define your custom style for the Menubar
+const menubarStyle = {
+  backgroundColor: '#f0f0f0',
+  borderBottom: '1px solid #ccc',
+};
+
+// Define the menu items
+const filteredMenuItems = menuListData?.map(menu => {
+  // Function to recursively filter items and update parent isChecked status
+  const filterItems = items => {
+    return items.filter(item => {
+      if (item.items && item.items.length > 0) {
+        // Recursively filter nested items and update parent isChecked status
+        item.items = filterItems(item.items);
+        item.isChecked = item.items.some(child => child.isChecked); // Update parent isChecked status
+      }
+      return item.isChecked === true;
+    });
+  };
+
+  const filteredItems = filterItems(menu.items);
+
+  return { ...menu, items: filteredItems };
+});
+console.log(filteredMenuItems)
   return (
-    <div>
-      <Navbar data={data}></Navbar>
-      {/* <DynamicNestedDropdown></DynamicNestedDropdown> */}
+    <div >
+      {/* <Navbar data={menuListData}></Navbar> */}
+     <div className=' d-flex justify-content-between align-items-center' style={cardStyle}>
+     <div>
+     <Menubar model={filteredMenuItems} style={menubarStyle} />
+     </div>
+      <div>
+      <button
+        class="btn btn-outline-success"
+        onClick={() => {
+          // handleSignOut();
+        }}
+      >
+       <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon>
+      </button>
+      <button
+        class="btn btn-outline-success"
+        onClick={() => {
+          // handleSignOut();
+        }}
+      >
+        Logout
+      </button>
+      </div>
     </div>
+   
+   
+    </div>
+    
   )
 }
 

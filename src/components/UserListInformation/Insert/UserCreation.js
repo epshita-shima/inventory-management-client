@@ -46,7 +46,7 @@ const [serialValue, setSerialValue]=useState([])
   const { data: serialNo } = useGetSerialNoQuery(undefined);
   const [createSerialNo] = useCreateSerialNoMutation();
   const [createNewUser] = useCreateUserMutation();
-
+console.log(JSON.stringify(menuItems))
   const navigate = useNavigate();
   useEffect(()=>{
     if( serialNo && serialNo.length > 0){
@@ -57,9 +57,6 @@ const [serialValue, setSerialValue]=useState([])
     }
   },[serialNo])
 
-  console.log(serialNo,serialValue) 
-  
- 
 
   const [password, setPassword] = useState("LC00");
   const [validated, setValidated] = useState(false);
@@ -74,10 +71,10 @@ const [serialValue, setSerialValue]=useState([])
     isactive: true,
     menulist: [],
   });
-console.log(menuItems)
+
 
   function mergePermissions(mainData, permissionsData) {
-    // Helper function to merge permissions for dropdown items recursively
+    // Helper function to merge permissions for items items recursively
     console.log(permissionsData)
     function mergeDropdownPermissions(mainDropdown, permissionsDropdown) {
       if (!mainDropdown || !permissionsDropdown.length===0) {
@@ -88,16 +85,16 @@ console.log(menuItems)
           (permItem) => permItem && permItem._id === mainItem._id
         );
         if (permissionsItem) {
-          // Merge permissions for the current dropdown item
+          // Merge permissions for the current items item
           return { ...mainItem, ...permissionsItem };
         }
-        if (mainItem.dropdown && permissionsItem && permissionsItem.dropdown) {
-          // If dropdown items exist in both datasets, merge permissions recursively
+        if (mainItem.items && permissionsItem && permissionsItem.items) {
+          // If items items exist in both datasets, merge permissions recursively
           return {
             ...mainItem,
-            dropdown: mergeDropdownPermissions(
-              mainItem.dropdown,
-              permissionsItem.dropdown
+            items: mergeDropdownPermissions(
+              mainItem.items,
+              permissionsItem.items
             ),
           };
         }
@@ -115,12 +112,12 @@ console.log(menuItems)
         //  permItem && permItem.parentIds === mainItem._id
       );
       console.log(permissionsItem)
-      if (permissionsItem && mainItem.dropdown && permissionsItem.dropdown) {
-        // Merge permissions for the current main item's dropdown items
+      if (permissionsItem && mainItem.items && permissionsItem.items) {
+        // Merge permissions for the current main item's items items
         return {
           ...mainItem,
-          dropdown: mergeDropdownPermissions(
-            mainItem.dropdown,
+          items: mergeDropdownPermissions(
+            mainItem.items,
             permissionsItem
           ),
         };
@@ -137,11 +134,11 @@ console.log(menuItems)
   }
  
  
-  //   const mergeCheckboxIntoDropdown = (dropdown, clickedCheckboxes) => {
-  //     return dropdown.map(item => {
+  //   const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
+  //     return items.map(item => {
   //       const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
   //       if (clickedCheckbox) {
-  //         // Merge the clicked checkbox data into the dropdown item
+  //         // Merge the clicked checkbox data into the items item
   //         return {
   //           ...item,
   //           trackId: clickedCheckbox.childId,
@@ -153,11 +150,11 @@ console.log(menuItems)
   //           isChecked: clickedCheckbox.isChecked,
   //           parentIds: clickedCheckbox.parentIds
   //         };
-  //       } else if (item.dropdown) {
+  //       } else if (item.items) {
   //         // Recursively merge into nested dropdowns
   //         return {
   //           ...item,
-  //           dropdown: mergeCheckboxIntoDropdown(item.dropdown, clickedCheckboxes)
+  //           items: mergeCheckboxIntoDropdown(item.items, clickedCheckboxes)
   //         };
   //       }
   //       return item;
@@ -169,15 +166,15 @@ console.log(menuItems)
   //   if (clickedCheckboxe.length > 0) {
   //     // Clone dataItem to avoid modifying the original array
   //     const clonedDataItem = { ...dataItem };
-  //     // Merge the checkbox data into the dropdown array
-  //     clonedDataItem.dropdown = mergeCheckboxIntoDropdown(clonedDataItem.dropdown, clickedCheckboxe);
+  //     // Merge the checkbox data into the items array
+  //     clonedDataItem.items = mergeCheckboxIntoDropdown(clonedDataItem.items, clickedCheckboxe);
   //     return clonedDataItem;
   //   }
   //   return dataItem;
   // });
   const mergedArray = mergedData.map(dataItem => {
-    const mergeCheckboxIntoDropdown = (dropdown, clickedCheckboxes) => {
-      return dropdown.map(item => {
+    const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
+      return items.map(item => {
         const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
         const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
         const insert = clickedCheckbox ? clickedCheckbox.insert : false;
@@ -186,7 +183,8 @@ console.log(menuItems)
         const del = clickedCheckbox ? clickedCheckbox.delete : false;
         const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
         const trackId= clickedCheckbox ? clickedCheckbox.childId :item._id
-        if (item.dropdown) {
+        
+        if (item.items) {
           return {
             ...item,
             trackId,
@@ -196,7 +194,7 @@ console.log(menuItems)
             pdf,
             delete: del,
             parentIds,
-            dropdown: mergeCheckboxIntoDropdown(item.dropdown, clickedCheckboxes)
+            items: mergeCheckboxIntoDropdown(item.items, clickedCheckboxes)
           };
         }
   
@@ -217,10 +215,76 @@ console.log(menuItems)
   
     return {
       ...dataItem,
-      dropdown: mergeCheckboxIntoDropdown(dataItem.dropdown, clickedCheckboxe)
+      items: mergeCheckboxIntoDropdown(dataItem.items, clickedCheckboxe)
     };
   });
+  // const mergedArray = mergedData.map(dataItem => {
+  //   const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
+  //     let parentIsChecked = false; // Local variable to track if any child is checked
+  //     const updatedDropdown = items.map(item => {
+  //       const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
+  //       const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
+  //       const insert = clickedCheckbox ? clickedCheckbox.insert : false;
+  //       const update = clickedCheckbox ? clickedCheckbox.update : false;
+  //       const pdf = clickedCheckbox ? clickedCheckbox.pdf : false;
+  //       const del = clickedCheckbox ? clickedCheckbox.delete : false;
+  //       const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
+  //       const trackId= clickedCheckbox ? clickedCheckbox.childId : item._id;
+  
+  //       // Check if any child item is checked
+  //       if (isChecked) {
+  //         parentIsChecked = true;
+  //       }
+  
+  //       // Recursively merge checkboxes into nested dropdowns
+  //       if (item.items) {
+  //         return {
+  //           ...item,
+  //           trackId,
+  //           isChecked,
+  //           insert,
+  //           update,
+  //           pdf,
+  //           delete: del,
+  //           parentIds,
+  //           items: mergeCheckboxIntoDropdown(item.items, clickedCheckboxes)
+  //         };
+  //       }
+  
+  //       return {
+  //         ...item,
+  //         trackId,
+  //         isChecked,
+  //         insert,
+  //         update,
+  //         pdf,
+  //         delete: del,
+  //         parentIds
+  //       };
+  //     });
+  
+  //     // Update parent's isChecked field if any child is checked
+  //     if (parentIsChecked) {
+  //       return updatedDropdown.map(item => {
+  //         return {
+  //           ...item,
+  //           isChecked: true
+  //         };
+  //       });
+  //     }
+  
+  //     return updatedDropdown;
+  //   };
+  
+  //   const clickedCheckboxe = clickedCheckboxes.filter(checkbox => checkbox.parentIds.includes(dataItem._id));
+  //   console.log(clickedCheckboxe)
 
+  //   return {
+  //     ...dataItem,
+  //     items: mergeCheckboxIntoDropdown(dataItem.items, clickedCheckboxe)
+  //   };
+  // });
+  
   const handleCreateUser = (e) => {
     e.preventDefault();
   
@@ -228,21 +292,20 @@ console.log(menuItems)
       ...formData,
       username: formData.firstname + "-0" + serialValue?.serialNo,
       menulist: mergedArray.map(item => {
-        const { _id, dropdown, ...itemWithoutId } = item;
+        const { _id, items, ...itemWithoutId } = item;
     
-        const dropdownWithoutIds = dropdown.map(d => {
+        const dropdownWithoutIds = items.map(d => {
           const { _id, ...dropdownItemWithoutId } = d;
           return dropdownItemWithoutId;
         });
     
         return {
           ...itemWithoutId,
-          dropdown: dropdownWithoutIds
+          items: dropdownWithoutIds
         };
       })
     };
     
-
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
       e.stopPropagation();
@@ -276,25 +339,12 @@ console.log(menuItems)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (isUpdate) {
-      // if (!(name in singleUserData)) {
-      //   console.error(`Field "${name}" does not exist in formData state.`);
-      //   return;
-      // }
-      // setSingleUserData({
-      //   ...singleUserData,
-      //   [name]: value,
-      // });
-    } else {
-      // if (!(name in formData)) {
-      //   console.error(`Field "${name}" does not exist in formData state.`);
-      //   return;
-      // }
+   
       setFormData({
         ...formData,
         [name]: value,
       });
-    }
+    
   };
 
   const options = userRoleData?.map(({ _id, userrolename }) => ({

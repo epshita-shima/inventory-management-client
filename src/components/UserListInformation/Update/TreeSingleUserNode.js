@@ -13,7 +13,7 @@ const TreeSingleUserNode = ({
     e.stopPropagation(); // Stop propagation to prevent duplications
     setIsOpen(!isOpen);
   };
-  console.log(node);
+console.log(node)
   const handleCheckboxClick = (subNode, parentId, checked) => {
     if (checked) {
       const updatedChild = {
@@ -74,14 +74,14 @@ const TreeSingleUserNode = ({
             </td>
           </tr>
           <tr></tr>
-          {isOpen && node?.dropdown.length > 0 && (
+          {isOpen && node?.items?.length > 0 && (
             <>
-              {node?.dropdown.map((subNode) => {
-                console.log(subNode?.dropdown?.length,subNode)
+              {node?.items.map((subNode) => {
+                console.log(subNode?.items?.length,subNode)
                 return(
                     <tr key={subNode?.trackId}>
                       <td>
-                        {subNode?.dropdown?.length > 0 ? (
+                        {subNode?.items?.length > 0 ? (
                           <TreeSingleUserNode
                             node={subNode}
                             parentIds={[...parentIds, node.trackId]}
@@ -108,7 +108,7 @@ const TreeSingleUserNode = ({
                         )}
                       </td>
     
-                      {subNode?.dropdown?.length > 0 ? (
+                      {subNode?.items?.length > 0 ? (
                         ""
                       ) : (
                         <td className="d-flex justify-content-between align-items-center">

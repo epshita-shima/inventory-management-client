@@ -23,11 +23,11 @@ console.log(clickedCheckboxes.parentIds)
   //     label: parentNode.label,
   //     url: parentNode.url,
   //     permissions: [],
-  //     dropdown: [],
+  //     items: [],
   //   }];
   //   console.log(parentNode);
-  //   if (parentNode.dropdown && parentNode.dropdown.length > 0) {
-  //     parentNode.dropdown.forEach((subNode) => {
+  //   if (parentNode.items && parentNode.items.length > 0) {
+  //     parentNode.items.forEach((subNode) => {
   //       // Filter clickedCheckboxes to get only child data for the current subNode
   //       console.log(subNode);
   //       const childCheckboxes = clickedCheckboxes.filter(
@@ -50,20 +50,20 @@ console.log(clickedCheckboxes.parentIds)
   //         pdf: childCheckboxes.length > 0 ? childCheckboxes[0].pdf : false,
   //         delete:
   //           childCheckboxes.length > 0 ? childCheckboxes[0].delete : false,
-  //         dropdown: [],
+  //         items: [],
   //       };
 
        
 
-  //       if (subNode.dropdown && subNode.dropdown.length > 0) {
-  //         nestedDropdown.dropdown = convertToNestedObject(
+  //       if (subNode.items && subNode.items.length > 0) {
+  //         nestedDropdown.items = convertToNestedObject(
   //           clickedCheckboxes,
   //           subNode
   //         );
-  //         console.log(nestedDropdown.dropdown);
+  //         console.log(nestedDropdown.items);
   //       }
 
-  //       nestedObject.dropdown.push(nestedDropdown);
+  //       nestedObject.items.push(nestedDropdown);
   //     });
   //   }
   //   console.log(nestedObject);
@@ -139,12 +139,12 @@ console.log(clickedCheckboxes.parentIds)
             </td>
           </tr>
           <tr></tr>
-          {isOpen && node.dropdown && (
+          {isOpen && node.items && (
             <>
-              {node.dropdown.map((subNode) => (
+              {node.items.map((subNode) => (
                 <tr key={subNode._id}>
                   <td>
-                    {subNode.dropdown ? (
+                    {subNode.items ? (
                       <TreeNode
                         node={subNode}
                         clickedCheckboxes={clickedCheckboxes}
@@ -182,7 +182,7 @@ console.log(clickedCheckboxes.parentIds)
                     )}
                   </td>
 
-                  {subNode.dropdown ? (
+                  {subNode.items ? (
                     ""
                   ) : (
                     <td className="d-flex justify-content-between align-items-center">

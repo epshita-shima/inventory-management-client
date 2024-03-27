@@ -8,12 +8,39 @@ import { useNavigate } from "react-router-dom";
 import { setUser } from "../../redux/features/user/userSlice";
 import NavbarItem from "../../components/NavbarItem";
 import Dropdown from "../../components/DynamicDropdown";
-
+import { Menubar } from 'primereact/menubar';
 const Navbar = ({ data }) => {
-  const { user, isLoading } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-console.log(data)
+  const [menuItems, setMenuItems] = useState(data);
+
+  // Function to update isChecked status of parent based on children's isChecked status
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const updateParentCheckedStatus = (items) => {
+    let allChecked = true;
+    for (const item of items) {
+      if (item.items && item.items.length > 0) {
+        const childrenChecked = updateParentCheckedStatus(item.items);
+        item.isChecked = childrenChecked;
+      }
+      if (!item.isChecked) {
+        allChecked = false;
+      }
+    }
+    return allChecked;
+  };
+
+  useEffect(() => {
+    const updatedMenuItems = [...menuItems];
+    updatedMenuItems.forEach(item => {
+      item.isChecked = updateParentCheckedStatus(item.items);
+    });
+    console.log(updatedMenuItems)
+    setMenuItems(updatedMenuItems);
+  }, []); // Run once on component mount
+
+  return (
+    <Menubar model={menuItems} />
+  );
+};
 //   const handleSignOut = async () => {
 //     try {
 //       await signOut(auth).then(() => {
@@ -25,34 +52,35 @@ console.log(data)
 //     }
 //   };
 
-  return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
-    <div className="collapse navbar-collapse">
-      <ul className="navbar-nav">
-        {data?.map((item, index) => (
-          <Dropdown key={index} item={item} isRight={index % 2 === 0} />
-        // <NavbarItem key={index} item={item}></NavbarItem>
-        ))}
-      </ul>
+  // return (
+  //   <nav className="navbar navbar-expand-lg navbar-light bg-light">
+  //   <div className="collapse navbar-collapse">
+  //     <ul className="navbar-nav">
+  //       {data?.map((item, index) =>{ 
+  //         console.log(item)
+  //         return(
+  //         <Dropdown key={index} item={item} isRight={index % 2 === 0} index={index}/>
+  //       )})}
+  //     </ul>
 
-    </div>
-   {/* {user?.email ? (
-    <div class="d-flex">
-      <button
-        class="btn btn-outline-success"
-        onClick={() => {
-          handleSignOut();
-        }}
-      >
-        Logout
-      </button>
-    </div>
-  ) : (
-    ""
-  )} */}
-  </nav>
-  );
+  //   </div>
+  //  {/* {user?.email ? (
+  //   <div class="d-flex">
+  //     <button
+  //       class="btn btn-outline-success"
+  //       onClick={() => {
+  //         handleSignOut();
+  //       }}
+  //     >
+  //       Logout
+  //     </button>
+  //   </div>
+  // ) : (
+  //   ""
+  // )} */}
+  // </nav>
+  // );
 
   
-};
+// };
 export default Navbar;

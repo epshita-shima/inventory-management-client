@@ -141,6 +141,7 @@ export const login = createAsyncThunk('auth/login', async (userData, { rejectWit
     return rejectWithValue(error.message);
   }
 });
+
 const userSlice = createSlice({
   name: 'auth',
   initialState,

@@ -23,50 +23,70 @@ import {
   useUpdateUserMutation,
 } from "../../../redux/features/user/userApi";
 import UserActiveListModal from "./UserActiveListModal/UserActiveListModal";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  PDFViewer,
-  StyleSheet,
-  Image,
-  Font,
-} from "@react-pdf/renderer";
+import { Font } from "@react-pdf/renderer";
 
-import { saveAs } from "file-saver";
 import swal from "sweetalert";
-import html2pdf from "html2pdf.js";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import logoImage from '../../../assets/images/logo-1933884_640.webp'
+import logoImage from "../../../assets/images/logo-1933884_640.webp";
+import { useGetCompanyInfoQuery } from "../../../redux/features/companyinfo/compayApi";
+import { addFooter, downloadPDF } from "../../ReportProperties/HeaderFooter";
+import handleDownload from "../../ReportProperties/HandelExcelDownload";
 
 const UserListInfo = () => {
   const [userId, setUserId] = useState(null);
   const { data: user } = useGetAllUserQuery(undefined);
-
+  const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
   const [activeUserModal, setActiveUserModal] = useState(false);
   const [inActiveUserModal, setInActiveUserModal] = useState(false);
-  // console.log(data)
+  console.log(companyinfo?.length)
   const [deleteUser, { isLoading, isSuccess, isError }] =
     useDeleteUserMutation();
-
+    var reportTitle="All Active User"
+console.log(reportTitle)
+  console.log(companyinfo);
   const navigate = useNavigate();
   const activeUser = user?.filter((user) => user.isactive == true);
   const inActiveUser = user?.filter((user) => user.isactive == false);
   const [extractedData, setExtractedData] = useState([]);
-
+  const [extractedInActiveData, setExtractedInActiveData] = useState([]);
+  const [demoData, setDemoData] = useState(null);
   // Extracting specific fields from the initial data and updating the state
+  const data = [
+    { Name: 'John', Age: 30 },
+    { Name: 'Jane', Age: 25 },
+    { Name: 'Doe', Age: 35 }
+  ];
   useEffect(() => {
     const activeUsers = user?.filter((user) => user.isactive == true);
+    const inActiveUser = user?.filter((user) => user.isactive == false);
     const extractedFields = activeUsers?.map((item) => ({
       firstname: item.firstname,
       mobileNo: item.mobileNo,
       username: item.username,
     }));
-    setExtractedData(extractedFields);
+    const extractedInactiveFields = inActiveUser?.map((item) => ({
+      firstname: item.firstname,
+      mobileNo: item.mobileNo,
+      username: item.username,
+    }));
+    setExtractedData(extractedFields)
+    setExtractedInActiveData(extractedInactiveFields);
   }, [user]);
+  useEffect(() => {
+    // Fetch the JSON data
+    const fetchData = async () => {
+      try {
+        const response = await fetch("jsonData.json"); // Adjust the path to your JSON file
+        const data = await response.json();
+        setDemoData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
+    fetchData();
+  }, []);
   Font.register({
     family: "Oswald",
     src: "https://fonts.gstatic.com/s/oswald/v13/Y_TKV6o8WovbUd3m_X9aAA.ttf",
@@ -206,6 +226,7 @@ const UserListInfo = () => {
       },
     },
   };
+
   const [filterText, setFilterText] = React.useState("");
   const [resetPaginationToggle, setResetPaginationToggle] =
     React.useState(false);
@@ -242,18 +263,17 @@ const UserListInfo = () => {
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                 <li>
-                  <a class="dropdown-item" href="#">
+                  <a class="dropdown-item" href="#" onClick={()=>{
+                    if(companyinfo?.length !==0 || undefined){
+                      downloadPDF({companyinfo},reportTitle)
+                    }
+                    }}>
                     PDF
                   </a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="#">
+                  <a class="dropdown-item" href="#" onClick={()=>{handleDownload(extractedData,companyinfo,reportTitle)}}>
                     Excel
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">
-                    Word
                   </a>
                 </li>
               </ul>
@@ -271,92 +291,8 @@ const UserListInfo = () => {
         </div>
       </>
     );
-  }, [filterText, resetPaginationToggle]);
+  }, [filterText, resetPaginationToggle,companyinfo,extractedData,reportTitle]);
 
-  const downloadPDF = () => {
-    const doc = new jsPDF();
-
-    // Header
-   
-    // Set headers
-  
-    doc.autoTable({ 
-      html: '#my-table', 
-      startY: 60, 
-      margin: { top: 60 }, 
-      headerStyles: { 
-        fillColor: [41, 128, 185], // Header background color
-        textColor: [255, 255, 255], // Header text color
-      }, 
-      theme: 'grid',
-      tableLineWidth: 0.5, // Border width for the whole table
-      styles: {
-        lineColor: [0, 0, 0], // Color for all borders
-        textColor: [0, 0, 0], // All text color
-      },
-      didParseCell: function(data) {
-        data.cell.styles.halign = 'center'; // Align all cell content to center
-      }
-    });
-    // Add footer text to each page
-    const pageCount = doc.internal.getNumberOfPages(); // Get the total number of pages
-    const logoWidthPercentage = 0.15; // 15% of page width for the logo
-    const detailsWidthPercentage = 0.80;
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i); // Go to page i
-    
-      const pageWidth = doc.internal.pageSize.width;
-      const pageHeight = doc.internal.pageSize.height;
-      const lineHeight = 7; // Adjust this value for line height
-      const headerY = 10;
-      const footerY = pageHeight - 10;
-    
-      // Header content
-     
-      const logoWidth = pageWidth * logoWidthPercentage;
-      const logoHeight = logoWidth * (40 / 40);
-      doc.addImage(logoImage, 'PNG', 10, headerY, logoWidth,logoHeight);
-
-      const companyName = 'Maliha ECO Bricks & Concrete Product';
-      const companyDetails1 = 'House No: 57, Sector:14, Gausul Azam Avenue, Uttara, Dhaka-1230';
-      const companyDetails2 = 'Contact No: +88 01713030927, Tel: +88 02-55093715';
-      const companyDetails3 = 'Email: malihaecobricks@gmail.com';
-      const companyNameUpper = companyName.toUpperCase();
-      const detailsX = logoWidth + 20;
-
-      const companyDetailsWidth =  pageWidth * detailsWidthPercentage;
-      doc.setFont('times', 'italic');
-      doc.setFontSize(14);
-      doc.setTextColor(100, 100, 100);
-      // doc.setFont("helvetica"); // Set font to helvetica (or any other font you prefer)
-      doc.text(companyNameUpper, doc.internal.pageSize.width / 2, headerY + 7,{ align: "center", width: companyDetailsWidth});
-
-      
-  doc.setFont('normal'); // Reset font style
-  doc.setFontSize(12); // Reset font size
-      doc.text(companyDetails1, doc.internal.pageSize.width / 2, headerY + 14, { align: "center",width: companyDetailsWidth });
-      doc.text(companyDetails2, doc.internal.pageSize.width / 2, headerY + 21, { align: "center",width: companyDetailsWidth });
-      doc.text(companyDetails3, doc.internal.pageSize.width / 2, headerY + 28, { align: "center",width: companyDetailsWidth });
-    
-      // Footer content
-      doc.text("Page " + i + " of " + pageCount, pageWidth - 20, footerY, { align: "right" });
-      doc.text(
-        "Factory Address: Paragaon (Borochala), Union: 10 No Hobir Bari, Seed Store, Valuka, Mymensingh",
-        pageWidth / 2,
-        footerY - 22,
-        { align: "center" }
-      );
-      doc.text(
-        "Contact No: +88 01613450736, +88 0173372064",
-        pageWidth / 2,
-        footerY - 15,
-        { align: "center" }
-      );
-    }
-  
-    // Save the PDF
-    doc.save("data.pdf");
-  };
   return (
     <div className="container-fluid p-0 m-0">
       <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
@@ -392,11 +328,9 @@ const UserListInfo = () => {
             <form class="form-inline my-2 my-lg-0">
               <button
                 class="btn text-light bg-dark my-2 my-sm-0"
-                onClick={
-                  // navigate("/user-creation");
-                  // generatePDF
-                  downloadPDF
-                }
+                onClick={() => {
+                  navigate("/user-creation");
+                }}
               >
                 Create User
               </button>
@@ -522,10 +456,10 @@ const UserListInfo = () => {
           </div>
         </div>
       </div>
-      <table id="my-table">
+      <table id="my-table" className="d-none">
         <thead>
           <tr>
-            <th>#</th>
+            <th>Sl.</th>
             <th>First name</th>
             <th>User Name</th>
             <th>Mobile No</th>
@@ -549,6 +483,8 @@ const UserListInfo = () => {
           user={activeUser}
           activeUserModal={activeUserModal}
           setActiveUserModal={setActiveUserModal}
+          extractedData={extractedData}
+          companyinfo={companyinfo}
         ></UserActiveListModal>
       ) : (
         ""
@@ -558,6 +494,8 @@ const UserListInfo = () => {
           user={inActiveUser}
           inActiveUserModal={inActiveUserModal}
           setInActiveUserModal={setInActiveUserModal}
+          extractedInActiveData={extractedInActiveData}
+          companyinfo={companyinfo}
         ></UserActiveListModal>
       ) : (
         ""

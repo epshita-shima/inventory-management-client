@@ -5,7 +5,7 @@ import Login from "./pages/Login/Login";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { setLoading, setUser } from "./redux/features/user/userSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { auth } from "./lib/firebase";
 import Home from "./pages/Home/Home";
 import SignUpMongodb from "./pages/SignUp/SignUpMongodb";
@@ -13,9 +13,11 @@ import LoginWithMongodb from "./pages/Login/LoginWithMongodb";
 import UserListInfo from "./components/UserListInformation/Index/UserListInfo";
 import UserCreation from "./components/UserListInformation/Insert/UserCreation";
 import SingleUserDisplay from "./components/UserListInformation/Update/SingleUserDisplay";
+import LoginWithUsername from "./pages/Login/LoginWithUsername";
 
 
 function App() {
+  const [singleUserData,setSingleUserData]=useState([])
   const dispatch = useDispatch();
   const apiData = [
     {
@@ -72,8 +74,9 @@ function App() {
         {/* <Route path="/" element={<SignUp></SignUp>}></Route> */}
         <Route path="/" element={<SignUpMongodb/>}></Route>
         <Route path="/login" element={<LoginWithMongodb></LoginWithMongodb>}></Route>
+        <Route path="/login/user" element={<LoginWithUsername singleUserData={singleUserData} setSingleUserData={setSingleUserData}></LoginWithUsername>}></Route>
         {/* <Route path="/login" element={<Login></Login>}></Route> */}
-        <Route path="/project" element={<Home></Home>}></Route>
+        <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route>
         <Route path="/user-creation" element={<UserCreation></UserCreation>}></Route>
         <Route path="/user-update/:id" element={<SingleUserDisplay></SingleUserDisplay>}></Route>
         <Route path="/user-list-data" element={<UserListInfo></UserListInfo>}></Route>

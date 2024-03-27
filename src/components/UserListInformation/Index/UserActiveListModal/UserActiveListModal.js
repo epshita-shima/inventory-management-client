@@ -6,17 +6,23 @@ import FilterComponent from "../FilterComponent";
 import DataTable from "react-data-table-component";
 import { useUpdateMultipleUserStatusMutation } from "../../../../redux/features/user/userApi";
 import swal from "sweetalert";
+import { downloadInactivePDF, downloadPDF } from "../../../ReportProperties/HeaderFooter";
+import handleDownload from "../../../ReportProperties/HandelExcelDownload";
 const UserActiveListModal = ({
   user,
   activeUserModal,
   inActiveUserModal,
   setInActiveUserModal,
   setActiveUserModal,
+  extractedData,
+  companyinfo,
+  extractedInActiveData
 }) => {
   const [selectedData, setSelectedData] = useState([]);
   const [updateMultipleData, { isLoading, isError }] =
     useUpdateMultipleUserStatusMutation();
-  console.log(selectedData);
+const activeReportTitle="All Active User"
+const inActiveReportTitle="All Inactive User"
   const handleCheckboxClick = (dataItem) => {
     console.log(dataItem);
     setSelectedData((prevSelectedData) => {
@@ -29,7 +35,7 @@ const UserActiveListModal = ({
       }
     });
   };
-  
+
   const handleUpdate = async () => {
     try {
       // Update the isactive field to true for all selected data items
@@ -148,12 +154,89 @@ const UserActiveListModal = ({
         setFilterText("");
       }
     };
+    
     return (
       <>
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon">
             {/* <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp; */}
-            <FontAwesomeIcon icon={faDownload}></FontAwesomeIcon>
+            {activeUserModal ? (
+              <div class="dropdown">
+                <button
+                  class="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  id="dropdownMenuButton1"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <FontAwesomeIcon icon={faDownload}></FontAwesomeIcon>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      onClick={() => {
+                        if (companyinfo?.length !== 0 || undefined) {
+                          downloadPDF({ companyinfo },activeReportTitle);
+                        }
+                      }}
+                    >
+                      PDF
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      onClick={() => {
+                        handleDownload(extractedData, companyinfo,activeReportTitle);
+                      }}
+                    >
+                      Excel
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            ) : (
+              <div class="dropdown">
+                <button
+                  class="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  id="dropdownMenuButton1"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <FontAwesomeIcon icon={faDownload}></FontAwesomeIcon>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      onClick={() => {
+                        if (companyinfo?.length !== 0 || undefined) {
+                          downloadInactivePDF({ companyinfo },inActiveReportTitle);
+                        }
+                      }}
+                    >
+                      PDF
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      onClick={() => {
+                        handleDownload( extractedInActiveData, companyinfo,inActiveReportTitle);
+                      }}
+                    >
+                      Excel
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         </div>{" "}
         &nbsp;&nbsp;
@@ -167,7 +250,14 @@ const UserActiveListModal = ({
         </div>
       </>
     );
-  }, [filterText, resetPaginationToggle]);
+  }, [
+    filterText,
+    resetPaginationToggle,
+    companyinfo,
+    extractedData,
+    activeUserModal,
+    extractedInActiveData
+  ]);
   return (
     <div
       class="modal fade"
@@ -211,6 +301,26 @@ const UserActiveListModal = ({
               subHeader
               subHeaderComponent={subHeaderComponent}
             />
+            <table id="my-tableInactive" className="d-none">
+              <thead>
+                <tr>
+                  <th>Sl.</th>
+                  <th>First name</th>
+                  <th>User Name</th>
+                  <th>Mobile No</th>
+                </tr>
+              </thead>
+              <tbody>
+                { extractedInActiveData?.map((item, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{item.firstname}</td>
+                    <td>{item.username}</td>
+                    <td>{item.mobileNo}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
           <div class="modal-footer">
             <button

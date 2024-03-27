@@ -65,6 +65,11 @@
     margin-left: 0px !important;
   }
 } */
+
+ul.dropdown-menu{
+  top:100%;
+  left:60%
+}
 .dropdown .dropdown-toggle {
   color: salmon;
   font-weight: bold;
@@ -73,6 +78,7 @@
   position:absolute;
   top:10%;
   right:100%
+
 }
 .dropdown-menu-left{
     position: absolute;
@@ -84,3 +90,4 @@
     top: 0;
     left: 100%; 
   } 
+

@@ -12,7 +12,7 @@ import swal from "sweetalert";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useGetSingleUserQuery,
-  useUpdateMultipleUserStatusMutation,
+  useUpdateMultipleUserFieldMutation,
 } from "../../../redux/features/user/userApi";
 import { useGetUserRoleQuery } from "../../../redux/features/userrole/userroleApi";
 import UserRoleEntryModal from "../../UserRoleInformation/Insert/UserRoleEntryModal";
@@ -24,7 +24,7 @@ const SingleUserDisplay = () => {
   const [singleUserData, setSingleUserData] = useState([]);
   const { data: singleUser, isLoading: singleUSerLoading } =
     useGetSingleUserQuery(id);
-  const [updateUser] = useUpdateMultipleUserStatusMutation();
+  const [updateUser] = useUpdateMultipleUserFieldMutation();
   const {
     data: userRoleData,
     isError: userRoleIsError,
@@ -35,6 +35,7 @@ const SingleUserDisplay = () => {
   useEffect(() => {
     setSingleUserData(singleUser);
   }, [singleUser]);
+console.log(singleUser)
 
   const [validated, setValidated] = useState(false);
   const parentIds = [];
@@ -47,14 +48,14 @@ console.log(JSON.stringify(singleUserData))
         console.log("cant find parent");
         return {
           ...item,
-          dropdown: updateDropdownListRecursive(updatedChild, item.dropdown),
+          items: updateDropdownListRecursive(updatedChild, item.items),
         };
-      } else if (item.dropdown && item.dropdown.length > 0) {
-        // If the current item has dropdown items, recursively call updateDropdownList on them
+      } else if (item.items && item.items.length > 0) {
+        // If the current item has items items, recursively call updateDropdownList on them
         console.log("cant find drpdown");
         return {
           ...item,
-          dropdown: updateDropdownList(updatedChild, item.dropdown),
+          items: updateDropdownList(updatedChild, item.items),
         };
       }
       return item; // Return unchanged item
@@ -70,12 +71,12 @@ console.log(JSON.stringify(singleUserData))
         console.log(child);
         console.log(updatedChild);
         return { ...child, ...updatedChild };
-      } else if (child.dropdown && child.dropdown.length > 0) {
-        // If the current child has dropdown items, recursively call updateDropdownListRecursive on them
+      } else if (child.items && child.items.length > 0) {
+        // If the current child has items items, recursively call updateDropdownListRecursive on them
         console.log("parent child");
         return {
           ...child,
-          dropdown: updateDropdownListRecursive(updatedChild, child.dropdown),
+          items: updateDropdownListRecursive(updatedChild, child.items),
         };
       }
       return child; // Return unchanged child
@@ -90,7 +91,7 @@ console.log(JSON.stringify(singleUserData))
     });
   };
 
-  const handleCreateUser = async (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
     console.log(JSON.stringify(singleUserData));
     try {
@@ -214,7 +215,7 @@ console.log(JSON.stringify(singleUserData))
             </p>
           </div>
           <div className="mt-5">
-            <Form validated={validated} onSubmit={handleCreateUser}>
+            <Form validated={validated} onSubmit={handleUpdateUser}>
               <div className="d-flex justify-content-between align-items-center">
                 <div className="w-100">
                   <div>
@@ -385,7 +386,7 @@ console.log(JSON.stringify(singleUserData))
                 outline: "none",
                 border: "none",
               }}
-              onClick={handleCreateUser}
+              onClick={handleUpdateUser}
             >
               Submit
             </button>

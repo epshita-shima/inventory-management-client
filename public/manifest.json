@@ -1,25 +1,159 @@
-{
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
-}
+[
+  {
+      "children": [],
+      "_id": "65d9795d342fe067c0232fbb",
+      "label": "User Setting",
+      "url": "#",
+      "permissions": [],
+      "items": [
+          {
+              "label": "User Role",
+              "url": "#",
+              "permissions": [],
+              "_id": "usersubitem-11",
+              "trackId": "65d9795d342fe067c0232fbb",
+              "isParent": "false"
+          },
+          {
+              "label": "User Profile",
+              "url": "#",
+              "permissions": [],
+              "items": [
+                  {
+                      "label": "User List",
+                      "url": "/user-list-data",
+                      "permissions": [],
+                      "_id": "usersubitem-121",
+                      "isParent": "false"
+                  },
+                  {
+                      "label": "Create User",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-122",
+                      "isParent": "false"
+                  }
+              ],
+              "_id": "usersubitem-12",
+              "trackId": "65d9795d342fe067c0232fbb",
+              "isParent": "true"
+          }
+      ],
+      "isParent": "true"
+  },
+  {
+      "children": [],
+      "_id": "65d9795d342fe067c0232fbc",
+      "label": "Departments",
+      "url": "#",
+      "permissions": [],
+      "items": [
+          {
+              "label": "Accounts Department",
+              "url": "#",
+              "permissions": [],
+              "items": [
+                  {
+                      "label": "Purchase Department",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-211",
+                      "isParent": "false"
+                  },
+                  {
+                      "label": "Sales Department",
+                      "url": "#",
+                      "permissions": [],
+                      "items": [
+                          {
+                              "label": "Purchase Department",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-212-1",
+                              "isParent": "false"
+                          },
+                          {
+                              "label": "Sales Department",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-212-2"
+                          },
+                          {
+                              "label": "Loan Department",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-212-3"
+                          },
+                          {
+                              "label": "All Reports",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-212-4"
+                          }
+                      ],
+                      "_id": "usersubitem-212",
+                      "isParent": "true"
+                  },
+                  {
+                      "label": "All Reports",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-213"
+                  }
+              ],
+              "_id": "usersubitem-21",
+              "trackId": "65d9795d342fe067c0232fbc",
+              "isParent": "true"
+          },
+          {
+              "label": "Commercial Department",
+              "url": "#",
+              "permissions": [],
+              "items": [
+                  {
+                      "label": "Export Department",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-221"
+                  },
+                  {
+                      "label": "Local Department",
+                      "url": "#",
+                      "permissions": [],
+                      "_id": "usersubitem-222"
+                  },
+                  {
+                      "label": "All Department Reports",
+                      "url": "#",
+                      "permissions": [],
+                      "items": [
+                          {
+                              "label": "Purchase Department",
+                              "url": "#",
+                              "_id": "usersubitem-223-1"
+                          },
+                          {
+                              "label": "Sales Department",
+                              "url": "#",
+                              "permissions": [],
+                              "_id": "usersubitem-223-2"
+                          }
+                      ],
+                      "_id": "usersubitem-223"
+                  }
+              ],
+              "_id": "usersubitem-22",
+              "trackId": "65d9795d342fe067c0232fbc",
+              "isParent": "true"
+          },
+          {
+              "label": "All Reports",
+              "url": "#",
+              "permissions": [],
+              "_id": "usersubitem-23",
+              "trackId": "65d9795d342fe067c0232fbc",
+              "isParent": "false"
+          }
+      ]
+  }
+]
