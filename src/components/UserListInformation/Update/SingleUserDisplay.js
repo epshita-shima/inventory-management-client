@@ -103,33 +103,6 @@ console.log(JSON.stringify(singleUserData))
       // An error occurred while updating data
       swal("Not possible", "Try again", "warning");
     }
-
-    // const form = e.currentTarget;
-    // if (form.checkValidity() === false) {
-    //   e.stopPropagation();
-    // }
-    // setValidated(true);
-
-    // const serialData = {
-    //   serialNo: serialNo?.serialNo,
-    //   type: "user",
-    //   year: "2024",
-    //   makeby: "shima",
-    //   updateby: "",
-    // };
-    // Check if any field is empty
-
-    // if (isEmpty) {
-    //   swal("Not possible", "Please fill up form correctly", "warning");
-    //   return;
-    // } else {
-    //   createSerialNo(serialData);
-    //   createNewUser(dataWithoutMenulistId);
-    //   swal("Done", "Data Save Successfully", "success");
-    //   navigate("/user-list-data");
-    // }
-    // // Handle form submission, for example, send data to backend
-    // console.log("Form submitted:", JSON.stringify(dataWithoutMenulistId));
   };
 
   const handleChange = (e) => {
@@ -163,8 +136,13 @@ console.log(JSON.stringify(singleUserData))
   // Example usage:
 
   return (
-    <div className="container-fluid p-0 m-0">
-      <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
+    <div className="container-fluid p-0 m-0" style={{
+      alignItems: "center",
+      position: "absolute",
+      top: "10%",
+      overflow:"hidden"
+    }}>
+      {/* <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
         <div class="container">
           <div
             class="collapse navbar-collapse d-flex justify-content-start align-items-center"
@@ -186,7 +164,7 @@ console.log(JSON.stringify(singleUserData))
             </ul>
           </div>
         </div>
-      </nav>
+      </nav> */}
       <div class="container">
         <div className="shadow-lg mt-5 p-5 rounded-4">
           <div className="d-flex justify-content-between align-items-center border-bottom">

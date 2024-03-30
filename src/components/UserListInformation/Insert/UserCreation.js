@@ -356,8 +356,15 @@ console.log(JSON.stringify(menuItems))
 
 
   return (
-    <div className="container-fluid p-0 m-0">
-      <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
+    <div className="container-fluid p-0 m-0" style={{
+      alignItems: "center",
+      position: "absolute",
+      top: "10%",
+      overflow:"scroll",
+      width:'95%',
+      height:'80%'
+    }}>
+      {/* <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
         <div class="container">
           <div
             class="collapse navbar-collapse d-flex justify-content-start align-items-center"
@@ -379,7 +386,7 @@ console.log(JSON.stringify(menuItems))
             </ul>
           </div>
         </div>
-      </nav>
+      </nav> */}
       <div class="container">
         <div className="shadow-lg mt-5 p-5 rounded-4">
           <div className="d-flex justify-content-between align-items-center border-bottom">

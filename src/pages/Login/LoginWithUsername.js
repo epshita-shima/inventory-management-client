@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useUserLoginMutation } from "../../redux/api/apiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/features/user/userSlice";
@@ -6,6 +6,7 @@ import logImage from "../../assets/images/cta1.1.jpg";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useGetAllUserQuery } from "../../redux/features/user/userApi";
+import swal from "sweetalert";
 
 const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   const [data] = useUserLoginMutation();
@@ -13,10 +14,15 @@ const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const inputRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn); // Select isLoggedIn state
   const navigate = useNavigate();
 console.log(user)
 
+
+const handleFocus = () => {
+  setPassword(''); // Clearing the password value
+};
   useEffect(() => {
     const userData = user?.filter(
       (item) => item.username == username && item.password == password
@@ -26,9 +32,14 @@ console.log(user)
   }, [user, password, username,setSingleUserData]);
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate('/project')
-    console.log(singleUserData[0]?.menulist)
-    sessionStorage.setItem('menulist',JSON.stringify(singleUserData[0]?.menulist))
+    if(singleUserData.length > 0){
+      navigate('/project')
+      sessionStorage.setItem('user',JSON.stringify(singleUserData))
+    }
+    else{
+      swal("Not Possible!", "Try Again!", "warning")
+    }
+  
 
     // if(isLoggedIn){
     //   navigate("/project");
@@ -39,7 +50,7 @@ console.log(user)
     // }
   };
   return (
-    <div className="container-fluid vh-100">
+    <div className="row vh-100">
       <div className=" h-100 w-100 position-relative">
         <img className="h-100 w-100" src={logImage} alt="" />
       </div>
@@ -69,6 +80,8 @@ console.log(user)
                     aria-label="Recipient's username"
                     aria-describedby="basic-addon2"
                     value={username}
+                    ref={inputRef}
+                    onFocus={handleFocus}
                     onChange={(e) => setUsername(e.target.value)}
                     className="border border-primary"
                   />
@@ -84,6 +97,8 @@ console.log(user)
                     placeholder="User's password"
                     id="inputPassword5"
                     required
+                    ref={inputRef}
+                    onFocus={handleFocus}
                     aria-describedby="passwordHelpBlock"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -100,14 +115,8 @@ console.log(user)
                   >
                     Login
                   </Button>
-                  {/* {isExit.isError ? (
-              <div className="text-warning mt-3 fw-bold d-flex justify-content-between align-items-center mx-auto">Please give valid username and password</div>
-            ) : (
-              ""
-            )} */}
+               
                 </div>
-                {/* <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <button type="submit">Login</button> */}
               </Form>
               {message && <p>{message}</p>}
             </>

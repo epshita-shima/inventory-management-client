@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDownload,
   faEye,
-  faFile,
+  faGear,
   faPenToSquare,
   faRefresh,
   faTrash,
@@ -19,31 +19,27 @@ import { useNavigate } from "react-router-dom";
 import {
   useDeleteUserMutation,
   useGetAllUserQuery,
-  useGetSingleUserQuery,
-  useUpdateUserMutation,
 } from "../../../redux/features/user/userApi";
 import UserActiveListModal from "./UserActiveListModal/UserActiveListModal";
 import { Font } from "@react-pdf/renderer";
 
 import swal from "sweetalert";
-import jsPDF from "jspdf";
 import "jspdf-autotable";
-import logoImage from "../../../assets/images/logo-1933884_640.webp";
 import { useGetCompanyInfoQuery } from "../../../redux/features/companyinfo/compayApi";
-import { addFooter, downloadPDF } from "../../ReportProperties/HeaderFooter";
+import { downloadPDF } from "../../ReportProperties/HeaderFooter";
 import handleDownload from "../../ReportProperties/HandelExcelDownload";
 
-const UserListInfo = () => {
+const UserListInfo = ({setChangePassword,setResetPassword}) => {
   const [userId, setUserId] = useState(null);
   const { data: user } = useGetAllUserQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
   const [activeUserModal, setActiveUserModal] = useState(false);
   const [inActiveUserModal, setInActiveUserModal] = useState(false);
-  console.log(companyinfo?.length)
+  console.log(companyinfo?.length);
   const [deleteUser, { isLoading, isSuccess, isError }] =
     useDeleteUserMutation();
-    var reportTitle="All Active User"
-console.log(reportTitle)
+  var reportTitle = "All Active User";
+  console.log(reportTitle);
   console.log(companyinfo);
   const navigate = useNavigate();
   const activeUser = user?.filter((user) => user.isactive == true);
@@ -52,11 +48,7 @@ console.log(reportTitle)
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
   const [demoData, setDemoData] = useState(null);
   // Extracting specific fields from the initial data and updating the state
-  const data = [
-    { Name: 'John', Age: 30 },
-    { Name: 'Jane', Age: 25 },
-    { Name: 'Doe', Age: 35 }
-  ];
+
   useEffect(() => {
     const activeUsers = user?.filter((user) => user.isactive == true);
     const inActiveUser = user?.filter((user) => user.isactive == false);
@@ -70,9 +62,10 @@ console.log(reportTitle)
       mobileNo: item.mobileNo,
       username: item.username,
     }));
-    setExtractedData(extractedFields)
+    setExtractedData(extractedFields);
     setExtractedInActiveData(extractedInactiveFields);
   }, [user]);
+
   useEffect(() => {
     // Fetch the JSON data
     const fetchData = async () => {
@@ -87,6 +80,7 @@ console.log(reportTitle)
 
     fetchData();
   }, []);
+
   Font.register({
     family: "Oswald",
     src: "https://fonts.gstatic.com/s/oswald/v13/Y_TKV6o8WovbUd3m_X9aAA.ttf",
@@ -136,6 +130,8 @@ console.log(reportTitle)
           <a
             target="_blank"
             className="action-icon"
+            data-toggle="tooltip"
+            data-placement="bottom" title="View user"
             style={{
               color: "#56CCAD",
               border: "2px solid #56CCAD",
@@ -144,9 +140,10 @@ console.log(reportTitle)
             }}
           >
             <FontAwesomeIcon
-              data-toggle="modal"
+              data-toggle="modal tooltip"
               data-target="#exampleModalLong"
               icon={faEye}
+       
               onClick={() => {
                 handleActiveStatus(activeUser?._id);
               }}
@@ -156,6 +153,7 @@ console.log(reportTitle)
           <a
             target="_blank"
             className="action-icon"
+            data-toggle="tooltip" data-placement="bottom" title="Update user"
             style={{
               color: "#56CCAD",
               border: "2px solid #56CCAD",
@@ -168,11 +166,29 @@ console.log(reportTitle)
               // handleActiveStatus(activeUser?._id);
             }}
           >
-            <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
+            <FontAwesomeIcon  icon={faPenToSquare}></FontAwesomeIcon>
           </a>
           <a
             target="_blank"
             className="action-icon "
+            style={{
+              background: "#1EDFBD",
+              padding: "5px",
+              color: "white",
+              borderRadius: "5px",
+              marginLeft: "10px",
+            }}
+           
+          >
+          <FontAwesomeIcon data-toggle="tooltip" data-placement="bottom" title="Reset password" icon={faGear} onClick={()=>{
+            setResetPassword(true)
+            setChangePassword(false)
+            navigate('/change-password')}}></FontAwesomeIcon>
+          </a>
+          <a
+            target="_blank"
+            className="action-icon "
+            data-toggle="tooltip" data-placement="bottom" title="Delete user"
             style={{
               color: "red",
               border: "2px solid red",
@@ -204,6 +220,7 @@ console.log(reportTitle)
         </div>
       ),
     },
+   
   ];
   const customStyles = {
     rows: {
@@ -263,16 +280,26 @@ console.log(reportTitle)
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                 <li>
-                  <a class="dropdown-item" href="#" onClick={()=>{
-                    if(companyinfo?.length !==0 || undefined){
-                      downloadPDF({companyinfo},reportTitle)
-                    }
-                    }}>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onClick={() => {
+                      if (companyinfo?.length !== 0 || undefined) {
+                        downloadPDF({ companyinfo }, reportTitle);
+                      }
+                    }}
+                  >
                     PDF
                   </a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="#" onClick={()=>{handleDownload(extractedData,companyinfo,reportTitle)}}>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onClick={() => {
+                      handleDownload(extractedData, companyinfo, reportTitle);
+                    }}
+                  >
                     Excel
                   </a>
                 </li>
@@ -291,11 +318,22 @@ console.log(reportTitle)
         </div>
       </>
     );
-  }, [filterText, resetPaginationToggle,companyinfo,extractedData,reportTitle]);
+  }, [
+    filterText,
+    resetPaginationToggle,
+    companyinfo,
+    extractedData,
+    reportTitle,
+  ]);
 
   return (
-    <div className="container-fluid p-0 m-0">
-      <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
+    <div className="row px-4 mx-4" style={{
+      alignItems: "center",
+      position: "absolute",
+      top: "10%",
+      width:'95%'
+    }}>
+      {/* <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
         <div class="container">
           <div
             class="collapse navbar-collapse d-flex justify-content-start align-items-center"
@@ -337,8 +375,8 @@ console.log(reportTitle)
             </form>
           </div>
         </div>
-      </nav>
-      <div class="container mt-4">
+      </nav> */}
+      <div class=" mt-4">
         <div class="row">
           <div class="col-sm-3">
             <div
@@ -438,9 +476,10 @@ console.log(reportTitle)
           </div>
         </div>
       </div>
-      <div class="container mt-5">
+      <div class=" mt-5">
         <div class="row">
-          <div className="col">
+          <div className="col" style={{overflowX:"scroll",
+      height:'400px',}}>
             <div className="shadow-lg overflow-x-auto flex-nowarp">
               <DataTable
                 columns={columns}

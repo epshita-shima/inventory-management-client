@@ -1,21 +1,33 @@
 .p-menubar.p-component{
-    background-color: white !important;
+    background-color: #CBF3F0 !important;
     border-bottom: none !important;
 }
 .p-menubar-root-list{
-    margin: 10px;
+    /* margin: 10px; */
+}
+.p-submenu-list{
+    /* background-color: aquamarine;
+    border-radius: 10px; */
+    /* padding: 5px; */
+}
+.p-submenu-list li{
+    margin-left: 0px !important;
 }
 .p-menuitem-content a{
     text-decoration: none;
-    margin: 8px;
+    /* margin-top: 8px; */
     /* width: 150px; */
-    color:black;
-    padding: 5px;
+    color:#23302C;
+    padding: 8px;
     text-align: center;
+    white-space: nowrap;
+    outline: none;
+    letter-spacing: 0.5px;
 }
 .p-menuitem-content a:hover{
     color: aliceblue;
-    background-color: orangered;
+    background-color: #0A203F;
    
     border-radius: 10px;
 }
+

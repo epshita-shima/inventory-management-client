@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Router, Routes } from "react-router-dom";
 import DynamicDropdown from "./components/DynamicDropdown";
 import SignUp from "./pages/SignUp/SignUp";
 import Login from "./pages/Login/Login";
@@ -14,10 +14,16 @@ import UserListInfo from "./components/UserListInformation/Index/UserListInfo";
 import UserCreation from "./components/UserListInformation/Insert/UserCreation";
 import SingleUserDisplay from "./components/UserListInformation/Update/SingleUserDisplay";
 import LoginWithUsername from "./pages/Login/LoginWithUsername";
+import Footer from "./pages/Footer/Footer";
+import MainView from "./components/MainView/MainView";
+import ChangePasswordModal from "./pages/Login/ChangePasswordModal";
 
 
 function App() {
   const [singleUserData,setSingleUserData]=useState([])
+  const [changePassword,setChangePassword]=useState(false)
+  const [resetPassword,setResetPassword]=useState(false)
+  
   const dispatch = useDispatch();
   const apiData = [
     {
@@ -51,7 +57,9 @@ function App() {
     },
     // ... other items
   ];
-
+  const getMenulistData = sessionStorage.getItem("user");
+ 
+  const menuListData = JSON.parse(getMenulistData);
   // useEffect(()=>{
   //   dispatch(setLoading(true))
   //   onAuthStateChanged(auth, (user) => {
@@ -67,20 +75,29 @@ function App() {
 
 
   return (
-    <div className="App">
+    <div>
       {/* <DynamicDropdown data={apiData} />; */}
-      {/* <Home></Home> */}
-      <Routes>
-        {/* <Route path="/" element={<SignUp></SignUp>}></Route> */}
-        <Route path="/" element={<SignUpMongodb/>}></Route>
+      {/*  */}
+    
+      <div className="app-container">
+       <Home singleUserData={singleUserData} setSingleUserData={setSingleUserData} setResetPassword={setResetPassword} setChangePassword={setChangePassword}></Home>
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<MainView></MainView>}></Route>
+          {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}
         <Route path="/login" element={<LoginWithMongodb></LoginWithMongodb>}></Route>
         <Route path="/login/user" element={<LoginWithUsername singleUserData={singleUserData} setSingleUserData={setSingleUserData}></LoginWithUsername>}></Route>
+        <Route path="/change-password" element={<ChangePasswordModal menuListData={menuListData} singleUserData={singleUserData} setSingleUserData={setSingleUserData} resetPassword={resetPassword} changePassword={changePassword}/>}></Route>
         {/* <Route path="/login" element={<Login></Login>}></Route> */}
-        <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route>
+        {/* <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route> */}
         <Route path="/user-creation" element={<UserCreation></UserCreation>}></Route>
         <Route path="/user-update/:id" element={<SingleUserDisplay></SingleUserDisplay>}></Route>
-        <Route path="/user-list-data" element={<UserListInfo></UserListInfo>}></Route>
-      </Routes>
+        <Route path="/user-list-data" element={<UserListInfo setChangePassword={setChangePassword} setResetPassword={setResetPassword}></UserListInfo>}></Route>
+          </Routes>
+        </div>
+        <Footer />
+      </div>
+    
     </div>
   );
 }
