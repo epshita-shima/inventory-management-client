@@ -8,6 +8,8 @@ import { useUpdateMultipleUserStatusMutation } from "../../../../redux/features/
 import swal from "sweetalert";
 import { downloadInactivePDF, downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../ReportProperties/HandelExcelDownload";
+import './UserActivationModal.css'
+
 const UserActiveListModal = ({
   user,
   activeUserModal,
@@ -163,7 +165,7 @@ const inActiveReportTitle="All Inactive User"
             {activeUserModal ? (
               <div class="dropdown">
                 <button
-                  class="btn btn-secondary dropdown-toggle"
+                  class="btn btn-download dropdown-toggle"
                   type="button"
                   id="dropdownMenuButton1"
                   data-bs-toggle="dropdown"
@@ -201,7 +203,7 @@ const inActiveReportTitle="All Inactive User"
             ) : (
               <div class="dropdown">
                 <button
-                  class="btn btn-secondary dropdown-toggle"
+                  class="btn btn-download dropdown-toggle"
                   type="button"
                   id="dropdownMenuButton1"
                   data-bs-toggle="dropdown"
@@ -334,15 +336,28 @@ const inActiveReportTitle="All Inactive User"
                 if (inActiveUserModal) {
                   setInActiveUserModal(false);
                 }
+               
+              }}
+              style={{
+                backgroundColor:'transparent',
+                border:'1px solid #1EDFBD',
+                color:'#1EDFBD',
+                textTransform:'uppercase'
               }}
             >
               Close
             </button>
             <button
               type="button"
-              class="btn btn-primary"
+              class={`btn btn-primary ${selectedData.length === 0 || isLoading ? 'disabled-button' : ''}`}
               onClick={handleUpdate}
               disabled={selectedData.length === 0 || isLoading}
+              style={{
+                backgroundColor:'#1EDFBD',
+                border:'none',
+                color:'#F7F0D5',
+                textTransform:'uppercase'
+              }}
             >
               Update Status
             </button>

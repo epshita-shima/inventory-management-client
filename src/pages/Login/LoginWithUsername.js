@@ -34,7 +34,7 @@ const handleFocus = () => {
     e.preventDefault();
     if(singleUserData.length > 0){
       navigate('/project')
-      sessionStorage.setItem('user',JSON.stringify(singleUserData))
+      localStorage.setItem('user',JSON.stringify(singleUserData))
     }
     else{
       swal("Not Possible!", "Try Again!", "warning")

@@ -1,25 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Button, Form } from "react-bootstrap";
-import { useUpdateMultipleUserFieldMutation, useUpdateUserPasswordMutation } from "../../redux/features/user/userApi";
-
+import {
+  useUpdateUserPasswordMutation,
+} from "../../redux/features/user/userApi";
+import { useNavigate } from 'react-router-dom';
+import './ChangePasswordModal.css'
 const ChangePasswordModal = ({
   menuListData,
   singleUserData,
   setSingleUserData,
-  resetPassword,changePassword
+  resetPassword,
+  changePassword,
 }) => {
   const [formData, setFormData] = useState({
     newPassword: "",
     confirmPassword: "",
   });
-  console.log(changePassword)
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const navigate=useNavigate()
   const [updateUserPassword] = useUpdateUserPasswordMutation();
-  console.log(singleUserData);
+
   useEffect(() => {
     setSingleUserData(menuListData);
   }, [setSingleUserData]);
-  const [passwordMismatch, setPasswordMismatch] = useState(false);
-  console.log(formData.newPassword === formData.confirmPassword);
+
   const handleChangePassword = (e) => {
     const { name, value } = e.target;
 
@@ -35,11 +39,13 @@ const ChangePasswordModal = ({
       return temp_data;
     });
   };
+
   const handleSaveChangePassword = (e) => {
-e.preventDefault()
-    updateUserPassword(singleUserData[0])
-    console.log(JSON.stringify(singleUserData))
+    e.preventDefault();
+    updateUserPassword(singleUserData[0]);
+    console.log(JSON.stringify(singleUserData));
   };
+
   return (
     <div
       className="row w-100"
@@ -51,10 +57,7 @@ e.preventDefault()
         top: "10%",
       }}
     >
-      <div
-        className="col-11  mt-4 p-5"
-        style={{  height: "500px" }}
-      >
+      <div className="col-11  mt-4 p-5" style={{ height: "500px" }}>
         <h4
           style={{
             borderBottom: "1px solid gray",
@@ -63,12 +66,8 @@ e.preventDefault()
             fontWeight: "bold",
           }}
         >
-          {
-            resetPassword ? 'Reset Password' : ''
-          }
-          {
-            changePassword ? 'Change Password' : ''
-          }
+          {resetPassword ? "Reset Password" : ""}
+          {changePassword ? "Change Password" : ""}
         </h4>
         <div
           style={{
@@ -115,12 +114,17 @@ e.preventDefault()
                     fontWeight: "bold",
                     fontSize: "15px",
                   }}
+                  onClick={()=>{
+                    navigate('/user-list-data')
+                  }}
                 >
                   Cancel
                 </Button>
                 <Button
                   variant="primary"
                   type="submit"
+                  className="btn-disabled"
+                  disabled={formData.newPassword !== formData.confirmPassword || formData.newPassword =='' || formData.confirmPassword ==''}
                   style={{
                     backgroundColor: "#1EDFBD",
                     border: "none",

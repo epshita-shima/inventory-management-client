@@ -17,6 +17,8 @@ import LoginWithUsername from "./pages/Login/LoginWithUsername";
 import Footer from "./pages/Footer/Footer";
 import MainView from "./components/MainView/MainView";
 import ChangePasswordModal from "./pages/Login/ChangePasswordModal";
+import RequireAuth from "./pages/RequireAuth/RequireAuth";
+import NotFound from "./pages/NotFound/NotFound";
 
 
 function App() {
@@ -57,7 +59,7 @@ function App() {
     },
     // ... other items
   ];
-  const getMenulistData = sessionStorage.getItem("user");
+  const getMenulistData = localStorage.getItem("user");
  
   const menuListData = JSON.parse(getMenulistData);
   // useEffect(()=>{
@@ -90,9 +92,12 @@ function App() {
         <Route path="/change-password" element={<ChangePasswordModal menuListData={menuListData} singleUserData={singleUserData} setSingleUserData={setSingleUserData} resetPassword={resetPassword} changePassword={changePassword}/>}></Route>
         {/* <Route path="/login" element={<Login></Login>}></Route> */}
         {/* <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route> */}
-        <Route path="/user-creation" element={<UserCreation></UserCreation>}></Route>
+        <Route path="/user-creation" element={<RequireAuth><UserCreation></UserCreation></RequireAuth>}></Route>
         <Route path="/user-update/:id" element={<SingleUserDisplay></SingleUserDisplay>}></Route>
-        <Route path="/user-list-data" element={<UserListInfo setChangePassword={setChangePassword} setResetPassword={setResetPassword}></UserListInfo>}></Route>
+        <Route path="/user-list-data" element={<RequireAuth>
+          <UserListInfo setChangePassword={setChangePassword} setResetPassword={setResetPassword} resetPassword={resetPassword} changePassword={changePassword}></UserListInfo>
+        </RequireAuth>}></Route>
+        <Route path='*' element={<NotFound></NotFound>}></Route>
           </Routes>
         </div>
         <Footer />

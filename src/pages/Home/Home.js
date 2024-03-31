@@ -16,7 +16,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 const Home = ({ singleUserData ,setChangePassword,setResetPassword}) => {
   const { data: user } = useGetAllUserQuery(undefined);
  
-  const getMenulistData = sessionStorage?.getItem("user");
+  const getMenulistData = localStorage?.getItem("user");
 
   const menuListData = JSON.parse(getMenulistData);
   console.log(menuListData)
@@ -530,7 +530,7 @@ const Home = ({ singleUserData ,setChangePassword,setResetPassword}) => {
     const userData = user?.filter(
       (item) => item?.username == menuListData[0]?.username && item.password == menuListData[0]?.password
     );
-    sessionStorage.setItem('user',JSON.stringify(userData))
+    localStorage.setItem('user',JSON.stringify(userData))
   };
   return (
     <div className="row" style={{ position: "relative", height: "100vh" }}>
@@ -546,7 +546,7 @@ const Home = ({ singleUserData ,setChangePassword,setResetPassword}) => {
             title="Menu Refresh"
             style={refreshBtnStyle}
             onClick={() => {
-              sessionStorage.setItem(
+              localStorage.setItem(
                 "menulist",
                 JSON.stringify(singleUserData[0]?.menulist)
               );
@@ -586,7 +586,7 @@ const Home = ({ singleUserData ,setChangePassword,setResetPassword}) => {
                 Change Password
               </Dropdown.Item>
               <Dropdown.Item href="#" onClick={() => {
-                    sessionStorage.clear();
+                    localStorage.clear();
                     navigate("/login/user");
                   }}>
                Logout

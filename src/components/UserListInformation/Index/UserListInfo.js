@@ -29,25 +29,94 @@ import { useGetCompanyInfoQuery } from "../../../redux/features/companyinfo/comp
 import { downloadPDF } from "../../ReportProperties/HeaderFooter";
 import handleDownload from "../../ReportProperties/HandelExcelDownload";
 
-const UserListInfo = ({setChangePassword,setResetPassword}) => {
+const UserListInfo = ({setChangePassword,setResetPassword,resetPassword, changePassword}) => {
   const [userId, setUserId] = useState(null);
   const { data: user } = useGetAllUserQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
   const [activeUserModal, setActiveUserModal] = useState(false);
   const [inActiveUserModal, setInActiveUserModal] = useState(false);
-  console.log(companyinfo?.length);
   const [deleteUser, { isLoading, isSuccess, isError }] =
     useDeleteUserMutation();
   var reportTitle = "All Active User";
-  console.log(reportTitle);
-  console.log(companyinfo);
   const navigate = useNavigate();
   const activeUser = user?.filter((user) => user.isactive == true);
   const inActiveUser = user?.filter((user) => user.isactive == false);
   const [extractedData, setExtractedData] = useState([]);
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
   const [demoData, setDemoData] = useState(null);
-  // Extracting specific fields from the initial data and updating the state
+const getUserId=localStorage.getItem('user')
+const userSingleId=JSON.parse(getUserId)
+const userIdFromSession=userSingleId[0]?._id
+
+  // useEffect(()=>{
+  //   const findUserListDropdown = (menuItems) => {
+  //     console.log(menuItems)
+  //     for (const menuItem of menuItems) {
+  //       if (menuItem.label === "User List") {
+  //         return menuItem;
+  //       } else if (menuItem.items && menuItem.items.length > 0) {
+  //         const userListItem = findUserListDropdown(menuItem.items);
+  //         if (userListItem) {
+  //           return userListItem;
+  //         }
+  //       }
+  //     }
+  //     return null;
+  //   };
+    
+  //   // Function to set properties for "User List" for all users
+  //   const setPermissionsForUserList = (users) => {
+  //     console.log(users)
+  //     users?.forEach(user => {
+  //       const userListItem = findUserListDropdown(user.menulist);
+  //       console.log(userListItem)
+  //       if (userListItem) {
+  //       setPermission(userListItem)
+  //         // Set properties for "User List"
+  //         // userListItem.isChecked = true;
+  //         // userListItem.insert = true;
+  //         // userListItem.update = true;
+  //         // userListItem.pdf = true;
+  //         // userListItem.delete = true;
+  //       }
+  //     });
+  //   };
+    
+  //   // Call the function to set permissions for all users
+  //   setPermissionsForUserList(activeUser);
+  // },[activeUser])
+
+  const extractUserListForCurrentUser = (userData, userId) => {
+    let userList = null;
+  
+    // Find the user object matching the provided userId
+    const currentUser = userData?.find(user => user._id === userId);
+  
+    if (currentUser) {
+      // Loop through the menus of the current user
+      currentUser?.menulist?.forEach(menu => {
+        menu?.items?.forEach(subMenu => {
+          // Check if the subMenu is the "User Profile" menu
+          if (subMenu?.label === "User Profile") {
+            // Find the "User List" sub-item
+            const userListSubMenu = subMenu?.items.find(subItem => subItem?.label === "User List");
+            if (userListSubMenu) {
+              // Set the user list property
+              userList = userListSubMenu;
+            }
+          }
+        });
+      });
+    }
+  
+    return userList;
+  };
+  
+  // Call the function to get the user list for the current user
+  const permission = extractUserListForCurrentUser(activeUser, userIdFromSession);
+  
+  // Output the user list for the current user
+  console.log(permission?.delete);
 
   useEffect(() => {
     const activeUsers = user?.filter((user) => user.isactive == true);
@@ -86,7 +155,6 @@ const UserListInfo = ({setChangePassword,setResetPassword}) => {
     src: "https://fonts.gstatic.com/s/oswald/v13/Y_TKV6o8WovbUd3m_X9aAA.ttf",
   });
 
-  console.log(extractedData);
 
   const handleActiveStatus = (id) => {
     setUserId(id);
@@ -127,6 +195,7 @@ const UserListInfo = ({setChangePassword,setResetPassword}) => {
       grow: 2,
       cell: (activeUser) => (
         <div className="d-flex justify-content-between align-content-center">
+      
           <a
             target="_blank"
             className="action-icon"
@@ -140,7 +209,7 @@ const UserListInfo = ({setChangePassword,setResetPassword}) => {
             }}
           >
             <FontAwesomeIcon
-              data-toggle="modal tooltip"
+              data-toggle="modal"
               data-target="#exampleModalLong"
               icon={faEye}
        
@@ -149,25 +218,27 @@ const UserListInfo = ({setChangePassword,setResetPassword}) => {
               }}
             ></FontAwesomeIcon>
           </a>
-
-          <a
-            target="_blank"
-            className="action-icon"
-            data-toggle="tooltip" data-placement="bottom" title="Update user"
-            style={{
-              color: "#56CCAD",
-              border: "2px solid #56CCAD",
-              padding: "3px",
-              borderRadius: "5px",
-              marginLeft: "10px",
-            }}
-            onClick={() => {
-              window.open(`user-update/${activeUser?._id}`);
-              // handleActiveStatus(activeUser?._id);
-            }}
-          >
-            <FontAwesomeIcon  icon={faPenToSquare}></FontAwesomeIcon>
-          </a>
+{
+  permission?.update? (<a
+    target="_blank"
+    className="action-icon"
+    data-toggle="tooltip" data-placement="bottom" title="Update user"
+    style={{
+      color: "#56CCAD",
+      border: "2px solid #56CCAD",
+      padding: "3px",
+      borderRadius: "5px",
+      marginLeft: "10px",
+    }}
+    onClick={() => {
+      window.open(`user-update/${activeUser?._id}`);
+      // handleActiveStatus(activeUser?._id);
+    }}
+  >
+    <FontAwesomeIcon  icon={faPenToSquare}></FontAwesomeIcon>
+  </a>):''
+}
+          
           <a
             target="_blank"
             className="action-icon "
@@ -178,45 +249,50 @@ const UserListInfo = ({setChangePassword,setResetPassword}) => {
               borderRadius: "5px",
               marginLeft: "10px",
             }}
-           
+          
           >
           <FontAwesomeIcon data-toggle="tooltip" data-placement="bottom" title="Reset password" icon={faGear} onClick={()=>{
             setResetPassword(true)
             setChangePassword(false)
-            navigate('/change-password')}}></FontAwesomeIcon>
+            // window.open(`/change-password`);
+            navigate('/change-password')
+            }}></FontAwesomeIcon>
           </a>
-          <a
-            target="_blank"
-            className="action-icon "
-            data-toggle="tooltip" data-placement="bottom" title="Delete user"
-            style={{
-              color: "red",
-              border: "2px solid red",
-              padding: "3px",
-              borderRadius: "5px",
-              marginLeft: "10px",
-            }}
-            onClick={() => {
-              swal({
-                title: "Are you sure?",
-                text: "Once deleted, you will not be able to recover this data!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-              }).then((willDelete) => {
-                if (willDelete) {
-                  deleteUser(activeUser?._id);
-                  swal("Poof! Your data has been deleted!", {
-                    icon: "success",
-                  });
-                } else {
-                  swal("Your data is safe!");
-                }
-              });
-            }}
-          >
-            <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
-          </a>
+          {
+            permission?.delete ? (<a
+              target="_blank"
+              className="action-icon "
+              data-toggle="tooltip" data-placement="bottom" title="Delete user"
+              style={{
+                color: "red",
+                border: "2px solid red",
+                padding: "3px",
+                borderRadius: "5px",
+                marginLeft: "10px",
+              }}
+              onClick={() => {
+                swal({
+                  title: "Are you sure?",
+                  text: "Once deleted, you will not be able to recover this data!",
+                  icon: "warning",
+                  buttons: true,
+                  dangerMode: true,
+                }).then((willDelete) => {
+                  if (willDelete) {
+                    deleteUser(activeUser?._id);
+                    swal("Poof! Your data has been deleted!", {
+                      icon: "success",
+                    });
+                  } else {
+                    swal("Your data is safe!");
+                  }
+                });
+              }}
+            >
+              <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
+            </a>) :''
+          }
+          
         </div>
       ),
     },
@@ -270,8 +346,9 @@ const UserListInfo = ({setChangePassword,setResetPassword}) => {
             </div>
             <div class="dropdown">
               <button
-                class="btn btn-secondary dropdown-toggle"
+                class="btn btn-download dropdown-toggle"
                 type="button"
+                
                 id="dropdownMenuButton1"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
@@ -306,7 +383,7 @@ const UserListInfo = ({setChangePassword,setResetPassword}) => {
               </ul>
             </div>
           </div>
-        </div>{" "}
+        </div>
         &nbsp;
         <FilterComponent
           onFilter={(e) => setFilterText(e.target.value)}
