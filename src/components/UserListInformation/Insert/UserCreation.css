@@ -5,3 +5,21 @@
     outline: none; /* Optional: Remove outline on focus */
     box-shadow: none; /* Optional: Remove box shadow */
   }
+  @media only screen and (max-width: 575px){
+    .usercreation-table{
+        height: 300px !important;
+    }
+    .input-label{
+      font-size: 12px;
+      margin-top: 2px;
+      margin-right: 5px;
+    }
+    .table-data-label{
+      font-size: 12px;
+      
+    }
+    .checkbox-design{
+      height: 12px;
+      width: 12px;
+    }
+}

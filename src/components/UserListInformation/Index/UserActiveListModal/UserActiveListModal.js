@@ -65,7 +65,7 @@ const inActiveReportTitle="All Inactive User"
       console.error("Error updating data:", error);
     }
   };
-
+console.log(user)
   const columns = [
     {
       name: "Sl.",
@@ -116,7 +116,7 @@ const inActiveReportTitle="All Inactive User"
   const customStyles = {
     table: {
       style: {
-        height: "380px",
+        height: "350px",
         overflow: "auto",
       },
     },
@@ -140,6 +140,9 @@ const inActiveReportTitle="All Inactive User"
       },
     },
   };
+  if (window.matchMedia("(max-width: 768px)").matches) {
+    customStyles.table.style.height = "150px"; // Adjust height for smaller screens
+  }
   const [filterText, setFilterText] = React.useState("");
   const [resetPaginationToggle, setResetPaginationToggle] =
     React.useState(false);
@@ -158,12 +161,13 @@ const inActiveReportTitle="All Inactive User"
     };
     
     return (
-      <>
+      <div className="d-flex align-items-center">
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon">
             {/* <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp; */}
             {activeUserModal ? (
-              <div class="dropdown">
+              <>
+              { user?.length > 0 ? (<div class="dropdown">
                 <button
                   class="btn btn-download dropdown-toggle"
                   type="button"
@@ -199,9 +203,12 @@ const inActiveReportTitle="All Inactive User"
                     </a>
                   </li>
                 </ul>
-              </div>
+              </div>) :''}
+              </>
+              
             ) : (
-              <div class="dropdown">
+              <>
+              { user?.length > 0 ? (<div class="dropdown">
                 <button
                   class="btn btn-download dropdown-toggle"
                   type="button"
@@ -237,20 +244,23 @@ const inActiveReportTitle="All Inactive User"
                     </a>
                   </li>
                 </ul>
-              </div>
+              </div>) :''}
+              </>
+              
             )}
           </div>
-        </div>{" "}
-        &nbsp;&nbsp;
-        <FilterComponent
-          onFilter={(e) => setFilterText(e.target.value)}
-          onClear={handleClear}
-          filterText={filterText}
-        />
-        <div style={{ display: "flex", alignItems: "center" }}>
-          {/* <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"/> */}
         </div>
-      </>
+        &nbsp;&nbsp;
+        {
+          user?.length >0 ? ( <FilterComponent
+            onFilter={(e) => setFilterText(e.target.value)}
+            onClear={handleClear}
+            filterText={filterText}
+          />) :''
+        }
+       
+       
+      </div>
     );
   }, [
     filterText,
@@ -258,16 +268,18 @@ const inActiveReportTitle="All Inactive User"
     companyinfo,
     extractedData,
     activeUserModal,
-    extractedInActiveData
+    extractedInActiveData,
+    user?.length
   ]);
   return (
     <div
-      class="modal fade"
-      id="exampleModalCenter"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
+    class="modal fade"
+    id="exampleModalCenter"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true"
+    style={{height:'550px'}}
     >
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">

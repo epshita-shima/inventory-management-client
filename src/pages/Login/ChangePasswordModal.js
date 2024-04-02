@@ -19,7 +19,12 @@ const ChangePasswordModal = ({
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const navigate=useNavigate()
   const [updateUserPassword] = useUpdateUserPasswordMutation();
-
+  const queryParams = new URLSearchParams(window.location.search);
+  const reset = queryParams.get('reset');
+  const change = queryParams.get('change');
+  
+  console.log('Reset:', reset); // true
+  console.log('Change:', change);
   useEffect(() => {
     setSingleUserData(menuListData);
   }, [setSingleUserData]);
@@ -57,7 +62,7 @@ const ChangePasswordModal = ({
         top: "10%",
       }}
     >
-      <div className="col-11  mt-4 p-5" style={{ height: "500px" }}>
+      <div className="col-11 mt-4 p-5">
         <h4
           style={{
             borderBottom: "1px solid gray",
@@ -66,8 +71,8 @@ const ChangePasswordModal = ({
             fontWeight: "bold",
           }}
         >
-          {resetPassword ? "Reset Password" : ""}
-          {changePassword ? "Change Password" : ""}
+          {reset==='true' ? "Reset Password" : ""}
+          {change==='true' ? "Change Password" : ""}
         </h4>
         <div
           style={{
@@ -75,7 +80,7 @@ const ChangePasswordModal = ({
             justifyContent: "center",
           }}
         >
-          <div className="shadow-lg col-8 card mt-4 p-5">
+          <div className="shadow-lg col-10 card mt-4 p-5 col-sm-8 col-md-8 col-lg-8">
             <Form onSubmit={handleSaveChangePassword}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label style={{ color: "#23302C" }}>

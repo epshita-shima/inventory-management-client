@@ -1,13 +1,10 @@
 import React from 'react'
 import { Navigate, useLocation } from 'react-router-dom';
-import { useGetAllUserQuery } from '../../redux/features/user/userApi';
 
 const RequireAuth = ({children}) => {
 const getUserFromSession=localStorage.getItem('user')
 const getUser=JSON.parse(getUserFromSession)
 const location = useLocation();
-const {data:user}=useGetAllUserQuery(undefined);
-const activeUser = user?.filter((user) => user.isactive == true);
 // const userIdFromSession=getUser[0]?._id
 // console.log(getUser)
 // const extractUserListForCurrentUser = (userData, userId) => {
@@ -71,13 +68,14 @@ const extractUrlsAndIsChecked = (userData) => {
   console.log(data);
   const currentUrl = window.location.href;
   const pathname = new URL(currentUrl).pathname;
-
+console.log(pathname)
   console.log(pathname); 
 // Function to match a URL with the data
 const matchUrlWithData = (data, url) => {
   // Iterate through the data array
   for (const item of data) {
     // Check if the URL matches
+    console.log(item?.url,url)
     if (item?.url === url) {
       return item; // Return the matched item
     }
@@ -93,7 +91,7 @@ console.log(matchedItem);
 if (!getUser || !matchedItem) {
     localStorage.clear();
 
-    return <Navigate to="/login/user" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
 }
     return children;
 }

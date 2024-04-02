@@ -115,7 +115,8 @@ var reportTitle="All User list"
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon">
             {/* <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp; */}
-            <div class="dropdown">
+            {
+              user?.length > 0 ?( <div class="dropdown">
               <button
                 class="btn btn-download dropdown-toggle"
                 type="button"
@@ -152,21 +153,22 @@ var reportTitle="All User list"
                   </a>
                 </li>
               </ul>
-            </div>
+            </div>) :''
+            }
+           
           </div>
         </div>{" "}
         &nbsp;&nbsp;
-        <FilterComponent
+       {
+        user?.length >0 ? ( <FilterComponent
           onFilter={(e) => setFilterText(e.target.value)}
           onClear={handleClear}
           filterText={filterText}
-        />
-        <div style={{ display: "flex", alignItems: "center" }}>
-          {/* <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"/> */}
-        </div>
+        />) :''
+       }
       </>
     );
-  }, [filterText, resetPaginationToggle, companyinfo, extractedData,reportTitle]);
+  }, [filterText, resetPaginationToggle, companyinfo, extractedData,reportTitle,user?.length]);
 
   return (
     <>

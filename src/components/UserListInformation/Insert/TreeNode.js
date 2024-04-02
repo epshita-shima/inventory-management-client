@@ -120,10 +120,10 @@ console.log(clickedCheckboxes.parentIds)
   // };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{position: "relative", overflow: "auto"}}>
       <table className="table table-bordered">
         <tbody>
-          <tr className="">
+          <tr className="table-data-label">
             <td
               colSpan="2"
               style={{
@@ -160,7 +160,7 @@ console.log(clickedCheckboxes.parentIds)
                           id={`${subNode?._id}`}
                           // checked={subNode?.isChecked || false}
                           name="check"
-                          className="form-check-input border-success me-2"
+                          className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
                             const { checked } = e.target;
                             
@@ -177,7 +177,7 @@ console.log(clickedCheckboxes.parentIds)
                             }
                           }}
                         />
-                        <label htmlFor="">{subNode.label}</label>
+                        <label className="input-label" htmlFor="">{subNode.label}</label>
                       </>
                     )}
                   </td>
@@ -191,7 +191,7 @@ console.log(clickedCheckboxes.parentIds)
                           type="checkbox"
                           id={`${subNode?._id}`}
                           // checked={subNode?.insert || false}
-                          className="form-check-input border-success me-2"
+                          className="form-check-input border-success me-2 checkbox-design"
                           // checked={clickedCheckboxes.findIndex(
                           //   (item) => item.itemId === subNode._id
                           // ) !== -1}
@@ -238,13 +238,13 @@ console.log(clickedCheckboxes.parentIds)
                             }
                           }}
                         />
-                        <label htmlFor="">Insert</label>
+                        <label className="input-label" htmlFor="">Insert</label>
                       </div>
                       <div className="d-flex">
                         <input
                           type="checkbox"
                           // checked={subNode?.update || false}
-                          className="form-check-input border-success me-2"
+                          className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
                             const { checked } = e.target;
                             const indexes = clickedCheckboxes.findIndex(
@@ -285,13 +285,13 @@ console.log(clickedCheckboxes.parentIds)
                             }
                           }}
                         />
-                        <label htmlFor="">Update</label>
+                        <label className="input-label" htmlFor="">Update</label>
                       </div>
                       <div className="d-flex">
                         <input
                           type="checkbox"
                           // checked={subNode?.delete || false}
-                          className="form-check-input border-success me-2"
+                          className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
                             const { checked } = e.target;
                             const indexes = clickedCheckboxes.findIndex(
@@ -332,13 +332,13 @@ console.log(clickedCheckboxes.parentIds)
                             }
                           }}
                         />
-                        <label htmlFor="">Delete</label>
+                        <label className="input-label" htmlFor="">Delete</label>
                       </div>
                       <div className="d-flex">
                         <input
                           type="checkbox"
                           // checked={subNode?.pdf || false}
-                          className="form-check-input border-success me-2"
+                          className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
                             const { checked } = e.target;
                             const indexes = clickedCheckboxes.findIndex(
@@ -381,7 +381,7 @@ console.log(clickedCheckboxes.parentIds)
                             }
                           }}
                         />
-                        <label htmlFor="">PDF</label>
+                        <label className="input-label" htmlFor="">PDF</label>
                       </div>
                     </td>
                   )}

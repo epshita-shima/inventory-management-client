@@ -17,7 +17,7 @@ const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   const inputRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn); // Select isLoggedIn state
   const navigate = useNavigate();
-console.log(user)
+  console.log(JSON.stringify(user))
 
 
 const handleFocus = () => {
@@ -33,21 +33,13 @@ const handleFocus = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     if(singleUserData.length > 0){
-      navigate('/project')
+      navigate('/main-view')
       localStorage.setItem('user',JSON.stringify(singleUserData))
     }
     else{
       swal("Not Possible!", "Try Again!", "warning")
     }
   
-
-    // if(isLoggedIn){
-    //   navigate("/project");
-    //   setMessage('Login Successfull')
-    // }
-    // else{
-    //   setMessage('Login Failed!')
-    // }
   };
   return (
     <div className="row vh-100">

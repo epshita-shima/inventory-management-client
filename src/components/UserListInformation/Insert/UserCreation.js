@@ -353,16 +353,10 @@ console.log(JSON.stringify(menuItems))
   }));
   
 
-
-
   return (
-    <div className="container-fluid p-0 m-0" style={{
-      alignItems: "center",
-      position: "absolute",
-      top: "10%",
-      overflow:"scroll",
-      width:'95%',
-      height:'80%'
+    <div className="container-fluid p-0 m-0 usercreation-table" style={{
+      overflowY:"scroll",
+      height:'500px'
     }}>
       {/* <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
         <div class="container">
@@ -388,7 +382,7 @@ console.log(JSON.stringify(menuItems))
         </div>
       </nav> */}
       <div class="container">
-        <div className="shadow-lg mt-5 p-5 rounded-4">
+        <div className="shadow-lg mt-2 mt-sm-5 mt-md-5 mt-lg-5 p-5 rounded-4">
           <div className="d-flex justify-content-between align-items-center border-bottom">
             <p>
               <FontAwesomeIcon
@@ -416,7 +410,7 @@ console.log(JSON.stringify(menuItems))
           </div>
           <div className="mt-5">
             <Form validated={validated} onSubmit={handleCreateUser}>
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="d-sm-block d-md-flex d-lg-flex justify-content-between align-items-center">
                 <div className="w-100">
                   <div>
                     <Form.Group controlId="formInput">
@@ -446,7 +440,7 @@ console.log(JSON.stringify(menuItems))
                   </div> */}
                 </div>
 
-                <div className="w-100 ms-2">
+                <div className="w-100 ms-sm-2  ms-md-2  ms-lg-2 mt-2 mt-sm-0">
                   <div>
                     <Form.Group controlId="formInput">
                       <Form.Control
@@ -471,7 +465,7 @@ console.log(JSON.stringify(menuItems))
                     </Form.Group>
                   </div>
                 </div>
-                <div className="w-100 ms-2">
+                <div className="w-100 ms-sm-2  ms-md-2  ms-lg-2 mt-2 mt-sm-0">
                   <Form.Group controlId="formInput">
                     <Form.Control
                       type="text"
@@ -490,7 +484,7 @@ console.log(JSON.stringify(menuItems))
                     {/* {validated && formData.lastname === '' && <div style={{ height: '20px' }}></div>} */}
                   </Form.Group>
                 </div>
-                <div className="w-100 ms-2">
+                <div className="w-100 ms-sm-2  ms-md-2  ms-lg-2 mt-2 mt-sm-0">
                   <Form.Group controlId="formInput">
                     <Form.Control
                       type="text"
@@ -505,7 +499,7 @@ console.log(JSON.stringify(menuItems))
                     </Form.Control.Feedback>
                   </Form.Group>
                 </div>
-                <div className="d-flex justify-content-between align-items-center w-100 ms-2">
+                <div className="d-flex justify-content-between align-items-center w-100 ms-sm-2  ms-md-2  ms-lg-2 mt-2 mt-sm-0">
                   <div className="w-100">
                     <Select
                       class="form-select"
@@ -570,7 +564,7 @@ console.log(JSON.stringify(menuItems))
             </Form>
           </div>
           <div className="mt-5">
-            <h4 className="fw-bold">Select Menu</h4>
+            <h4 className="fw-bold ">Select Menu</h4>
             {
               <TreeView
                 isUpdate={isUpdate}

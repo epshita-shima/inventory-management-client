@@ -45,3 +45,16 @@
     background-color:#15BF91;
     color:white !important
 } 
+.btn-download.active{
+    background-color:#15BF91;
+    color:white !important
+}
+.btn-download:hover{
+    background-color:#15BF91;
+    color:white !important
+}
+@media only screen and (max-width: 575px){
+    .userlist-table{
+        height: 600px !important;
+    }
+}

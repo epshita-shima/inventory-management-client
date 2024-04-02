@@ -29,7 +29,12 @@ import { useGetCompanyInfoQuery } from "../../../redux/features/companyinfo/comp
 import { downloadPDF } from "../../ReportProperties/HeaderFooter";
 import handleDownload from "../../ReportProperties/HandelExcelDownload";
 
-const UserListInfo = ({setChangePassword,setResetPassword,resetPassword, changePassword}) => {
+const UserListInfo = ({
+  setChangePassword,
+  setResetPassword,
+  resetPassword,
+  changePassword,
+}) => {
   const [userId, setUserId] = useState(null);
   const { data: user } = useGetAllUserQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
@@ -44,10 +49,11 @@ const UserListInfo = ({setChangePassword,setResetPassword,resetPassword, changeP
   const [extractedData, setExtractedData] = useState([]);
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
   const [demoData, setDemoData] = useState(null);
-const getUserId=localStorage.getItem('user')
-const userSingleId=JSON.parse(getUserId)
-const userIdFromSession=userSingleId[0]?._id
-
+  const getUserId = localStorage.getItem("user");
+  const userSingleId = JSON.parse(getUserId);
+  const userIdFromSession = userSingleId[0]?._id;
+  const permidionData = user?.filter((user) => user._id == userIdFromSession);
+  console.log(companyinfo);
   // useEffect(()=>{
   //   const findUserListDropdown = (menuItems) => {
   //     console.log(menuItems)
@@ -63,7 +69,7 @@ const userIdFromSession=userSingleId[0]?._id
   //     }
   //     return null;
   //   };
-    
+
   //   // Function to set properties for "User List" for all users
   //   const setPermissionsForUserList = (users) => {
   //     console.log(users)
@@ -81,25 +87,27 @@ const userIdFromSession=userSingleId[0]?._id
   //       }
   //     });
   //   };
-    
+
   //   // Call the function to set permissions for all users
   //   setPermissionsForUserList(activeUser);
   // },[activeUser])
 
   const extractUserListForCurrentUser = (userData, userId) => {
     let userList = null;
-  
+
     // Find the user object matching the provided userId
-    const currentUser = userData?.find(user => user._id === userId);
-  
+    const currentUser = userData?.find((user) => user._id === userId);
+
     if (currentUser) {
       // Loop through the menus of the current user
-      currentUser?.menulist?.forEach(menu => {
-        menu?.items?.forEach(subMenu => {
+      currentUser?.menulist?.forEach((menu) => {
+        menu?.items?.forEach((subMenu) => {
           // Check if the subMenu is the "User Profile" menu
           if (subMenu?.label === "User Profile") {
             // Find the "User List" sub-item
-            const userListSubMenu = subMenu?.items.find(subItem => subItem?.label === "User List");
+            const userListSubMenu = subMenu?.items.find(
+              (subItem) => subItem?.label === "User List"
+            );
             if (userListSubMenu) {
               // Set the user list property
               userList = userListSubMenu;
@@ -108,13 +116,16 @@ const userIdFromSession=userSingleId[0]?._id
         });
       });
     }
-  
+
     return userList;
   };
-  
+
   // Call the function to get the user list for the current user
-  const permission = extractUserListForCurrentUser(activeUser, userIdFromSession);
-  
+  const permission = extractUserListForCurrentUser(
+    permidionData,
+    userIdFromSession
+  );
+
   // Output the user list for the current user
   console.log(permission?.delete);
 
@@ -155,7 +166,6 @@ const userIdFromSession=userSingleId[0]?._id
     src: "https://fonts.gstatic.com/s/oswald/v13/Y_TKV6o8WovbUd3m_X9aAA.ttf",
   });
 
-
   const handleActiveStatus = (id) => {
     setUserId(id);
   };
@@ -195,12 +205,12 @@ const userIdFromSession=userSingleId[0]?._id
       grow: 2,
       cell: (activeUser) => (
         <div className="d-flex justify-content-between align-content-center">
-      
           <a
             target="_blank"
             className="action-icon"
             data-toggle="tooltip"
-            data-placement="bottom" title="View user"
+            data-placement="bottom"
+            title="View user"
             style={{
               color: "#56CCAD",
               border: "2px solid #56CCAD",
@@ -212,33 +222,36 @@ const userIdFromSession=userSingleId[0]?._id
               data-toggle="modal"
               data-target="#exampleModalLong"
               icon={faEye}
-       
               onClick={() => {
                 handleActiveStatus(activeUser?._id);
               }}
             ></FontAwesomeIcon>
           </a>
-{
-  permission?.update? (<a
-    target="_blank"
-    className="action-icon"
-    data-toggle="tooltip" data-placement="bottom" title="Update user"
-    style={{
-      color: "#56CCAD",
-      border: "2px solid #56CCAD",
-      padding: "3px",
-      borderRadius: "5px",
-      marginLeft: "10px",
-    }}
-    onClick={() => {
-      window.open(`user-update/${activeUser?._id}`);
-      // handleActiveStatus(activeUser?._id);
-    }}
-  >
-    <FontAwesomeIcon  icon={faPenToSquare}></FontAwesomeIcon>
-  </a>):''
-}
-          
+          {permission?.update ? (
+            <a
+              target="_blank"
+              className="action-icon"
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Update user"
+              style={{
+                color: "#56CCAD",
+                border: "2px solid #56CCAD",
+                padding: "3px",
+                borderRadius: "5px",
+                marginLeft: "10px",
+              }}
+              onClick={() => {
+                window.open(`user-update/${activeUser?._id}`);
+                // handleActiveStatus(activeUser?._id);
+              }}
+            >
+              <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
+            </a>
+          ) : (
+            ""
+          )}
+
           <a
             target="_blank"
             className="action-icon "
@@ -249,20 +262,27 @@ const userIdFromSession=userSingleId[0]?._id
               borderRadius: "5px",
               marginLeft: "10px",
             }}
-          
           >
-          <FontAwesomeIcon data-toggle="tooltip" data-placement="bottom" title="Reset password" icon={faGear} onClick={()=>{
-            setResetPassword(true)
-            setChangePassword(false)
-            // window.open(`/change-password`);
-            navigate('/change-password')
-            }}></FontAwesomeIcon>
+            <FontAwesomeIcon
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Reset password"
+              icon={faGear}
+              onClick={() => {
+                setResetPassword(true);
+                setChangePassword(false);
+                const url = `/main-view/change-password?reset=true&change=false`;
+                window.open(url, "_blank");
+              }}
+            ></FontAwesomeIcon>
           </a>
-          {
-            permission?.delete ? (<a
+          {permission?.delete ? (
+            <a
               target="_blank"
               className="action-icon "
-              data-toggle="tooltip" data-placement="bottom" title="Delete user"
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Delete user"
               style={{
                 color: "red",
                 border: "2px solid red",
@@ -290,13 +310,13 @@ const userIdFromSession=userSingleId[0]?._id
               }}
             >
               <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
-            </a>) :''
-          }
-          
+            </a>
+          ) : (
+            ""
+          )}
         </div>
       ),
     },
-   
   ];
   const customStyles = {
     rows: {
@@ -338,9 +358,9 @@ const userIdFromSession=userSingleId[0]?._id
     };
 
     return (
-      <>
+      <div className="d-block d-sm-flex justify-content-center align-items-center ">
         <div className="d-flex justify-content-end align-items-center">
-          <div className="table-head-icon d-flex">
+          <div className="table-head-icon d-flex ">
             <div>
               <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp;
             </div>
@@ -348,7 +368,6 @@ const userIdFromSession=userSingleId[0]?._id
               <button
                 class="btn btn-download dropdown-toggle"
                 type="button"
-                
                 id="dropdownMenuButton1"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
@@ -384,16 +403,15 @@ const userIdFromSession=userSingleId[0]?._id
             </div>
           </div>
         </div>
-        &nbsp;
-        <FilterComponent
+   
+       <div className="mt-2 mt-sm-0 ms-2 mb-2 mb-sm-0">
+       <FilterComponent
           onFilter={(e) => setFilterText(e.target.value)}
           onClear={handleClear}
           filterText={filterText}
         />
-        <div style={{ display: "flex", alignItems: "center" }}>
-          {/* <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"/> */}
-        </div>
-      </>
+       </div>
+      </div>
     );
   }, [
     filterText,
@@ -404,12 +422,7 @@ const userIdFromSession=userSingleId[0]?._id
   ]);
 
   return (
-    <div className="row px-4 mx-4" style={{
-      alignItems: "center",
-      position: "absolute",
-      top: "10%",
-      width:'95%'
-    }}>
+    <div className="row px-4 mx-4">
       {/* <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
         <div class="container">
           <div
@@ -484,7 +497,7 @@ const userIdFromSession=userSingleId[0]?._id
               </div>
             </div>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-3 mt-4 mt-sm-0">
             <div
               class="cardbox shadow-lg"
               style={{
@@ -519,7 +532,7 @@ const userIdFromSession=userSingleId[0]?._id
               </div>
             </div>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-3 mt-4 mt-sm-0">
             <div
               class="cardbox shadow-lg"
               style={{ borderLeft: "12px solid red", borderRadius: "10px" }}
@@ -555,8 +568,13 @@ const userIdFromSession=userSingleId[0]?._id
       </div>
       <div class=" mt-5">
         <div class="row">
-          <div className="col" style={{overflowX:"scroll",
-      height:'400px',}}>
+          <div
+            className="col userlist-table"
+            style={{
+              overflowX: "scroll",
+              height: "400px",
+            }}
+          >
             <div className="shadow-lg overflow-x-auto flex-nowarp">
               <DataTable
                 columns={columns}

@@ -19,6 +19,7 @@ import MainView from "./components/MainView/MainView";
 import ChangePasswordModal from "./pages/Login/ChangePasswordModal";
 import RequireAuth from "./pages/RequireAuth/RequireAuth";
 import NotFound from "./pages/NotFound/NotFound";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 
 function App() {
@@ -78,29 +79,32 @@ function App() {
 
   return (
     <div>
-      {/* <DynamicDropdown data={apiData} />; */}
-      {/*  */}
-    
       <div className="app-container">
-       <Home singleUserData={singleUserData} setSingleUserData={setSingleUserData} setResetPassword={setResetPassword} setChangePassword={setChangePassword}></Home>
         <div className="content">
           <Routes>
-            <Route path="/" element={<MainView></MainView>}></Route>
-          {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}
-        <Route path="/login" element={<LoginWithMongodb></LoginWithMongodb>}></Route>
-        <Route path="/login/user" element={<LoginWithUsername singleUserData={singleUserData} setSingleUserData={setSingleUserData}></LoginWithUsername>}></Route>
-        <Route path="/change-password" element={<ChangePasswordModal menuListData={menuListData} singleUserData={singleUserData} setSingleUserData={setSingleUserData} resetPassword={resetPassword} changePassword={changePassword}/>}></Route>
-        {/* <Route path="/login" element={<Login></Login>}></Route> */}
-        {/* <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route> */}
-        <Route path="/user-creation" element={<RequireAuth><UserCreation></UserCreation></RequireAuth>}></Route>
-        <Route path="/user-update/:id" element={<SingleUserDisplay></SingleUserDisplay>}></Route>
-        <Route path="/user-list-data" element={<RequireAuth>
+          <Route path="/" element={<LoginWithUsername singleUserData={singleUserData} setSingleUserData={setSingleUserData}></LoginWithUsername>}></Route>
+            <Route path="/main-view" element={<MainView setChangePassword={setChangePassword} setResetPassword={setResetPassword}></MainView>}>
+              <Route index element={<Dashboard></Dashboard>}></Route>
+              <Route path="change-password" element={<ChangePasswordModal menuListData={menuListData} singleUserData={singleUserData} setSingleUserData={setSingleUserData} resetPassword={resetPassword} changePassword={changePassword}/>}></Route>
+              <Route path="user-creation" element={<RequireAuth><UserCreation></UserCreation></RequireAuth>}></Route>
+              <Route path="user-update/:id" element={<SingleUserDisplay></SingleUserDisplay>}></Route>
+              <Route path="user-list-data" element={<RequireAuth>
           <UserListInfo setChangePassword={setChangePassword} setResetPassword={setResetPassword} resetPassword={resetPassword} changePassword={changePassword}></UserListInfo>
         </RequireAuth>}></Route>
         <Route path='*' element={<NotFound></NotFound>}></Route>
+            </Route>
+          {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}
+        {/* <Route path="/login" element={<LoginWithMongodb></LoginWithMongodb>}></Route> */}
+       
+        
+        {/* <Route path="/login" element={<Login></Login>}></Route> */}
+        {/* <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route> */}
+       
+       
+        
+    
           </Routes>
         </div>
-        <Footer />
       </div>
     
     </div>

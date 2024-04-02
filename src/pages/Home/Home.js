@@ -8,22 +8,22 @@ import { useEffect, useState } from "react";
 import { Menubar } from "primereact/menubar";
 import "./Home.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { faRefresh, faUser } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown } from "react-bootstrap";
 import ChangePasswordModal from "../Login/ChangePasswordModal";
 import Footer from "../Footer/Footer";
 import { Outlet, useNavigate } from "react-router-dom";
-const Home = ({ singleUserData ,setChangePassword,setResetPassword}) => {
-  const { data: user } = useGetAllUserQuery(undefined);
- 
+const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
+  const { data: user, refetch } = useGetAllUserQuery(undefined);
+
   const getMenulistData = localStorage?.getItem("user");
 
   const menuListData = JSON.parse(getMenulistData);
-  console.log(menuListData)
-  if(menuListData !==null ){
+  console.log(menuListData);
+  if (menuListData !== null) {
     var menuListSingleData = menuListData[0]?.menulist;
   }
-  
+
   console.log(menuListSingleData);
   const [showComponent, setShowComponent] = useState(false);
   const navigate = useNavigate();
@@ -520,84 +520,163 @@ const Home = ({ singleUserData ,setChangePassword,setResetPassword}) => {
 
   const handleClick = () => {
     // setShowComponent(true); // Set showComponent state to true to render MyComponent
-    setChangePassword(true)
-    setResetPassword(false)
-    navigate("/change-password");
+    setChangePassword(true);
+    setResetPassword(false);
+    const url = `change-password?reset=false&change=true`;
+    window.open(url, "_blank");
   };
 
-  const handleRefreshData = () => {
-    console.log(menuListData)
-    const userData = user?.filter(
-      (item) => item?.username == menuListData[0]?.username && item.password == menuListData[0]?.password
-    );
-    localStorage.setItem('user',JSON.stringify(userData))
+  const handleRefreshData = async () => {
+    console.log(menuListData);
+    await refetch().then(({ data }) => {
+      const userData = data?.filter(
+        (item) =>
+          item?.username === menuListData[0]?.username &&
+          item.password === menuListData[0]?.password
+      );
+
+      console.log(userData);
+      // Update localStorage with the filtered userData
+      localStorage.setItem("user", JSON.stringify(userData));
+    });
   };
   return (
-    <div className="row" style={{ position: "relative", height: "100vh" }}>
-      <div
-        className="col d-flex justify-content-between align-items-center"
-        style={cardStyle}
-      >
-        <div className="d-flex justify-content-between align-items-center">
-          <button
-            className="btn"
-            data-toggle="tooltip"
-            data-placement="bottom"
-            title="Menu Refresh"
-            style={refreshBtnStyle}
-            onClick={() => {
-              localStorage.setItem(
-                "menulist",
-                JSON.stringify(singleUserData[0]?.menulist)
-              );
-            
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faRefresh}
-              className="fs-3"
-              onClick={() => {
-                handleRefreshData()
-              }}
-            ></FontAwesomeIcon>
-          </button>
-          <Menubar model={filteredMenuItems} style={menubarStyle} />
-        </div>
-        <div>
-          <Dropdown>
-            <Dropdown.Toggle
-              variant="secondary"
-              id="dropdown-basic"
-              style={{
-                backgroundColor: "#0A203F",
-                color: "white",
-                border: "none",
-                outline: "none",
-              }}
-            >
-         {
-          menuListData !==null ? `     Hello, ${menuListData[0]?.firstname}
-          ${menuListData[0]?.lastname}` :''
-         }
-            </Dropdown.Toggle>
+    <div className="container-fluid">
+      <div className="row">
+        <div
+          className="col-md d-flex justify-content-between align-items-center"
+          style={cardStyle}
+        >
+          <div class="d-block d-md-none">
+            <div className="d-flex justify-content-between align-items-center">
+              {/* Dropdown button with custom icon */}
+              <div className="position-relative">
+                <Dropdown>
+                  <Dropdown.Toggle
+                    variant="secondary"
+                    id="dropdown-basic"
+                    style={{
+                      backgroundColor: "#0A203F",
+                      color: "white",
+                      border: "none",
+                      outline: "none",
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faUser} className="fs-3">
+                      {" "}
+                    </FontAwesomeIcon>
+                  </Dropdown.Toggle>
 
-            <Dropdown.Menu>
-              <Dropdown.Item href="#" onClick={handleClick}>
-                Change Password
-              </Dropdown.Item>
-              <Dropdown.Item href="#" onClick={() => {
-                    localStorage.clear();
-                    navigate("/login/user");
-                  }}>
-               Logout
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+                  <Dropdown.Menu
+                    style={{ overflowY: "auto", height: "150px",width
+                    :'250px', backgroundColor:'#CBF3F0'}}
+                  >
+                    <Dropdown>
+                    <Dropdown.Toggle 
+                    // variant="secondary"
+                    id="dropdown-basic1"
+                    style={{
+                      backgroundColor: "#0A203F",
+                      color: "white",
+                      border: "none",
+                      outline: "none",
+                      height:"28px"
+                    }}
+                      >
+                    Menus
+                    </Dropdown.Toggle>
+                    
+                    <Dropdown.Menu style={{overflowY:'auto', height: "150px", backgroundColor:'#CBF3F0'}}>
+                    <Dropdown.Item onClick={handleRefreshData} style={{fontWeight:'bold'}}>
+                      <FontAwesomeIcon icon={faRefresh} className="me-2" />
+                      Refresh Data
+                    </Dropdown.Item>
+                    <Menubar model={filteredMenuItems} style={menubarStyle} />
+                    </Dropdown.Menu>
+                    </Dropdown>
+                    {/* <div className="overflow-auto">
+                      <Menubar model={filteredMenuItems} style={menubarStyle} />
+                    </div> */}
+
+                    <Dropdown.Item href="#" onClick={handleClick} style={{fontWeight:'bold'}}>
+                      Change Password
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      href="#"
+                      style={{fontWeight:'bold'}}
+                      onClick={() => {
+                        localStorage.clear();
+                        navigate("/");
+                      }}
+                    >
+                      Logout
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+              {/* Show name for large screens */}
+              <span className="d-none d-md-block">
+                {menuListData !== null
+                  ? `Hello, ${menuListData[0]?.firstname} ${menuListData[0]?.lastname}`
+                  : ""}
+              </span>
+            </div>
+          </div>
+
+          <div className="d-none d-md-flex justify-content-between align-items-center w-100">
+            <div className="d-flex justify-content-between align-items-center ">
+              <button
+                className="btn"
+                data-toggle="tooltip"
+                data-placement="bottom"
+                title="Menu Refresh"
+                style={refreshBtnStyle} // Limit button width
+                onClick={handleRefreshData}
+              >
+                <FontAwesomeIcon
+                  icon={faRefresh}
+                  className="fs-3"
+                ></FontAwesomeIcon>
+              </button>
+
+              <Menubar model={filteredMenuItems} style={menubarStyle} />
+            </div>
+            <div>
+              <Dropdown>
+                <Dropdown.Toggle
+                  variant="secondary"
+                  id="dropdown-basic"
+                  style={{
+                    backgroundColor: "#0A203F",
+                    color: "white",
+                    border: "none",
+                    outline: "none",
+                  }}
+                >
+                  {menuListData !== null
+                    ? `Hello, ${menuListData[0]?.firstname} ${menuListData[0]?.lastname}`
+                    : ""}
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                  <Dropdown.Item href="#" onClick={handleClick}>
+                    Change Password
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    href="#"
+                    onClick={() => {
+                      localStorage.clear();
+                      navigate("/");
+                    }}
+                  >
+                    Logout
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          </div>
         </div>
       </div>
-      {/* {showComponent && <ChangePasswordModal menuListData={menuListData} singleUserData={singleUserData} setSingleUserData={setSingleUserData}/>} */}
-
-      {/* <Footer></Footer> */}
     </div>
   );
 };
