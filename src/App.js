@@ -20,6 +20,7 @@ import ChangePasswordModal from "./pages/Login/ChangePasswordModal";
 import RequireAuth from "./pages/RequireAuth/RequireAuth";
 import NotFound from "./pages/NotFound/NotFound";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import CreateMenu from "./components/MenuInformation/Insert/CreateMenu";
 
 
 function App() {
@@ -91,6 +92,7 @@ function App() {
               <Route path="user-list-data" element={<RequireAuth>
           <UserListInfo setChangePassword={setChangePassword} setResetPassword={setResetPassword} resetPassword={resetPassword} changePassword={changePassword}></UserListInfo>
         </RequireAuth>}></Route>
+        <Route path="create-menu" element={<CreateMenu></CreateMenu>}></Route>
         <Route path='*' element={<NotFound></NotFound>}></Route>
             </Route>
           {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}

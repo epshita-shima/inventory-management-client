@@ -22,9 +22,10 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
   console.log(menuListData);
   if (menuListData !== null) {
     var menuListSingleData = menuListData[0]?.menulist;
+   
   }
 
-  console.log(menuListSingleData);
+  console.log(JSON.stringify(menuListSingleData));
   const [showComponent, setShowComponent] = useState(false);
   const navigate = useNavigate();
 
