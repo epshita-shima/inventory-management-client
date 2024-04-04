@@ -5,7 +5,14 @@ const menuApi = api.injectEndpoints({
     getAllMenuItems: builder.query({
       query: () => "/menuitems",
     }),
+    insertMenu: builder.mutation({
+      query: (payload) => ({
+        url: "/menuitems/insert/menu",
+        method: "PUT",
+        body: payload,
+      }),
+    })
   }),
 });
 
-export const { useGetAllMenuItemsQuery } = menuApi;
+export const { useGetAllMenuItemsQuery, useInsertMenuMutation} = menuApi;

@@ -25,7 +25,7 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
    
   }
 
-  console.log(JSON.stringify(menuListSingleData));
+
   const [showComponent, setShowComponent] = useState(false);
   const navigate = useNavigate();
 

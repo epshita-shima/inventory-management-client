@@ -172,7 +172,7 @@ console.log(JSON.stringify(menuItems))
   //   }
   //   return dataItem;
   // });
-  const mergedArray = mergedData.map(dataItem => {
+  const mergedArray = mergedData?.map(dataItem => {
     const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
       return items.map(item => {
         const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);

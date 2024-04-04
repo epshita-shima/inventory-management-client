@@ -54,43 +54,6 @@ const UserListInfo = ({
   const userIdFromSession = userSingleId[0]?._id;
   const permidionData = user?.filter((user) => user._id == userIdFromSession);
   console.log(companyinfo);
-  // useEffect(()=>{
-  //   const findUserListDropdown = (menuItems) => {
-  //     console.log(menuItems)
-  //     for (const menuItem of menuItems) {
-  //       if (menuItem.label === "User List") {
-  //         return menuItem;
-  //       } else if (menuItem.items && menuItem.items.length > 0) {
-  //         const userListItem = findUserListDropdown(menuItem.items);
-  //         if (userListItem) {
-  //           return userListItem;
-  //         }
-  //       }
-  //     }
-  //     return null;
-  //   };
-
-  //   // Function to set properties for "User List" for all users
-  //   const setPermissionsForUserList = (users) => {
-  //     console.log(users)
-  //     users?.forEach(user => {
-  //       const userListItem = findUserListDropdown(user.menulist);
-  //       console.log(userListItem)
-  //       if (userListItem) {
-  //       setPermission(userListItem)
-  //         // Set properties for "User List"
-  //         // userListItem.isChecked = true;
-  //         // userListItem.insert = true;
-  //         // userListItem.update = true;
-  //         // userListItem.pdf = true;
-  //         // userListItem.delete = true;
-  //       }
-  //     });
-  //   };
-
-  //   // Call the function to set permissions for all users
-  //   setPermissionsForUserList(activeUser);
-  // },[activeUser])
 
   const extractUserListForCurrentUser = (userData, userId) => {
     let userList = null;

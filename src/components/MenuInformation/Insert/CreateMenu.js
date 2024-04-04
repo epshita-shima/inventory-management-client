@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import React, { useRef, useState } from "react";
 import Select from "react-select";
-import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
+import { useGetAllMenuItemsQuery, useInsertMenuMutation } from "../../../redux/features/menus/menuApi";
 import "./CreateMenu.css";
 import * as Yup from "yup";
 import { InputGroup } from "react-bootstrap";
@@ -15,6 +15,7 @@ import { InputGroup } from "react-bootstrap";
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
   const [parentMenuName, setParentMenuName] = useState("");
+  const [insertMenu]=useInsertMenuMutation()
   const {
     data: menuItems,
     isError: menuItemsIsError,
@@ -36,26 +37,30 @@ const CreateMenu = () => {
     };
     return flattenRecursive(options);
   };
-
+console.log(JSON.stringify(menuItems))
   const flattenedOptions = flattenOptions(menuItems);
-  console.log(parentMenuName);
+
   const handleSubmit = (e, values) => {
+    e.preventDefault()
     const modelMenuInsert = {
       children: [],
-      label: parentMenuName,
+      label: parentMenuName.label,
       url: "#",
       permissions: [],
-      items: [
-        {
-          label: "User List",
-          url: "/user-list-data",
-          permissions: [],
-          _id: "usersubitem-121",
-          isParent: "false",
-        },
-      ],
+      items: [],
+      _id:parentMenuName.value
     };
-    console.log(values);
+    values.detailsData.map((item) => {
+      modelMenuInsert.items.push({
+        children: [],
+        label: item.parent_ChildName,
+        url: "#",
+        permissions: [],
+        items: [],
+        trackId:parentMenuName.value
+      })})
+      console.log(JSON.stringify(modelMenuInsert))
+      insertMenu(modelMenuInsert)
   };
   return (
     <div
@@ -118,7 +123,7 @@ const CreateMenu = () => {
                 // style={{ border: "1px solid #00B987" }}
                 // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
                 onChange={(e) => {
-                  setParentMenuName(e.value);
+                  setParentMenuName(e);
                 }}
               ></Select>
 
@@ -128,6 +133,7 @@ const CreateMenu = () => {
           <div className="d-flex justify-content-between align-items-center mt-4">
             <button
               type="submit"
+              form="menucreation-form"
               className="border-0 "
               style={{
                 backgroundColor: "#00B987",
@@ -182,9 +188,9 @@ const CreateMenu = () => {
                 formik.resetForm();
               }}
               render={({ values, setFieldValue }) => (
-                <Form
-                  onSubmit={() => {
-                    handleSubmit(values);
+                <Form id='menucreation-form' 
+                  onSubmit={(e) => {
+                    handleSubmit(e,values);
                   }}
                 >
                   <FieldArray
@@ -294,6 +300,7 @@ const CreateMenu = () => {
                                                 );
                                               }}
                                             />
+                                            <br />
                                             <span className="text-danger">
                                               <ErrorMessage
                                                 name={`detailsData.${index}.parent_ChildName`}
