@@ -7,60 +7,115 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import React, { useRef, useState } from "react";
 import Select from "react-select";
-import { useGetAllMenuItemsQuery, useInsertMenuMutation } from "../../../redux/features/menus/menuApi";
+import { useGetAllMenuItemsQuery, useCreateMenuMutation, useUpdateMenuMutation } from "../../../redux/features/menus/menuApi";
 import "./CreateMenu.css";
 import * as Yup from "yup";
 import { InputGroup } from "react-bootstrap";
 
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
-  const [parentMenuName, setParentMenuName] = useState("");
-  const [insertMenu]=useInsertMenuMutation()
+  const [parentMenuName, setParentMenuName] = useState('');
+  const [createMenu]=useCreateMenuMutation()
+  const [updateMenu]=useUpdateMenuMutation()
   const {
     data: menuItems,
     isError: menuItemsIsError,
     isLoading: menuItemsIsLoading,
   } = useGetAllMenuItemsQuery();
-  const flattenOptions = (options) => {
-    const flattenRecursive = (options, parentLabel) => {
-      let result = [];
-      options?.forEach((option) => {
+//   const flattenOptions = (options) => {
+//     const flattenRecursive = (options, parentLabel) => {
+//       console.log(options, parentLabel)
+//       let result = [];
+//       options?.forEach((option) => {
+//         result.push({
+//           value: option._id,
+//           label: parentLabel ? `${option.label}` : option.label,
+//         });
+//         if (option.items && option.items.length > 0) {
+//           result = result.concat(flattenRecursive(option.items, option.label));
+//         }
+//       });
+//       return result;
+//     };
+//     return flattenRecursive(options);
+//   };
+// console.log(JSON.stringify(menuItems))
+//   const flattenedOptions = flattenOptions(menuItems);
+console.log(menuItems)
+
+const flattenOptions = (options) => {
+  const flattenRecursive = (options, parentLabel) => {
+    let result = [];
+    options?.forEach((option) => {
+      if (option.isParent==true) {
         result.push({
           value: option._id,
-          label: parentLabel ? `${option.label}` : option.label,
+          label: option.label,
         });
-        if (option.items && option.items.length > 0) {
-          result = result.concat(flattenRecursive(option.items, option.label));
-        }
-      });
-      return result;
-    };
-    return flattenRecursive(options);
+      } else {
+        // result.push({
+        //   value: option._id,
+        //   label: parentLabel ? `${parentLabel} > ${option.label}` : option.label,
+        // });
+      }
+      if (option.items && option.items.length > 0) {
+        result = result.concat(flattenRecursive(option.items, option.label));
+      }
+    });
+    return result;
   };
-console.log(JSON.stringify(menuItems))
-  const flattenedOptions = flattenOptions(menuItems);
-
+  return flattenRecursive(options);
+};
+const flattenedOptions = flattenOptions(menuItems);
+console.log(flattenedOptions)
   const handleSubmit = (e, values) => {
     e.preventDefault()
-    const modelMenuInsert = {
-      children: [],
-      label: parentMenuName.label,
-      url: "#",
-      permissions: [],
-      items: [],
-      _id:parentMenuName.value
-    };
-    values.detailsData.map((item) => {
-      modelMenuInsert.items.push({
+    if(parentMenuName){
+      const modelMenuInsert = {
         children: [],
-        label: item.parent_ChildName,
+        label: parentMenuName.label,
         url: "#",
         permissions: [],
         items: [],
-        trackId:parentMenuName.value
-      })})
-      console.log(JSON.stringify(modelMenuInsert))
-      insertMenu(modelMenuInsert)
+        isParent: true,
+        _id: parentMenuName.value
+      };
+      values.detailsData.map((item) => {
+        modelMenuInsert.items.push({
+          children: [],
+          label: item.parent_ChildName,
+          url: "#",
+          permissions: [],
+          items: [],
+          trackId:parentMenuName.value,
+          isParent:item.isChild
+        })})
+        console.log(JSON.stringify(modelMenuInsert))
+        updateMenu(modelMenuInsert)
+    }
+    else{
+        function convertToMenuItem(data) {
+          const { parentmenu, detailsData } = data;
+          const menuItems = detailsData?.map(item => {
+              return {
+                  children: [],
+                  label: item.parent_ChildName,
+                  url: "#",
+                  permissions: [],
+                  items: [],
+                  isParent: item.isChild ? true : false
+              };
+          });
+      
+          return {
+              parentmenu,
+              menuItems
+          };
+      }
+      const convertedData = convertToMenuItem(values);
+      createMenu(convertedData.menuItems)
+    }
+   
   };
   return (
     <div
@@ -97,8 +152,39 @@ console.log(JSON.stringify(menuItems))
             </div>
           </div>
           <div>
-            <div className="w-50 mt-4">
+          <div className="w-50 mt-4">
               <label htmlFor="">Parent Name</label>
+              <Select
+                class="form-select"
+                className="mb-3 mt-1"
+                aria-label="Default select example"
+                name="itemType"
+                isDisabled
+                options={flattenedOptions}
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    borderColor: state.isFocused ? "#fff" : "#fff",
+                    border: "1px solid #00B987",
+                  }),
+                }}
+                theme={(theme) => ({
+                  ...theme,
+                  colors: {
+                    ...theme.colors,
+                    primary25: "#CBF3F0",
+                    primary: "#00B987",
+                  },
+                })}
+                // style={{ border: "1px solid #00B987" }}
+                // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
+                onChange={(e) => {
+                  setParentMenuName(e);
+                }}
+              ></Select>
+            </div>
+            <div className="w-50 mt-4">
+              <label htmlFor="">Sub Parent Name</label>
               <Select
                 class="form-select"
                 className="mb-3 mt-1"
@@ -126,8 +212,6 @@ console.log(JSON.stringify(menuItems))
                   setParentMenuName(e);
                 }}
               ></Select>
-
-              <div className=""></div>
             </div>
           </div>
           <div className="d-flex justify-content-between align-items-center mt-4">
@@ -197,7 +281,6 @@ console.log(JSON.stringify(menuItems))
                     name="detailsData"
                     render={(arrayHelpers) => {
                       ArrayHelperRef.current = arrayHelpers;
-                      console.log(values);
                       const details = values.detailsData;
                       return (
                         <div>

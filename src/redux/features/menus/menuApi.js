@@ -4,15 +4,28 @@ const menuApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAllMenuItems: builder.query({
       query: () => "/menuitems",
+      providesTags: [
+        "createmenu",
+        "createchildmenu",
+      ],
     }),
-    insertMenu: builder.mutation({
+    createMenu: builder.mutation({
       query: (payload) => ({
-        url: "/menuitems/insert/menu",
-        method: "PUT",
+        url: "/menuitems/create/menu",
+        method: "POST",
         body: payload,
       }),
+      invalidatesTags: ["createmenu"],
+    }),
+    updateMenu: builder.mutation({
+      query: (payload) => ({
+        url: "/menuitems/update/menu",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["createchildmenu"],
     })
   }),
 });
 
-export const { useGetAllMenuItemsQuery, useInsertMenuMutation} = menuApi;
+export const { useGetAllMenuItemsQuery, useCreateMenuMutation,useUpdateMenuMutation} = menuApi;
