@@ -174,7 +174,8 @@ console.log(JSON.stringify(menuItems))
   // });
   const mergedArray = mergedData?.map(dataItem => {
     const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
-      return items.map(item => {
+      console.log(items);
+      return items?.map(item => {
         const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
         const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
         const insert = clickedCheckbox ? clickedCheckbox.insert : false;
@@ -182,22 +183,12 @@ console.log(JSON.stringify(menuItems))
         const pdf = clickedCheckbox ? clickedCheckbox.pdf : false;
         const del = clickedCheckbox ? clickedCheckbox.delete : false;
         const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
-        const trackId= clickedCheckbox ? clickedCheckbox.childId :item._id
-        
-        if (item.items) {
-          return {
-            ...item,
-            trackId,
-            isChecked,
-            insert,
-            update,
-            pdf,
-            delete: del,
-            parentIds,
-            items: mergeCheckboxIntoDropdown(item.items, clickedCheckboxes)
-          };
-        }
+        const trackId = clickedCheckbox ? clickedCheckbox.childId : item._id;
+        console.log(item.items?.length);
   
+        // Recursively merge checkboxes into nested items
+        const mergedItems = mergeCheckboxIntoDropdown(item?.items, clickedCheckboxes);
+  console.log(mergedItems)
         return {
           ...item,
           trackId,
@@ -206,16 +197,17 @@ console.log(JSON.stringify(menuItems))
           update,
           pdf,
           delete: del,
-          parentIds
+          parentIds,
+          items: mergedItems // Assign the merged items
         };
       });
     };
   
     const clickedCheckboxe = clickedCheckboxes.filter(checkbox => checkbox.parentIds.includes(dataItem._id));
-  
+  console.log(clickedCheckboxe)
     return {
       ...dataItem,
-      items: mergeCheckboxIntoDropdown(dataItem.items, clickedCheckboxe)
+      items: mergeCheckboxIntoDropdown(dataItem?.items || [], clickedCheckboxe) // Use empty array if items is undefined
     };
   });
   // const mergedArray = mergedData.map(dataItem => {
@@ -294,7 +286,7 @@ console.log(JSON.stringify(menuItems))
       menulist: mergedArray.map(item => {
         const { _id, items, ...itemWithoutId } = item;
     
-        const dropdownWithoutIds = items.map(d => {
+        const dropdownWithoutIds = items?.map(d => {
           const { _id, ...dropdownItemWithoutId } = d;
           return dropdownItemWithoutId;
         });

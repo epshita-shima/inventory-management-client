@@ -20,9 +20,9 @@ const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   console.log(JSON.stringify(user))
 
 
-const handleFocus = () => {
-  setPassword(''); // Clearing the password value
-};
+  const handleFocus = () => {
+    setPassword(''); // Clearing the password value
+  };
   useEffect(() => {
     const userData = user?.filter(
       (item) => item.username == username && item.password == password

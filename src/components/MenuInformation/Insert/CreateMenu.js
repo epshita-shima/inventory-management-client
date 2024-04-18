@@ -11,6 +11,7 @@ import { useGetAllMenuItemsQuery, useCreateMenuMutation, useUpdateMenuMutation }
 import "./CreateMenu.css";
 import * as Yup from "yup";
 import { InputGroup } from "react-bootstrap";
+import swal from "sweetalert";
 
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
@@ -67,56 +68,118 @@ const flattenOptions = (options) => {
   return flattenRecursive(options);
 };
 const flattenedOptions = flattenOptions(menuItems);
-console.log(flattenedOptions)
-  const handleSubmit = (e, values) => {
-    e.preventDefault()
-    if(parentMenuName){
-      const modelMenuInsert = {
-        children: [],
-        label: parentMenuName.label,
-        url: "#",
-        permissions: [],
-        items: [],
-        isParent: true,
-        _id: parentMenuName.value
-      };
-      values.detailsData.map((item) => {
-        modelMenuInsert.items.push({
-          children: [],
-          label: item.parent_ChildName,
-          url: "#",
-          permissions: [],
-          items: [],
-          trackId:parentMenuName.value,
-          isParent:item.isChild
-        })})
-        console.log(JSON.stringify(modelMenuInsert))
-        updateMenu(modelMenuInsert)
-    }
-    else{
-        function convertToMenuItem(data) {
-          const { parentmenu, detailsData } = data;
-          const menuItems = detailsData?.map(item => {
-              return {
-                  children: [],
-                  label: item.parent_ChildName,
-                  url: "#",
-                  permissions: [],
-                  items: [],
-                  isParent: item.isChild ? true : false
-              };
+const flattenOptionsData = (options) => {
+  const flattenRecursive = (options, parentLabel) => {
+    let result = [];
+    options?.forEach((option) => {
+      if (option.isParent==true) {
+        result.push({
+          value: option._id,
+          label: option.label,
+          trackId:option.trackId
+        });
+      } else {
+        // result.push({
+        //   value: option._id,
+        //   label: parentLabel ? `${parentLabel} > ${option.label}` : option.label,
+        // });
+      }
+      if (option.items && option.items.length > 0) {
+        result = result.concat(flattenRecursive(option.items, option.label));
+      }
+    });
+    return result;
+  };
+  return flattenRecursive(options);
+};
+const flattenedOptionsData = flattenOptionsData(menuItems);
+console.log(flattenedOptionsData)
+const handleSubmit = async (e, values) => {
+  e.preventDefault();
+  console.log(parentMenuName.value)
+  try {
+    values.detailsData.forEach((item) => {
+    console.log(item)
+      if (item.isChild==false && parentMenuName.value ==undefined || item.parent_ChildName=='') {
+        swal("Not possible", "Please select parent name", "warning");
+      }
+      else{
+        if (parentMenuName) {
+          const modelMenuInsert = {
+            children: [],
+            label: parentMenuName.label,
+            url: "#",
+            permissions: [],
+            items: [],
+            isParent: true,
+            _id: parentMenuName.value,
+            trackId:parentMenuName.trackId
+          };
+    
+          values.detailsData.forEach((item) => {
+            console.log(item.isChild)
+            modelMenuInsert.items.push({
+              children: [],
+              label: item.parent_ChildName,
+              url: "#",
+              permissions: [],
+              items: [],
+              trackId: parentMenuName.value,
+              isParent: item.isChild ? true : false
+            });
           });
-      
-          return {
+          console.log(parentMenuName.value)
+        
+          swal("Done", "Data Save Successfully", "success");
+       
+        updateMenu(modelMenuInsert);
+        values.parentmenu=''
+        values.detailsData.forEach((item) => {
+          item.parent_ChildName=''
+        }
+        )
+
+        } else {
+          function convertToMenuItem(data) {
+            const { parentmenu, detailsData } = data;
+            console.log(detailsData)
+            const menuItems = detailsData?.map(item => {
+              return {
+                children: [],
+                label: item.parent_ChildName,
+                url: "#",
+                permissions: [],
+                items: [],
+                isParent: item.isChild ? true : false,
+              };
+            });
+            return {
               parentmenu,
               menuItems
-          };
+            };
+          }
+    
+          const convertedData = convertToMenuItem(values);
+          console.log(JSON.stringify(convertedData.menuItems))
+          swal("Done", "Data Save Successfully", "success");
+         createMenu(convertedData.menuItems);
+         values.parentmenu=''
+         values.detailsData.forEach((item) => {
+          item.parent_ChildName=''
+        })
+        }
       }
-      const convertedData = convertToMenuItem(values);
-      createMenu(convertedData.menuItems)
-    }
+     
+    });
    
-  };
+
+    // swal("Done", "Data Saved Successfully", "success");
+  } catch (error) {
+    console.error("Error saving data:", error);
+    swal("Error", "Failed to save data. Please try again later.", "error");
+  }
+};
+
   return (
     <div
       className="container-fluid usercreation-table"
@@ -152,37 +215,7 @@ console.log(flattenedOptions)
             </div>
           </div>
           <div>
-          <div className="w-50 mt-4">
-              <label htmlFor="">Parent Name</label>
-              <Select
-                class="form-select"
-                className="mb-3 mt-1"
-                aria-label="Default select example"
-                name="itemType"
-                isDisabled
-                options={flattenedOptions}
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    borderColor: state.isFocused ? "#fff" : "#fff",
-                    border: "1px solid #00B987",
-                  }),
-                }}
-                theme={(theme) => ({
-                  ...theme,
-                  colors: {
-                    ...theme.colors,
-                    primary25: "#CBF3F0",
-                    primary: "#00B987",
-                  },
-                })}
-                // style={{ border: "1px solid #00B987" }}
-                // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
-                onChange={(e) => {
-                  setParentMenuName(e);
-                }}
-              ></Select>
-            </div>
+          
             <div className="w-50 mt-4">
               <label htmlFor="">Sub Parent Name</label>
               <Select
@@ -191,6 +224,7 @@ console.log(flattenedOptions)
                 aria-label="Default select example"
                 name="itemType"
                 options={flattenedOptions}
+                
                 styles={{
                   control: (baseStyles, state) => ({
                     ...baseStyles,
@@ -209,7 +243,10 @@ console.log(flattenedOptions)
                 // style={{ border: "1px solid #00B987" }}
                 // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
                 onChange={(e) => {
-                  setParentMenuName(e);
+                  console.log(e)
+                  const filterData=flattenedOptionsData.find((x)=>x.value==e.value)
+                  console.log(filterData)
+                  setParentMenuName(filterData);
                 }}
               ></Select>
             </div>
@@ -329,7 +366,7 @@ console.log(flattenedOptions)
                                                   fontSize: "16px",
                                                 }}
                                               >
-                                                P
+                                                C
                                               </span>
                                               <div class="form-switch ms-2">
                                                 <input
@@ -356,7 +393,7 @@ console.log(flattenedOptions)
                                                   marginLeft: "5px",
                                                 }}
                                               >
-                                                C
+                                                P
                                               </label>
                                             </div>
                                             <span className="text-danger">
@@ -370,6 +407,7 @@ console.log(flattenedOptions)
                                               type="text"
                                               name={`detailsData.${index}.parent_ChildName`}
                                               placeholder="Parent / Child"
+                                              value={detail.parent_ChildName}
                                               style={{
                                                 border: "1px solid #00B987",
                                                 padding: "5px",

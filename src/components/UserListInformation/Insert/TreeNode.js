@@ -144,7 +144,7 @@ console.log(clickedCheckboxes.parentIds)
               {node.items.map((subNode) => (
                 <tr key={subNode._id}>
                   <td>
-                    {subNode.items ? (
+                    {subNode.items?.length > 0 ? (
                       <TreeNode
                         node={subNode}
                         clickedCheckboxes={clickedCheckboxes}
@@ -182,7 +182,7 @@ console.log(clickedCheckboxes.parentIds)
                     )}
                   </td>
 
-                  {subNode.items ? (
+                  {subNode?.items?.length > 0 ? (
                     ""
                   ) : (
                     <td className="d-flex justify-content-between align-items-center">
