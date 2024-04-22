@@ -7,7 +7,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import React, { useRef, useState } from "react";
 import Select from "react-select";
-import { useGetAllMenuItemsQuery, useCreateMenuMutation, useUpdateMenuMutation } from "../../../redux/features/menus/menuApi";
+import {
+  useGetAllMenuItemsQuery,
+  useCreateMenuMutation,
+  useUpdateMenuMutation,
+} from "../../../redux/features/menus/menuApi";
 import "./CreateMenu.css";
 import * as Yup from "yup";
 import { InputGroup } from "react-bootstrap";
@@ -15,170 +19,193 @@ import swal from "sweetalert";
 
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
-  const [parentMenuName, setParentMenuName] = useState('');
-  const [createMenu]=useCreateMenuMutation()
-  const [updateMenu]=useUpdateMenuMutation()
+  const [parentMenuName, setParentMenuName] = useState("");
+  const [menuType, setMenuType] = useState("");
+  const [createMenu] = useCreateMenuMutation();
+  const [updateMenu] = useUpdateMenuMutation();
+  const selectInputRef = useRef();
+  const [selectedTopParentValue, setSelectedTopParentValue] = useState(null);
+  console.log(menuType);
   const {
     data: menuItems,
     isError: menuItemsIsError,
     isLoading: menuItemsIsLoading,
   } = useGetAllMenuItemsQuery();
-//   const flattenOptions = (options) => {
-//     const flattenRecursive = (options, parentLabel) => {
-//       console.log(options, parentLabel)
-//       let result = [];
-//       options?.forEach((option) => {
-//         result.push({
-//           value: option._id,
-//           label: parentLabel ? `${option.label}` : option.label,
-//         });
-//         if (option.items && option.items.length > 0) {
-//           result = result.concat(flattenRecursive(option.items, option.label));
-//         }
-//       });
-//       return result;
-//     };
-//     return flattenRecursive(options);
-//   };
-// console.log(JSON.stringify(menuItems))
-//   const flattenedOptions = flattenOptions(menuItems);
-console.log(menuItems)
 
-const flattenOptions = (options) => {
-  const flattenRecursive = (options, parentLabel) => {
-    let result = [];
-    options?.forEach((option) => {
-      if (option.isParent==true) {
-        result.push({
-          value: option._id,
-          label: option.label,
-        });
-      } else {
-        // result.push({
-        //   value: option._id,
-        //   label: parentLabel ? `${parentLabel} > ${option.label}` : option.label,
-        // });
-      }
-      if (option.items && option.items.length > 0) {
-        result = result.concat(flattenRecursive(option.items, option.label));
-      }
-    });
-    return result;
-  };
-  return flattenRecursive(options);
-};
-const flattenedOptions = flattenOptions(menuItems);
-const flattenOptionsData = (options) => {
-  const flattenRecursive = (options, parentLabel) => {
-    let result = [];
-    options?.forEach((option) => {
-      if (option.isParent==true) {
-        result.push({
-          value: option._id,
-          label: option.label,
-          trackId:option.trackId
-        });
-      } else {
-        // result.push({
-        //   value: option._id,
-        //   label: parentLabel ? `${parentLabel} > ${option.label}` : option.label,
-        // });
-      }
-      if (option.items && option.items.length > 0) {
-        result = result.concat(flattenRecursive(option.items, option.label));
-      }
-    });
-    return result;
-  };
-  return flattenRecursive(options);
-};
-const flattenedOptionsData = flattenOptionsData(menuItems);
-console.log(flattenedOptionsData)
-const handleSubmit = async (e, values) => {
-  e.preventDefault();
-  console.log(parentMenuName.value)
-  try {
-    values.detailsData.forEach((item) => {
-    console.log(item)
-      if (item.isChild==false && parentMenuName.value ==undefined || item.parent_ChildName=='') {
-        swal("Not possible", "Please select parent name", "warning");
-      }
-      else{
-        if (parentMenuName) {
-          const modelMenuInsert = {
-            children: [],
-            label: parentMenuName.label,
-            url: "#",
-            permissions: [],
-            items: [],
-            isParent: true,
-            _id: parentMenuName.value,
-            trackId:parentMenuName.trackId
-          };
-    
-          values.detailsData.forEach((item) => {
-            console.log(item.isChild)
-            modelMenuInsert.items.push({
-              children: [],
-              label: item.parent_ChildName,
-              url: "#",
-              permissions: [],
-              items: [],
-              trackId: parentMenuName.value,
-              isParent: item.isChild ? true : false
-            });
+  const menuTypeOptions = [
+    { value: "child", label: "Child" },
+    { value: "parent", label: "Parent" },
+  ];
+
+  const flattenOptions = (options) => {
+    const flattenRecursive = (options, parentLabel) => {
+      let result = [];
+      options?.forEach((option) => {
+        if (option.isParent == true) {
+          result.push({
+            value: option._id,
+            label: option.label,
           });
-          console.log(parentMenuName.value)
-        
-          swal("Done", "Data Save Successfully", "success");
-       
-        updateMenu(modelMenuInsert);
-        values.parentmenu=''
-        values.detailsData.forEach((item) => {
-          item.parent_ChildName=''
-        }
-        )
-
         } else {
-          function convertToMenuItem(data) {
-            const { parentmenu, detailsData } = data;
-            console.log(detailsData)
-            const menuItems = detailsData?.map(item => {
-              return {
+          // result.push({
+          //   value: option._id,
+          //   label: parentLabel ? `${parentLabel} > ${option.label}` : option.label,
+          // });
+        }
+        if (option.items && option.items.length > 0) {
+          result = result.concat(flattenRecursive(option.items, option.label));
+        }
+      });
+      return result;
+    };
+    return flattenRecursive(options);
+  };
+  const flattenedOptions = flattenOptions(menuItems);
+  console.log(flattenedOptions);
+  const flattenOptionsData = (options) => {
+    const flattenRecursive = (options, parentLabel) => {
+      let result = [];
+      options?.forEach((option) => {
+        if (option.isParent == true) {
+          result.push({
+            value: option._id,
+            label: option.label,
+            trackId: option.trackId,
+          });
+        } else {
+          // result.push({
+          //   value: option._id,
+          //   label: parentLabel ? `${parentLabel} > ${option.label}` : option.label,
+          // });
+        }
+        if (option.items && option.items.length > 0) {
+          result = result.concat(flattenRecursive(option.items, option.label));
+        }
+      });
+      return result;
+    };
+    return flattenRecursive(options);
+  };
+  const flattenedOptionsData = flattenOptionsData(menuItems);
+  console.log(flattenedOptionsData);
+
+  const handleSubmit = async (e, values) => {
+    e.preventDefault();
+    console.log(values);
+    const modelMenuInsert = {
+      children: [],
+      label: parentMenuName.label,
+      url: "#",
+      permissions: [],
+      items: [],
+      isParent: "",
+      _id: parentMenuName.value,
+      trackId: parentMenuName.trackId,
+    };
+    try {
+      values.detailsData.forEach((item) => {
+        console.log(item);
+        if( item.menu_name == "")
+        {
+          swal("Not Possible!", "Please take valid input", {
+            icon: "warning",
+          });
+          return
+        }
+        
+        else if (menuType == "child" && parentMenuName.value == undefined) {
+          swal("Not possible", "Please select parent name", "warning");
+        }
+         else {
+          if (parentMenuName) {
+            values.detailsData.forEach((item) => {
+              console.log(item.menu_type);
+              modelMenuInsert.items.push({
                 children: [],
-                label: item.parent_ChildName,
+                label: item.menu_name,
                 url: "#",
                 permissions: [],
                 items: [],
-                isParent: item.isChild ? true : false,
-              };
+                trackId: parentMenuName.value,
+                isParent: menuType == "parent" ? true : false,
+              });
             });
-            return {
-              parentmenu,
-              menuItems
-            };
-          }
-    
-          const convertedData = convertToMenuItem(values);
-          console.log(JSON.stringify(convertedData.menuItems))
-          swal("Done", "Data Save Successfully", "success");
-         createMenu(convertedData.menuItems);
-         values.parentmenu=''
-         values.detailsData.forEach((item) => {
-          item.parent_ChildName=''
-        })
-        }
-      }
-     
-    });
-   
 
-    // swal("Done", "Data Saved Successfully", "success");
-  } catch (error) {
-    console.error("Error saving data:", error);
-    swal("Error", "Failed to save data. Please try again later.", "error");
-  }
-};
+            // swal("Done", "Data Save Successfully", "success");
+            console.log(modelMenuInsert);
+            // values.detailsData.forEach((item) => {
+            //   item.menu_name = "";
+            // });
+            // updateMenu(modelMenuInsert);
+           
+         
+          } else {
+            values.detailsData.forEach((item) => {
+              if( item.menu_name == "")
+                {
+                  swal("Not Possible!", "Please take valid input", {
+                    icon: "warning",
+                  });
+                }
+              else{
+                function convertToMenuItem(data) {
+                  const { parentmenu, detailsData } = data;
+                  console.log(detailsData);
+                  const menuItems = detailsData?.map((item) => {
+                    return {
+                      children: [],
+                      label: item.menu_name,
+                      url: "#",
+                      permissions: [],
+                      items: [],
+                      isParent: menuType == "parent" ? true : false,
+                    };
+                  });
+                  return {
+                    parentmenu,
+                    menuItems,
+                  };
+                }
+    
+                const convertedData = convertToMenuItem(values);
+                console.log(JSON.stringify(convertedData.menuItems));
+    
+                swal({
+                  title: "Are you sure this menus are top parent ?",
+                  text: "It will show as a top heading, because you are not select any parent",
+                  icon: "warning",
+                  buttons: true,
+                  dangerMode: true,
+                }).then((willDelete) => {
+                  if (willDelete) {
+                    // deleteUser(activeUser?._id);
+                    swal("Done", "Data Save Successfully", {
+                      icon: "success",
+                    });
+                    //  createMenu(convertedData.menuItems);
+                    // values.parentmenu = "";
+                    // values.detailsData.forEach((item) => {
+                    //   item.menu_name = "";
+                    // });
+                    // values.detailsData=[]
+                  } else {
+                    swal(" Cancel! Saving data ");
+                  }
+                });
+              }
+            })
+         
+            
+          }
+        }
+      });
+
+      // swal("Done", "Data Saved Successfully", "success");
+    } catch (error) {
+      console.error("Error saving data:", error);
+      swal("Error", "Failed to save data. Please try again later.", "error");
+    }
+  };
 
   return (
     <div
@@ -215,40 +242,89 @@ const handleSubmit = async (e, values) => {
             </div>
           </div>
           <div>
-          
-            <div className="w-50 mt-4">
-              <label htmlFor="">Sub Parent Name</label>
-              <Select
-                class="form-select"
-                className="mb-3 mt-1"
-                aria-label="Default select example"
-                name="itemType"
-                options={flattenedOptions}
-                
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    borderColor: state.isFocused ? "#fff" : "#fff",
-                    border: "1px solid #00B987",
-                  }),
-                }}
-                theme={(theme) => ({
-                  ...theme,
-                  colors: {
-                    ...theme.colors,
-                    primary25: "#CBF3F0",
-                    primary: "#00B987",
-                  },
-                })}
-                // style={{ border: "1px solid #00B987" }}
-                // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
-                onChange={(e) => {
-                  console.log(e)
-                  const filterData=flattenedOptionsData.find((x)=>x.value==e.value)
-                  console.log(filterData)
-                  setParentMenuName(filterData);
-                }}
-              ></Select>
+            <div className="d-flex justify-content-between align-items-center w-75">
+              <div className="w-50 mt-4">
+                <label htmlFor="">Parent Name</label>
+                <Select
+                  class="form-select"
+                  className="mb-3 mt-1"
+                  aria-label="Default select example"
+                  name="itemType"
+                  isDisabled={menuType=='parent'}
+                  options={flattenedOptions}
+                  // value={flattenedOptions?.find((x) => x.value == parentMenuName.value)}
+                  // ref={selectInputRef}
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? "#fff" : "#fff",
+                      border: "1px solid #00B987",
+                    }),
+                  }}
+                  theme={(theme) => ({
+                    ...theme,
+                    colors: {
+                      ...theme.colors,
+                      primary25: "#CBF3F0",
+                      primary: "#00B987",
+                    },
+                  })}
+                  // style={{ border: "1px solid #00B987" }}
+                  // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
+                  value={flattenedOptions?.find(
+                    (x) => x.value == selectedTopParentValue
+                  )}
+                  onChange={(e) => {
+                    setSelectedTopParentValue(e.value);
+                    const filterData = flattenedOptionsData.find(
+                      (x) => x.value == e.value
+                    );
+                    console.log(filterData);
+                    setParentMenuName(filterData);
+                  }}
+                ></Select>
+              </div>
+              <div className=" mt-4" style={{ width: "40%" }}>
+                <label htmlFor="">Menu Type</label>
+                <Select
+                  class="form-select"
+                  className="mb-3 mt-1"
+                  aria-label="Default select example"
+                  name="menuType"
+                  
+                  options={menuTypeOptions}
+                  // value={menuTypeOptions?.find((x) => x.value == menuType.value)}
+                  // ref={selectInputRef}
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? "#fff" : "#fff",
+                      border: "1px solid #00B987",
+                    }),
+                  }}
+                  theme={(theme) => ({
+                    ...theme,
+                    colors: {
+                      ...theme.colors,
+                      primary25: "#CBF3F0",
+                      primary: "#00B987",
+                    },
+                  })}
+                  // style={{ border: "1px solid #00B987" }}
+                  // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
+                  // value={menuTypeOptions?.find(
+                  //   (x) => x.value == selectedTopParentValue
+                  // )}
+                  onChange={(e) => {
+                    console.log(e);
+                    if (e.value == "child") {
+                      setMenuType(e.value);
+                    } else {
+                      setMenuType(e.value);
+                    }
+                  }}
+                ></Select>
+              </div>
             </div>
           </div>
           <div className="d-flex justify-content-between align-items-center mt-4">
@@ -278,8 +354,8 @@ const handleSubmit = async (e, values) => {
               }}
               onClick={() => {
                 ArrayHelperRef.current.push({
-                  isChild: false,
-                  parent_ChildName: "",
+                  menu_type: menuType,
+                  menu_name: "",
                 });
               }}
             >
@@ -292,16 +368,16 @@ const handleSubmit = async (e, values) => {
                 parentmenu: parentMenuName,
                 detailsData: [
                   {
-                    isChild: false,
-                    parent_ChildName: "",
+                    menu_type: menuType,
+                    menu_name: "",
                   },
                 ],
               }}
               validationSchema={Yup.object({
                 detailsData: Yup.array().of(
                   Yup.object().shape({
-                    isChild: Yup.string().required("Required"),
-                    parent_ChildName: Yup.string().required("Required"),
+                    menu_type: Yup.string().required("Required"),
+                    menu_name: Yup.string().required("Required"),
                   })
                 ),
               })}
@@ -309,9 +385,10 @@ const handleSubmit = async (e, values) => {
                 formik.resetForm();
               }}
               render={({ values, setFieldValue }) => (
-                <Form id='menucreation-form' 
+                <Form
+                  id="menucreation-form"
                   onSubmit={(e) => {
-                    handleSubmit(e,values);
+                    handleSubmit(e, values);
                   }}
                 >
                   <FieldArray
@@ -330,12 +407,6 @@ const handleSubmit = async (e, values) => {
                                 <tr>
                                   <th className="bg-white text-center align-middle text-[#581C87] ">
                                     Sl
-                                  </th>
-                                  <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
-                                    Menu Type
-                                    <span className="text-danger fw-bold fs-2">
-                                      *
-                                    </span>
                                   </th>
 
                                   <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
@@ -357,7 +428,7 @@ const handleSubmit = async (e, values) => {
                                           <td className="bg-white text-center align-middle">
                                             {index + 1}
                                           </td>
-                                          <td className="text-center align-middle">
+                                          {/* <td className="text-center align-middle">
                                             <div class="d-flex align-items-center justify-content-center">
                                               <span
                                                 style={{
@@ -372,11 +443,11 @@ const handleSubmit = async (e, values) => {
                                                 <input
                                                   type="checkbox"
                                                   class="form-check-input"
-                                                  name={`detailsData.${index}.isChild`}
+                                                  name={`detailsData.${index}.menu_type`}
                                                   id="site_state"
                                                   onClick={(e) => {
                                                     setFieldValue(
-                                                      `detailsData.${index}.isChild`,
+                                                      `detailsData.${index}.menu_type`,
                                                       e.target.checked
                                                     );
                                                   }}
@@ -398,16 +469,16 @@ const handleSubmit = async (e, values) => {
                                             </div>
                                             <span className="text-danger">
                                               <ErrorMessage
-                                                name={`detailsData.${index}.isChild`}
+                                                name={`detailsData.${index}.menu_type`}
                                               />
                                             </span>
-                                          </td>
+                                          </td> */}
                                           <td className="text-center align-middle">
                                             <Field
                                               type="text"
-                                              name={`detailsData.${index}.parent_ChildName`}
+                                              name={`detailsData.${index}.menu_name`}
                                               placeholder="Parent / Child"
-                                              value={detail.parent_ChildName}
+                                              value={detail?.menu_name}
                                               style={{
                                                 border: "1px solid #00B987",
                                                 padding: "5px",
@@ -415,16 +486,40 @@ const handleSubmit = async (e, values) => {
                                                 borderRadius: "5px",
                                               }}
                                               onClick={(e) => {
-                                                setFieldValue(
-                                                  `detailsData.${index}.parent_ChildName`,
-                                                  e.target.value
-                                                );
+                                                console.log(menuType);
+                                                if (menuType == "") {
+                                                  swal(
+                                                    "Not possible",
+                                                    "Please select menu type",
+                                                    "warning"
+                                                  );
+                                                } else {
+                                                  if (menuType == "parent") {
+                                                    setFieldValue(
+                                                      `detailsData.${index}.menu_name`,
+                                                      e.target.value
+                                                    );
+                                                    setFieldValue(
+                                                      `detailsData.${index}.menu_type`,
+                                                      true
+                                                    );
+                                                  } else {
+                                                    setFieldValue(
+                                                      `detailsData.${index}.menu_name`,
+                                                      e.target.value
+                                                    );
+                                                    setFieldValue(
+                                                      `detailsData.${index}.menu_type`,
+                                                      false
+                                                    );
+                                                  }
+                                                }
                                               }}
                                             />
                                             <br />
                                             <span className="text-danger">
                                               <ErrorMessage
-                                                name={`detailsData.${index}.parent_ChildName`}
+                                                name={`detailsData.${index}.menu_name`}
                                               />
                                             </span>
                                           </td>

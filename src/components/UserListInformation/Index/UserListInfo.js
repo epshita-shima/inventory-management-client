@@ -66,10 +66,10 @@ const UserListInfo = ({
       currentUser?.menulist?.forEach((menu) => {
         menu?.items?.forEach((subMenu) => {
           // Check if the subMenu is the "User Profile" menu
-          if (subMenu?.label === "User Profile") {
+          if (subMenu?.label === subMenu?.label) {
             // Find the "User List" sub-item
             const userListSubMenu = subMenu?.items.find(
-              (subItem) => subItem?.label === "User List"
+              (subItem) => subItem?.label === subItem?.label
             );
             if (userListSubMenu) {
               // Set the user list property
@@ -90,7 +90,7 @@ const UserListInfo = ({
   );
 
   // Output the user list for the current user
-  console.log(permission?.delete);
+  console.log(permission);
 
   useEffect(() => {
     const activeUsers = user?.filter((user) => user.isactive == true);

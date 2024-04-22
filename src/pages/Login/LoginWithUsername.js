@@ -7,6 +7,7 @@ import { Button, Form, InputGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useGetAllUserQuery } from "../../redux/features/user/userApi";
 import swal from "sweetalert";
+import './LoginWithUsername.css'
 
 const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   const [data] = useUserLoginMutation();
@@ -17,19 +18,19 @@ const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   const inputRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn); // Select isLoggedIn state
   const navigate = useNavigate();
-  console.log(JSON.stringify(user))
 
 
   const handleFocus = () => {
     setPassword(''); // Clearing the password value
   };
+
   useEffect(() => {
     const userData = user?.filter(
       (item) => item.username == username && item.password == password
     );
-    console.log(userData);
     setSingleUserData(userData)
   }, [user, password, username,setSingleUserData]);
+  
   const handleLogin = (e) => {
     e.preventDefault();
     if(singleUserData.length > 0){
@@ -42,10 +43,10 @@ const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   
   };
   return (
-    <div className="row vh-100">
-      <div className=" h-100 w-100 position-relative">
+    <div className="row background-image">
+      {/* <div className=" ">
         <img className="h-100 w-100" src={logImage} alt="" />
-      </div>
+      </div> */}
       <div
         className="shadow-lg position-absolute w-50 rounded-4"
         style={{

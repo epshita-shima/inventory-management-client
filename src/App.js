@@ -23,12 +23,11 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import CreateMenu from "./components/MenuInformation/Insert/CreateMenu";
 import MenuList from "./components/MenuInformation/Index/MenuList";
 
-
 function App() {
-  const [singleUserData,setSingleUserData]=useState([])
-  const [changePassword,setChangePassword]=useState(false)
-  const [resetPassword,setResetPassword]=useState(false)
-  
+  const [singleUserData, setSingleUserData] = useState([]);
+  const [changePassword, setChangePassword] = useState(false);
+  const [resetPassword, setResetPassword] = useState(false);
+
   const dispatch = useDispatch();
   const apiData = [
     {
@@ -63,7 +62,7 @@ function App() {
     // ... other items
   ];
   const getMenulistData = localStorage.getItem("user");
- 
+
   const menuListData = JSON.parse(getMenulistData);
   // useEffect(()=>{
   //   dispatch(setLoading(true))
@@ -78,39 +77,82 @@ function App() {
   //   });
   // },[dispatch])
 
-
   return (
     <div>
       <div className="app-container">
         <div className="content">
           <Routes>
-          <Route path="/" element={<LoginWithUsername singleUserData={singleUserData} setSingleUserData={setSingleUserData}></LoginWithUsername>}></Route>
-            <Route path="/main-view" element={<MainView setChangePassword={setChangePassword} setResetPassword={setResetPassword}></MainView>}>
+            <Route
+              path="/"
+              element={
+                <LoginWithUsername
+                  singleUserData={singleUserData}
+                  setSingleUserData={setSingleUserData}
+                ></LoginWithUsername>
+              }
+            ></Route>
+            <Route
+              path="/main-view"
+              element={
+                <MainView
+                  setChangePassword={setChangePassword}
+                  setResetPassword={setResetPassword}
+                ></MainView>
+              }
+            >
               <Route index element={<Dashboard></Dashboard>}></Route>
-              <Route path="change-password" element={<ChangePasswordModal menuListData={menuListData} singleUserData={singleUserData} setSingleUserData={setSingleUserData} resetPassword={resetPassword} changePassword={changePassword}/>}></Route>
-              <Route path="user-creation" element={<RequireAuth><UserCreation></UserCreation></RequireAuth>}></Route>
-              <Route path="user-update/:id" element={<SingleUserDisplay></SingleUserDisplay>}></Route>
-              <Route path="user-list-data" element={<RequireAuth>
-          <UserListInfo setChangePassword={setChangePassword} setResetPassword={setResetPassword} resetPassword={resetPassword} changePassword={changePassword}></UserListInfo>
-        </RequireAuth>}></Route>
-        <Route path="create-menu" element={<CreateMenu></CreateMenu>}></Route>
-        <Route path="menu-list" element={<MenuList></MenuList>}></Route>
-        <Route path='*' element={<NotFound></NotFound>}></Route>
+              <Route
+                path="change-password"
+                element={
+                  <ChangePasswordModal
+                    menuListData={menuListData}
+                    singleUserData={singleUserData}
+                    setSingleUserData={setSingleUserData}
+                    resetPassword={resetPassword}
+                    changePassword={changePassword}
+                  />
+                }
+              ></Route>
+              <Route
+                path="user-creation"
+                element={
+                  // <RequireAuth>
+                  <UserCreation></UserCreation>
+                  //  </RequireAuth>
+                }
+              ></Route>
+              <Route
+                path="user-update/:id"
+                element={<SingleUserDisplay></SingleUserDisplay>}
+              ></Route>
+              <Route
+                path="user-list-data"
+                element={
+                  // <RequireAuth>
+                    <UserListInfo
+                      setChangePassword={setChangePassword}
+                      setResetPassword={setResetPassword}
+                      resetPassword={resetPassword}
+                      changePassword={changePassword}
+                    ></UserListInfo>
+                  // </RequireAuth>
+                }
+              ></Route>
+              <Route
+                path="create-menu"
+                element={<CreateMenu></CreateMenu>}
+              ></Route>
+              <Route path="menu-list" element={<MenuList></MenuList>}></Route>
+              <Route path="*" element={<NotFound></NotFound>}></Route>
             </Route>
-          {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}
-        {/* <Route path="/login" element={<LoginWithMongodb></LoginWithMongodb>}></Route> */}
-       
-        
-        {/* <Route path="/login" element={<Login></Login>}></Route> */}
-        {/* <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route> */}
-       
-       
-        
-    
+            {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}
+            {/* <Route path="/login" element={<LoginWithMongodb></LoginWithMongodb>}></Route> */}
+
+            {/* <Route path="/login" element={<Login></Login>}></Route> */}
+            {/* <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route> */}
           </Routes>
         </div>
       </div>
-    
     </div>
   );
 }

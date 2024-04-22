@@ -120,7 +120,7 @@ const ChangePasswordModal = ({
                     fontSize: "15px",
                   }}
                   onClick={()=>{
-                    navigate('/user-list-data')
+                    navigate('/main-view/user-list-data')
                   }}
                 >
                   Cancel

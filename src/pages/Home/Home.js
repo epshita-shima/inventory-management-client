@@ -22,466 +22,10 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
   console.log(menuListData);
   if (menuListData !== null) {
     var menuListSingleData = menuListData[0]?.menulist;
-   
   }
-
 
   const [showComponent, setShowComponent] = useState(false);
   const navigate = useNavigate();
-
-  // const navbarData = [
-  //   {
-  //     label: 'Home',
-  //     link: '#',
-  //     active: true,
-  //   },
-  //   {
-  //     label: 'Link',
-  //     link: '#',
-  //     active: false,
-  //   },
-  //   {
-  //     label: 'User Setting',
-  //     link: '#',
-  //     items: [
-  //       {
-  //         label: 'User Role',
-  //         link: '#'
-  //       },
-
-  //       {
-  //         label: 'User Profile',
-  //         link: '#',
-  //         items: [
-  //           {
-  //             label: 'User List',
-  //             link: '/user-list-data'
-  //           },
-  //           {
-  //             label: 'Create User',
-  //             link: '#'
-  //           },
-  //         ]
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     label: 'Disabled',
-  //     link: '#',
-  //     disabled: true,
-  //   },
-  //   // {
-  //   //   label: 'Departments',
-  //   //   link: '#',
-  //   //   items: [
-  //   //     {
-  //   //       label: 'Accounts Department',
-  //   //       link: '#',
-  //   //       items: [
-  //   //         {
-  //   //           label: 'Purchase Department',
-  //   //           link: '#'
-  //   //         },
-  //   //         {
-  //   //           label: 'Sales Department',
-  //   //           link: '#',
-  //   //           items: [
-  //   //             {
-  //   //               label: 'Purchase Department',
-  //   //               link: '#'
-  //   //             },
-  //   //             {
-  //   //               label: 'Sales Department',
-  //   //               link: '#'
-  //   //             },
-  //   //             {
-  //   //               label: 'Loan Department',
-  //   //               link: '#'
-  //   //             },
-  //   //             {
-  //   //               label: 'All Reports',
-  //   //               link: '#'
-  //   //             }
-  //   //           ]
-  //   //         },
-  //   //         {
-  //   //           label: 'Loan Department',
-  //   //           link: '#'
-  //   //         },
-  //   //         {
-  //   //           label: 'All Reports',
-  //   //           link: '#'
-  //   //         }
-  //   //       ]
-  //   //     },
-  //   //      {
-  //   //       label: 'Commercial Department',
-  //   //       link: '#',
-  //   //       items: [
-  //   //         {
-  //   //           label: 'Export Department',
-  //   //           link: '#'
-  //   //         },
-  //   //         {
-  //   //           label: 'Local Department',
-  //   //           link: '#'
-  //   //         },
-  //   //         {
-  //   //           label: 'All Department Reports',
-  //   //           link: '#',
-  //   //           items: [
-  //   //             {
-  //   //               label: 'Purchase Department',
-  //   //               link: '#'
-  //   //             },
-  //   //             {
-  //   //               label: 'Sales Department',
-  //   //               link: '#'
-  //   //             },
-  //   //             {
-  //   //               label: 'Loan Department',
-  //   //               link: '#',
-  //   //               items: [
-  //   //                 {
-  //   //                   label: 'Purchase Department',
-  //   //                   link: '#'
-  //   //                 },
-  //   //                 {
-  //   //                   label: 'Sales Department',
-  //   //                   link: '#'
-  //   //                 },
-  //   //                 {
-  //   //                   label: 'Loan Department',
-  //   //                   link: '#',
-  //   //                   items: [
-  //   //                     {
-  //   //                       label: 'Purchase Department',
-  //   //                       link: '#'
-  //   //                     },
-  //   //                     {
-  //   //                       label: 'Sales Department',
-  //   //                       link: '#'
-  //   //                     },
-  //   //                     {
-  //   //                       label: 'Loan Department',
-  //   //                       link: '#'
-  //   //                     },
-  //   //                     {
-  //   //                       label: 'All Reports',
-  //   //                       link: '#' ,
-  //   //                       items: [
-  //   //                         {
-  //   //                           label: 'Purchase Department',
-  //   //                           link: '#'
-  //   //                         },
-  //   //                         {
-  //   //                           label: 'Sales Department',
-  //   //                           link: '#'
-  //   //                         },
-  //   //                         {
-  //   //                           label: 'Loan Department',
-  //   //                           link: '#',
-  //   //                           items: [
-  //   //                             {
-  //   //                               label: 'Purchase Department',
-  //   //                               link: '#'
-  //   //                             },
-  //   //                             {
-  //   //                               label: 'Sales Department',
-  //   //                               link: '#'
-  //   //                             },
-  //   //                             {
-  //   //                               label: 'Loan Department',
-  //   //                               link: '#'
-  //   //                             },
-  //   //                             {
-  //   //                               label: 'All Reports',
-  //   //                               link: '#'
-  //   //                             }
-  //   //                           ]
-  //   //                         },
-  //   //                         {
-  //   //                           label: 'All Reports',
-  //   //                           link: '#'
-  //   //                         }
-  //   //                       ]
-  //   //                     }
-  //   //                   ]
-  //   //                 },
-  //   //                 {
-  //   //                   label: 'All Reports',
-  //   //                   link: '#'
-  //   //                 }
-  //   //               ]
-  //   //             },
-  //   //             {
-  //   //               label: 'All Reports',
-  //   //               link: '#'
-  //   //             }
-  //   //           ]
-  //   //         }
-  //   //       ]
-  //   //     }
-  //   //   ]
-  //   // },
-
-  // ];
-
-  const navbarData = [
-    {
-      _id: "65d1a288f98ea6dd01974174",
-      label: "Home",
-      link: "#",
-      active: true,
-    },
-    {
-      _id: "65d1a288f98ea6dd01974175",
-      label: "Link",
-      link: "#",
-      active: false,
-    },
-    {
-      label: "User Setting",
-      url: "#",
-      permissions: [],
-      items: [
-        {
-          label: "User Role",
-          url: "#",
-          permissions: [],
-          items: [],
-        },
-        {
-          label: "User Profile",
-          url: "#",
-          permissions: [],
-          items: [],
-        },
-        {
-          label: "User List",
-          url: "/user-list-data",
-          permissions: [],
-          items: [],
-        },
-        {
-          label: "Create User",
-          url: "#",
-          permissions: [],
-          items: [],
-        },
-      ],
-    },
-    {
-      label: "Departments",
-      url: "#",
-      permissions: [],
-      items: [
-        {
-          label: "Accounts Department",
-          url: "#",
-          permissions: [],
-          items: [
-            {
-              label: "Purchase Department",
-              url: "#",
-              permissions: [],
-            },
-            {
-              label: "Sales Department",
-              url: "#",
-              permissions: [],
-              items: [
-                {
-                  label: "Purchase Department",
-                  url: "#",
-                  permissions: [],
-                  items: [],
-                },
-                {
-                  label: "Sales Department",
-                  url: "#",
-                  permissions: [],
-                  items: [],
-                },
-                {
-                  label: "Loan Department",
-                  url: "#",
-                  permissions: [],
-                  items: [],
-                },
-                {
-                  label: "All Reports",
-                  url: "#",
-                  permissions: [],
-                  items: [],
-                },
-              ],
-            },
-            {
-              label: "Loan Department",
-              url: "#",
-              permissions: [],
-              items: [],
-            },
-            {
-              label: "All Reports",
-              url: "#",
-              permissions: [],
-              items: [],
-            },
-          ],
-        },
-        {
-          label: "Commercial Department",
-          url: "#",
-          permissions: [],
-          items: [
-            {
-              label: "Export Department",
-              url: "#",
-              permissions: [],
-            },
-            {
-              label: "Local Department",
-              url: "#",
-              permissions: [],
-            },
-            {
-              label: "All Department Reports",
-              url: "#",
-              permissions: [],
-              items: [
-                {
-                  label: "Purchase Department",
-                  url: "#",
-                  permissions: [],
-                  items: [],
-                },
-                {
-                  label: "Sales Department",
-                  url: "#",
-                  permissions: [],
-                  items: [],
-                },
-                {
-                  label: "Loan Department",
-                  url: "#",
-                  permissions: [],
-                  items: [
-                    {
-                      label: "Purchase Department",
-                      url: "#",
-                      permissions: [],
-                      items: [],
-                    },
-                    {
-                      label: "Sales Department",
-                      url: "#",
-                      permissions: [],
-                      items: [],
-                    },
-                    {
-                      label: "Loan Department",
-                      url: "#",
-                      permissions: [],
-                      items: [
-                        {
-                          label: "Purchase Department",
-                          url: "#",
-                          permissions: [],
-                          items: [],
-                        },
-                        {
-                          label: "Sales Department",
-                          url: "#",
-                          permissions: [],
-                          items: [],
-                        },
-                        {
-                          label: "Loan Department",
-                          url: "#",
-                          permissions: [],
-                          items: [],
-                        },
-                        {
-                          label: "All Reports",
-                          url: "#",
-                          permissions: [],
-                          items: [
-                            {
-                              label: "Purchase Department",
-                              url: "#",
-                              permissions: [],
-                              items: [],
-                            },
-                            {
-                              label: "Sales Department",
-                              url: "#",
-                              permissions: [],
-                              items: [],
-                            },
-                            {
-                              label: "Loan Department",
-                              url: "#",
-                              permissions: [],
-                              items: [
-                                {
-                                  label: "Purchase Department",
-                                  url: "#",
-                                  permissions: [],
-                                  items: [],
-                                },
-                                {
-                                  label: "Sales Department",
-                                  url: "#",
-                                  permissions: [],
-                                  items: [],
-                                },
-                                {
-                                  label: "Loan Department",
-                                  url: "#",
-                                  permissions: [],
-                                  items: [],
-                                },
-                                {
-                                  label: "All Reports",
-                                  url: "#",
-                                  permissions: [],
-                                  items: [],
-                                },
-                              ],
-                            },
-                            {
-                              label: "All Reports",
-                              url: "#",
-                              permissions: [],
-                              items: [],
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                    {
-                      label: "All Reports",
-                      url: "#",
-                      permissions: [],
-                      items: [],
-                    },
-                  ],
-                },
-                {
-                  label: "All Reports",
-                  url: "#",
-                  permissions: [],
-                  items: [],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ];
 
   const cardStyle = {
     border: "1px solid #ccc",
@@ -518,7 +62,7 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
 
     return { ...menu, items: filteredItems };
   });
-
+  console.log(filteredMenuItems);
   const handleClick = () => {
     // setShowComponent(true); // Set showComponent state to true to render MyComponent
     setChangePassword(true);
@@ -527,20 +71,67 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
     window.open(url, "_blank");
   };
 
+  // const handleRefreshData = async () => {
+  //   console.log(menuListData);
+  //   await refetch().then(({ data }) => {
+  //     const userData = data?.filter(
+  //       (item) =>
+  //         item?.username === menuListData[0]?.username &&
+  //         item.password === menuListData[0]?.password
+  //     );
+
+  //     console.log(JSON.stringify(userData));
+  //     // Update localStorage with the filtered userData
+  //     // localStorage.setItem("user", JSON.stringify(userData));
+  //   });
+  // };
+
   const handleRefreshData = async () => {
-    console.log(menuListData);
     await refetch().then(({ data }) => {
       const userData = data?.filter(
         (item) =>
           item?.username === menuListData[0]?.username &&
           item.password === menuListData[0]?.password
       );
-
-      console.log(userData);
       // Update localStorage with the filtered userData
-      localStorage.setItem("user", JSON.stringify(userData));
+      // localStorage.setItem("user", JSON.stringify(userData));
+
+      // Define a function to recursively update properties
+      if (userData.roleId === "65d48768a106fcb4f5c28071") {
+        const updateProperties = (item) => {
+          // Create a new object with the existing properties and set them to true
+          const newItem = {
+            ...item,
+            isChecked: true,
+            insert: true,
+            update: true,
+            delete: true,
+            pdf: true,
+          };
+
+          // Recursively update properties for child items
+          newItem.items = newItem?.items?.map((child) =>
+            updateProperties(child)
+          );
+
+          return newItem;
+        };
+
+        // Update properties for each item in the menulist
+        const updatedUserData = userData.map((item) => {
+          const updatedMenuList = item?.menulist?.map((menu) =>
+            updateProperties(menu)
+          );
+          return { ...item, menulist: updatedMenuList };
+        });
+
+        localStorage.setItem("user", JSON.stringify(updatedUserData));
+      } else {
+        localStorage.setItem("user", JSON.stringify(userData));
+      }
     });
   };
+
   return (
     <div className="container-fluid">
       <div className="row">
@@ -569,42 +160,62 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu
-                    style={{ overflowY: "auto", height: "150px",width
-                    :'250px', backgroundColor:'#CBF3F0'}}
+                    style={{
+                      overflowY: "auto",
+                      height: "150px",
+                      width: "250px",
+                      backgroundColor: "#CBF3F0",
+                    }}
                   >
                     <Dropdown>
-                    <Dropdown.Toggle 
-                    // variant="secondary"
-                    id="dropdown-basic1"
-                    style={{
-                      backgroundColor: "#0A203F",
-                      color: "white",
-                      border: "none",
-                      outline: "none",
-                      height:"28px"
-                    }}
+                      <Dropdown.Toggle
+                        // variant="secondary"
+                        id="dropdown-basic1"
+                        style={{
+                          backgroundColor: "#0A203F",
+                          color: "white",
+                          border: "none",
+                          outline: "none",
+                          height: "28px",
+                        }}
                       >
-                    Menus
-                    </Dropdown.Toggle>
-                    
-                    <Dropdown.Menu style={{overflowY:'auto', height: "150px", backgroundColor:'#CBF3F0'}}>
-                    <Dropdown.Item onClick={handleRefreshData} style={{fontWeight:'bold'}}>
-                      <FontAwesomeIcon icon={faRefresh} className="me-2" />
-                      Refresh Data
-                    </Dropdown.Item>
-                    <Menubar model={filteredMenuItems} style={menubarStyle} />
-                    </Dropdown.Menu>
+                        Menus
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu
+                        style={{
+                          overflowY: "auto",
+                          height: "150px",
+                          backgroundColor: "#CBF3F0",
+                        }}
+                      >
+                        <Dropdown.Item
+                          onClick={handleRefreshData}
+                          style={{ fontWeight: "bold" }}
+                        >
+                          <FontAwesomeIcon icon={faRefresh} className="me-2" />
+                          Refresh Data
+                        </Dropdown.Item>
+                        <Menubar
+                          model={filteredMenuItems}
+                          style={menubarStyle}
+                        />
+                      </Dropdown.Menu>
                     </Dropdown>
                     {/* <div className="overflow-auto">
                       <Menubar model={filteredMenuItems} style={menubarStyle} />
                     </div> */}
 
-                    <Dropdown.Item href="#" onClick={handleClick} style={{fontWeight:'bold'}}>
+                    <Dropdown.Item
+                      href="#"
+                      onClick={handleClick}
+                      style={{ fontWeight: "bold" }}
+                    >
                       Change Password
                     </Dropdown.Item>
                     <Dropdown.Item
                       href="#"
-                      style={{fontWeight:'bold'}}
+                      style={{ fontWeight: "bold" }}
                       onClick={() => {
                         localStorage.clear();
                         navigate("/");
