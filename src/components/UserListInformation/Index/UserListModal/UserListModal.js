@@ -11,6 +11,7 @@ import {
   downloadPDF,
 } from "../../../ReportProperties/HeaderFooter";
 import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
+
 const UserListModal = ({ user }) => {
   const [extractedData, setExtractedData] = useState([]);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
@@ -230,6 +231,8 @@ var reportTitle="All User list"
           </div>
         </div>
       </div>
+
+     
     </>
   );
 };

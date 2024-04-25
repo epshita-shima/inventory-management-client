@@ -98,7 +98,7 @@ console.log(JSON.stringify(singleUserData))
       await updateUser(singleUserData);
       // Data has been successfully updated
       swal("Done", "Data Update Successfully", "success");
-      navigate("/user-list-data");
+      navigate("/main-view/user-list");
     } catch (error) {
       // An error occurred while updating data
       swal("Not possible", "Try again", "warning");

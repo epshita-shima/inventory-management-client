@@ -21,7 +21,8 @@ import RequireAuth from "./pages/RequireAuth/RequireAuth";
 import NotFound from "./pages/NotFound/NotFound";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import CreateMenu from "./components/MenuInformation/Insert/CreateMenu";
-import MenuList from "./components/MenuInformation/Index/MenuList";
+import MenuList from "./components/MenuInformation/Index/MenuTableData/MenuList";
+import MenuDataList from "./components/MenuInformation/Index/MenuDataList";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -114,7 +115,7 @@ function App() {
                 }
               ></Route>
               <Route
-                path="user-creation"
+                path="/main-view/create-user"
                 element={
                   // <RequireAuth>
                   <UserCreation></UserCreation>
@@ -126,7 +127,7 @@ function App() {
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>
               <Route
-                path="user-list-data"
+                path="/main-view/user-list"
                 element={
                   // <RequireAuth>
                     <UserListInfo
@@ -142,7 +143,7 @@ function App() {
                 path="create-menu"
                 element={<CreateMenu></CreateMenu>}
               ></Route>
-              <Route path="menu-list" element={<MenuList></MenuList>}></Route>
+              <Route path="menu-list" element={<MenuDataList></MenuDataList>}></Route>
               <Route path="*" element={<NotFound></NotFound>}></Route>
             </Route>
             {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}

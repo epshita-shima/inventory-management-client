@@ -11,12 +11,11 @@ const TreeNode = ({
  data
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isParentChecked, setIsParentChecked] = useState(false);
 console.log(parentIds)
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
-console.log(clickedCheckboxes.parentIds)
+console.log(clickedCheckboxes)
   // function convertToNestedObject(clickedCheckboxes, parentNode) {
   //   const nestedObject =[ {
   //     _id: parentNode._id,
@@ -73,8 +72,8 @@ console.log(clickedCheckboxes.parentIds)
   // Assuming node, clickedCheckboxes, and parentIds are available
 //   const nestedObject = convertToNestedObject(clickedCheckboxes, node);
 // console.log(nestedObject)
-  const handleCheckboxClick = (subNode) => {
-    console.log(subNode)
+  const handleCheckboxClick = (subNode,trackId, checked) => {
+    console.log(subNode,trackId, checked)
     console.log(parentIds)
     const isDuplicate = clickedCheckboxes?.some(
       (check) => check?.itemId === subNode?._id
@@ -86,11 +85,11 @@ console.log(clickedCheckboxes.parentIds)
           ...prevData,
           {
             childId: subNode?._id,
-            insert: false,
-            update: false,
-            pdf: false,
-            delete: false,
-            isChecked: true,
+            insert: subNode.insert,
+            update: subNode.update,
+            pdf: subNode.pdf,
+            delete: subNode.delete,
+            isChecked: subNode.isChecked,
             parentIds: parentIds,
           },
         ]);
@@ -99,17 +98,17 @@ console.log(clickedCheckboxes.parentIds)
           ...prevData,
           {
             childId: subNode?._id,
-            insert: false,
-            update: false,
-            pdf: false,
-            delete: false,
-            isChecked: true,
+            insert: subNode.insert,
+            update: subNode.update,
+            pdf: subNode.pdf,
+            delete: subNode.delete,
+            isChecked: subNode.isChecked,
             parentIds: parentIds,
           },
         ]);
       }
 
-      console.log("Previous Array:", clickedCheckboxes);
+    console.log("Previous Array:", clickedCheckboxes);
     }
   };
 
@@ -141,7 +140,8 @@ console.log(clickedCheckboxes.parentIds)
           <tr></tr>
           {isOpen && node.items && (
             <>
-              {node.items.map((subNode) => (
+              {node.items.map((subNode) =>
+               (
                 <tr key={subNode._id}>
                   <td>
                     {subNode.items?.length > 0 ? (
@@ -158,16 +158,15 @@ console.log(clickedCheckboxes.parentIds)
                         <input
                           type="checkbox"
                           id={`${subNode?._id}`}
-                          // checked={subNode?.isChecked || false}
+                          checked={subNode?.isChecked || false}
                           name="check"
                           className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
                             const { checked } = e.target;
-                            
                             if (checked) {
                               parentIds.push(node._id);
                               console.log(node._id)
-                              handleCheckboxClick(subNode);
+                              handleCheckboxClick(subNode,node.trackId, checked);
                             } else {
                               const updatedData = clickedCheckboxes.filter(
                                 (item) => item?.childId !== subNode?._id
@@ -386,7 +385,8 @@ console.log(clickedCheckboxes.parentIds)
                     </td>
                   )}
                 </tr>
-              ))}
+              )
+              )}
             </>
           )}
         </tbody>

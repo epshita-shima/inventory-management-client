@@ -13,9 +13,11 @@ import { Dropdown } from "react-bootstrap";
 import ChangePasswordModal from "../Login/ChangePasswordModal";
 import Footer from "../Footer/Footer";
 import { Outlet, useNavigate } from "react-router-dom";
+import { useGetAllMenuItemsQuery } from "../../redux/features/menus/menuApi";
 const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
   const { data: user, refetch } = useGetAllUserQuery(undefined);
-
+const {data:menus}=useGetAllMenuItemsQuery(undefined)
+console.log(menus)
   const getMenulistData = localStorage?.getItem("user");
 
   const menuListData = JSON.parse(getMenulistData);
@@ -23,9 +25,9 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
   if (menuListData !== null) {
     var menuListSingleData = menuListData[0]?.menulist;
   }
-
   const [showComponent, setShowComponent] = useState(false);
   const navigate = useNavigate();
+
 
   const cardStyle = {
     border: "1px solid #ccc",
@@ -88,6 +90,7 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
 
   const handleRefreshData = async () => {
     await refetch().then(({ data }) => {
+      console.log(data)
       const userData = data?.filter(
         (item) =>
           item?.username === menuListData[0]?.username &&
@@ -97,9 +100,11 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
       // localStorage.setItem("user", JSON.stringify(userData));
 
       // Define a function to recursively update properties
-      if (userData.roleId === "65d48768a106fcb4f5c28071") {
+      console.log(userData[0]?.roleId)
+      if (userData[0]?.roleId === "65d48768a106fcb4f5c28071") {
         const updateProperties = (item) => {
           // Create a new object with the existing properties and set them to true
+          console.log(item)
           const newItem = {
             ...item,
             isChecked: true,
@@ -119,15 +124,15 @@ const Home = ({ singleUserData, setChangePassword, setResetPassword }) => {
 
         // Update properties for each item in the menulist
         const updatedUserData = userData.map((item) => {
-          const updatedMenuList = item?.menulist?.map((menu) =>
+          const updatedMenuList = menus?.map((menu) =>
             updateProperties(menu)
           );
           return { ...item, menulist: updatedMenuList };
         });
-
+        console.log(updatedUserData)
         localStorage.setItem("user", JSON.stringify(updatedUserData));
       } else {
-        localStorage.setItem("user", JSON.stringify(userData));
+        // localStorage.setItem("user", JSON.stringify(userData));
       }
     });
   };

@@ -30,7 +30,7 @@ const UserCreation = () => {
   var [isUpdate] = useState(id ? true : false);
   const [clickedCheckboxes, setClickedCheckboxes] = useState([]);
   const [singleUserData, setSingleUserData] = useState([]);
-const [serialValue, setSerialValue]=useState([])
+  const [serialValue, setSerialValue]=useState([])
 
   const {
     data: userRoleData,
@@ -331,7 +331,7 @@ console.log(JSON.stringify(menuItems))
   // });
   console.log(mergedArray)
 const checkedData=mergedArray.filter(x=>x.isChecked==true)
-
+console.log(checkedData)
   const handleCreateUser = (e) => {
     e.preventDefault();
   
@@ -379,7 +379,7 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
       createSerialNo(serialData);
       createNewUser(dataWithoutMenulistId);
       swal("Done", "Data Save Successfully", "success");
-      navigate("/main-view/user-list-data");
+      navigate("/main-view/user-list");
     }
     // Handle form submission, for example, send data to backend
     console.log("Form submitted:", JSON.stringify(dataWithoutMenulistId ));
@@ -598,7 +598,7 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
                       )}
                     </div>
                   </div>
-                  <div className=" ms-2">
+                  <div className="ms-2">
                     <FontAwesomeIcon
                       className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
                       style={{ background: "#00B987" }}
@@ -622,7 +622,6 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
                 clickedCheckboxes={clickedCheckboxes}
                 setClickedCheckboxes={setClickedCheckboxes}
                 parentIds={parentIds}
-              
               />
             }
           </div>

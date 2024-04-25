@@ -1,57 +1,74 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useMemo } from "react";
-import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
+import React, { useEffect, useMemo, useState } from "react";
+import { useGetAllMenuItemsQuery } from "../../../../redux/features/menus/menuApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye,
   faPenToSquare,
+  faPlus,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
-import { useGetAllUserQuery } from "../../../redux/features/user/userApi";
+import { useGetAllUserQuery } from "../../../../redux/features/user/userApi";
 import FilterComponent from "./FilterComponent";
 import DataTable from "react-data-table-component";
+import { useNavigate } from "react-router-dom";
+
 
 const MenuList = () => {
   const { data: menuItems } = useGetAllMenuItemsQuery(undefined);
   const { data: user } = useGetAllUserQuery(undefined);
-  const getUserId = localStorage.getItem("user");
-  const userSingleId = JSON.parse(getUserId);
-  const userIdFromSession = userSingleId[0]?._id;
-  const permidionData = user?.filter((user) => user._id == userIdFromSession);
-  const extractUserListForCurrentUser = (userData, userId) => {
-    let userList = null;
-
-    // Find the user object matching the provided userId
-    const currentUser = userData?.find((user) => user._id === userId);
-
-    if (currentUser) {
-      // Loop through the menus of the current user
-      currentUser?.menulist?.forEach((menu) => {
-        menu?.items?.forEach((subMenu) => {
-          // Check if the subMenu is the "User Profile" menu
-          if (subMenu?.label === "User Profile") {
-            // Find the "User List" sub-item
-            const userListSubMenu = subMenu?.items.find(
-              (subItem) => subItem?.label === "User List"
-            );
-            if (userListSubMenu) {
-              // Set the user list property
-              userList = userListSubMenu;
-            }
-          }
-        });
-      });
+  const [permission,setPermission]=useState()
+  const navigate=useNavigate()
+  useEffect(()=>{
+    if (localStorage.length > 0) {
+      const getUserId = localStorage.getItem("user");
+      const userSingleId = JSON.parse(getUserId);
+      const userIdFromSession = userSingleId[0]?._id;
+      const permidionData = user?.filter((user) => user._id == userIdFromSession);
+      const extractUserListForCurrentUser = (userData, userId) => {
+        let userList = null;
+    
+        // Find the user object matching the provided userId
+        const currentUser = userData?.find((user) => user._id === userId);
+    
+        if (currentUser) {
+          // Loop through the menus of the current user
+          currentUser?.menulist?.forEach((menu) => {
+            menu?.items?.forEach((subMenu) => {
+              // Check if the subMenu is the "User Profile" menu
+              if (subMenu?.label === "User Profile") {
+                // Find the "User List" sub-item
+                const userListSubMenu = subMenu?.items.find(
+                  (subItem) => subItem?.label === "User List"
+                );
+                if (userListSubMenu) {
+                  // Set the user list property
+                  userList = userListSubMenu;
+                }
+              }
+            });
+          });
+        }
+    
+        return userList;
+      };
+    
+      var permission = extractUserListForCurrentUser(
+        permidionData,
+        userIdFromSession
+      );
+      setPermission(permission)
+    } else {
+      navigate('/')
     }
+  },[user,navigate])
 
-    return userList;
-  };
+
+
 
   // Call the function to get the user list for the current user
-  const permission = extractUserListForCurrentUser(
-    permidionData,
-    userIdFromSession
-  );
+
   const flattenOptions = (options) => {
     const flattenRecursive = (options, parentLabel) => {
       let result = [];
@@ -199,7 +216,9 @@ const MenuList = () => {
     };
     return (
       <div className="d-flex justify-content-between align-items-center w-100">
-        <h2>Menu list</h2>
+        <div className="d-flex justify-content-between align-items-center w-25">
+        <h2 style={{fontSize:'24px', fontWeight:'bold',letterSpacing:'0.8px'}}>Menu list</h2>
+        </div>
         <FilterComponent
           onFilter={(e) => setFilterText(e.target.value)}
           onClear={handleClear}
@@ -230,6 +249,7 @@ const MenuList = () => {
               subHeaderComponent={subHeaderComponent}
             />
           </div>
+       
         </div>
       </div>
     </div>

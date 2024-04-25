@@ -5,7 +5,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import {
   useGetAllMenuItemsQuery,
@@ -16,6 +16,7 @@ import "./CreateMenu.css";
 import * as Yup from "yup";
 import { InputGroup } from "react-bootstrap";
 import swal from "sweetalert";
+import { useNavigate } from "react-router-dom";
 
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
@@ -23,9 +24,17 @@ const CreateMenu = () => {
   const [menuType, setMenuType] = useState("");
   const [createMenu] = useCreateMenuMutation();
   const [updateMenu] = useUpdateMenuMutation();
-  const selectInputRef = useRef();
   const [selectedTopParentValue, setSelectedTopParentValue] = useState(null);
-  console.log(menuType);
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    if(localStorage.length>0){
+
+    }
+    else{
+      navigate('/')
+    }
+  },[navigate])
   const {
     data: menuItems,
     isError: menuItemsIsError,
@@ -73,10 +82,6 @@ const CreateMenu = () => {
             trackId: option.trackId,
           });
         } else {
-          // result.push({
-          //   value: option._id,
-          //   label: parentLabel ? `${parentLabel} > ${option.label}` : option.label,
-          // });
         }
         if (option.items && option.items.length > 0) {
           result = result.concat(flattenRecursive(option.items, option.label));
@@ -101,106 +106,132 @@ const CreateMenu = () => {
       isParent: "",
       _id: parentMenuName.value,
       trackId: parentMenuName.trackId,
+      insert: false,
+      update: false,
+      pdf: false,
+      delete: false,
+      isChecked: false,
     };
     try {
       values.detailsData.forEach((item) => {
-        console.log(item);
-        if( item.menu_name == "")
-        {
-          swal("Not Possible!", "Please take valid input", {
+        if (item.menu_name == "") {
+          swal("Not Possible!", "Data Not Found", {
             icon: "warning",
           });
-          return
-        }
-        
-        else if (menuType == "child" && parentMenuName.value == undefined) {
+          return;
+        } else if (menuType == "child" && parentMenuName.value == undefined) {
           swal("Not possible", "Please select parent name", "warning");
-        }
-         else {
-          if (parentMenuName) {
-            values.detailsData.forEach((item) => {
-              console.log(item.menu_type);
-              modelMenuInsert.items.push({
-                children: [],
-                label: item.menu_name,
-                url: "#",
-                permissions: [],
-                items: [],
-                trackId: parentMenuName.value,
-                isParent: menuType == "parent" ? true : false,
-              });
-            });
-
-            // swal("Done", "Data Save Successfully", "success");
-            console.log(modelMenuInsert);
-            // values.detailsData.forEach((item) => {
-            //   item.menu_name = "";
-            // });
-            // updateMenu(modelMenuInsert);
-           
-         
-          } else {
-            values.detailsData.forEach((item) => {
-              if( item.menu_name == "")
-                {
-                  swal("Not Possible!", "Please take valid input", {
-                    icon: "warning",
-                  });
-                }
-              else{
-                function convertToMenuItem(data) {
-                  const { parentmenu, detailsData } = data;
-                  console.log(detailsData);
-                  const menuItems = detailsData?.map((item) => {
-                    return {
-                      children: [],
-                      label: item.menu_name,
-                      url: "#",
-                      permissions: [],
-                      items: [],
-                      isParent: menuType == "parent" ? true : false,
-                    };
-                  });
-                  return {
-                    parentmenu,
-                    menuItems,
-                  };
-                }
-    
-                const convertedData = convertToMenuItem(values);
-                console.log(JSON.stringify(convertedData.menuItems));
-    
-                swal({
-                  title: "Are you sure this menus are top parent ?",
-                  text: "It will show as a top heading, because you are not select any parent",
-                  icon: "warning",
-                  buttons: true,
-                  dangerMode: true,
-                }).then((willDelete) => {
-                  if (willDelete) {
-                    // deleteUser(activeUser?._id);
-                    swal("Done", "Data Save Successfully", {
-                      icon: "success",
-                    });
-                    //  createMenu(convertedData.menuItems);
-                    // values.parentmenu = "";
-                    // values.detailsData.forEach((item) => {
-                    //   item.menu_name = "";
-                    // });
-                    // values.detailsData=[]
-                  } else {
-                    swal(" Cancel! Saving data ");
-                  }
-                });
-              }
-            })
-         
-            
-          }
         }
       });
 
-      // swal("Done", "Data Saved Successfully", "success");
+      if (parentMenuName) {
+        var errorCount = 0;
+        values.detailsData.forEach((item) => {
+          if (item.menu_name == "") {
+            errorCount++;
+          }
+          const convertmenuName = item?.menu_name
+            .toLowerCase()
+            .replace(/\s+/g, "-");
+
+          modelMenuInsert.items.push({
+            children: [],
+            label: item.menu_name,
+            url: `${
+              menuType == "parent" ? "#" : `/main-view/${convertmenuName}`
+            }`,
+            permissions: [],
+            items: [],
+            trackId: parentMenuName.value,
+            isParent: menuType == "parent" ? true : false,
+            insert: false,
+            update: false,
+            pdf: false,
+            delete: false,
+            isChecked: false,
+          });
+        });
+        console.log(errorCount);
+        console.log(modelMenuInsert);
+        if (errorCount <= 0) {
+          updateMenu(modelMenuInsert);
+          swal("Done", "Data Save Successfully", "success");
+          navigate("/main-view/menu-list");
+        } else {
+          swal("Not Possible!", "Data Not Found", {
+            icon: "warning",
+          });
+        }
+      } else {
+        values.detailsData.forEach((item) => {
+          if (item.menu_name == "") {
+            swal("Not Possible!", "Data Not Found", {
+              icon: "warning",
+            });
+          } else {
+            if (menuType == "child" && parentMenuName.value == undefined) {
+              swal(
+                "Not Possible!",
+                "Please select parent name because you are select menu type as a child",
+                {
+                  icon: "warning",
+                }
+              );
+            } else {
+              function convertToMenuItem(data) {
+                const { parentmenu, detailsData } = data;
+                console.log(detailsData);
+                const menuItems = detailsData?.map((item) => {
+                  const convertmenuName = item?.menu_name
+                    .toLowerCase()
+                    .replace(/\s+/g, "-");
+
+                  return {
+                    children: [],
+                    label: item.menu_name,
+                    url: `${
+                      menuType == "parent"
+                        ? "#"
+                        : `/main-view/${convertmenuName}`
+                    }`,
+                    permissions: [],
+                    items: [],
+                    isParent: menuType == "parent" ? true : false,
+                    insert: false,
+                    update: false,
+                    pdf: false,
+                    delete: false,
+                    isChecked: false,
+                  };
+                });
+                return {
+                  parentmenu,
+                  menuItems,
+                };
+              }
+
+              const convertedData = convertToMenuItem(values);
+              swal({
+                title: "Are you sure this menus are top parent ?",
+                text: "It will show as a top heading, because you are not select any parent",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+              }).then((willDelete) => {
+                if (willDelete) {
+                  swal("Done", "Data Save Successfully", {
+                    icon: "success",
+                  });
+                  createMenu(convertedData.menuItems);
+                  navigate("/main-view/menu-list");
+                } else {
+                  swal(" Cancel! Saving data ");
+                }
+              });
+            }
+          }
+        });
+      }
     } catch (error) {
       console.error("Error saving data:", error);
       swal("Error", "Failed to save data. Please try again later.", "error");
@@ -250,10 +281,10 @@ const CreateMenu = () => {
                   className="mb-3 mt-1"
                   aria-label="Default select example"
                   name="itemType"
-                  isDisabled={menuType=='parent'}
+                  // isDisabled={menuType == "parent"}
                   options={flattenedOptions}
                   // value={flattenedOptions?.find((x) => x.value == parentMenuName.value)}
-                  // ref={selectInputRef}
+
                   styles={{
                     control: (baseStyles, state) => ({
                       ...baseStyles,
@@ -291,10 +322,9 @@ const CreateMenu = () => {
                   className="mb-3 mt-1"
                   aria-label="Default select example"
                   name="menuType"
-                  
                   options={menuTypeOptions}
                   // value={menuTypeOptions?.find((x) => x.value == menuType.value)}
-                  // ref={selectInputRef}
+
                   styles={{
                     control: (baseStyles, state) => ({
                       ...baseStyles,
@@ -332,12 +362,18 @@ const CreateMenu = () => {
               type="submit"
               form="menucreation-form"
               className="border-0 "
+              disabled={menuType == "" && parentMenuName.value == undefined}
               style={{
-                backgroundColor: "#00B987",
+                backgroundColor: `${
+                  menuType === "" && parentMenuName.value === undefined
+                    ? "gray"
+                    : "#00B987"
+                }`,
                 color: "white",
                 padding: "5px 10px",
                 fontSize: "14px",
                 borderRadius: "5px",
+                width: "100px",
               }}
             >
               Save

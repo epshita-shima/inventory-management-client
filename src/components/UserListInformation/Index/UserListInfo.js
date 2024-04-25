@@ -28,6 +28,8 @@ import "jspdf-autotable";
 import { useGetCompanyInfoQuery } from "../../../redux/features/companyinfo/compayApi";
 import { downloadPDF } from "../../ReportProperties/HeaderFooter";
 import handleDownload from "../../ReportProperties/HandelExcelDownload";
+import { Button } from 'react-bootstrap';
+
 
 const UserListInfo = ({
   setChangePassword,
@@ -322,7 +324,9 @@ const UserListInfo = ({
 
     return (
       <div className="d-block d-sm-flex justify-content-center align-items-center ">
+        <button >Create User</button>
         <div className="d-flex justify-content-end align-items-center">
+          
           <div className="table-head-icon d-flex ">
             <div>
               <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp;
@@ -549,7 +553,9 @@ const UserListInfo = ({
                 subHeader
                 subHeaderComponent={subHeaderComponent}
               />
+             
             </div>
+           
           </div>
         </div>
       </div>
@@ -597,6 +603,8 @@ const UserListInfo = ({
       ) : (
         ""
       )}
+
+
     </div>
   );
 };

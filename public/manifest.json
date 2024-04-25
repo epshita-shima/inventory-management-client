@@ -21,7 +21,7 @@
               "items": [
                   {
                       "label": "User List",
-                      "url": "/user-list-data",
+                      "url": "//main-view/user-list",
                       "permissions": [],
                       "_id": "usersubitem-121",
                       "isParent": "false"
