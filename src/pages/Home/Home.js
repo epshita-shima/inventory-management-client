@@ -28,7 +28,15 @@ console.log(menus)
   const [showComponent, setShowComponent] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(()=>{
+    if(localStorage.length>0){
 
+    }
+    else{
+      navigate('/')
+    }
+  },[navigate])
+  
   const cardStyle = {
     border: "1px solid #ccc",
     borderRadius: "5px",
@@ -48,11 +56,11 @@ console.log(menus)
   };
   // Define the menu items
   const filteredMenuItems = menuListSingleData?.map((menu) => {
-    // Function to recursively filter items and update parent isChecked status
+    // Function to recursively filter items and isUpdated parent isChecked status
     const filterItems = (items) => {
       return items.filter((item) => {
         if (item.items && item.items.length > 0) {
-          // Recursively filter nested items and update parent isChecked status
+          // Recursively filter nested items and isUpdated parent isChecked status
           item.items = filterItems(item.items);
           item.isChecked = item.items.some((child) => child.isChecked); // Update parent isChecked status
         }
@@ -99,7 +107,7 @@ console.log(menus)
       // Update localStorage with the filtered userData
       // localStorage.setItem("user", JSON.stringify(userData));
 
-      // Define a function to recursively update properties
+      // Define a function to recursively isUpdated properties
       console.log(userData[0]?.roleId)
       if (userData[0]?.roleId === "65d48768a106fcb4f5c28071") {
         const updateProperties = (item) => {
@@ -108,13 +116,13 @@ console.log(menus)
           const newItem = {
             ...item,
             isChecked: true,
-            insert: true,
-            update: true,
-            delete: true,
-            pdf: true,
+            isInserted: true,
+            isUpdated: true,
+            isRemoved: true,
+            isPDF: true,
           };
 
-          // Recursively update properties for child items
+          // Recursively isUpdated properties for child items
           newItem.items = newItem?.items?.map((child) =>
             updateProperties(child)
           );

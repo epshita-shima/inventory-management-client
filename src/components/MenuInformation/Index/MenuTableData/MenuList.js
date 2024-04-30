@@ -14,24 +14,25 @@ import FilterComponent from "./FilterComponent";
 import DataTable from "react-data-table-component";
 import { useNavigate } from "react-router-dom";
 
-
 const MenuList = () => {
   const { data: menuItems } = useGetAllMenuItemsQuery(undefined);
   const { data: user } = useGetAllUserQuery(undefined);
-  const [permission,setPermission]=useState()
-  const navigate=useNavigate()
-  useEffect(()=>{
+  const [permission, setPermission] = useState();
+  const navigate = useNavigate();
+  useEffect(() => {
     if (localStorage.length > 0) {
       const getUserId = localStorage.getItem("user");
       const userSingleId = JSON.parse(getUserId);
       const userIdFromSession = userSingleId[0]?._id;
-      const permidionData = user?.filter((user) => user._id == userIdFromSession);
+      const permidionData = user?.filter(
+        (user) => user._id == userIdFromSession
+      );
       const extractUserListForCurrentUser = (userData, userId) => {
         let userList = null;
-    
+
         // Find the user object matching the provided userId
         const currentUser = userData?.find((user) => user._id === userId);
-    
+
         if (currentUser) {
           // Loop through the menus of the current user
           currentUser?.menulist?.forEach((menu) => {
@@ -50,24 +51,19 @@ const MenuList = () => {
             });
           });
         }
-    
+
         return userList;
       };
-    
+
       var permission = extractUserListForCurrentUser(
         permidionData,
         userIdFromSession
       );
-      setPermission(permission)
+      setPermission(permission);
     } else {
-      navigate('/')
+      navigate("/");
     }
-  },[user,navigate])
-
-
-
-
-  // Call the function to get the user list for the current user
+  }, [user, navigate]);
 
   const flattenOptions = (options) => {
     const flattenRecursive = (options, parentLabel) => {
@@ -88,6 +84,7 @@ const MenuList = () => {
 
   const flattenedOptions = flattenOptions(menuItems);
   console.log(flattenedOptions);
+
   const columns = [
     {
       name: "Sl.",
@@ -125,7 +122,7 @@ const MenuList = () => {
                 marginLeft: "10px",
               }}
               onClick={() => {
-                window.open(`user-update/${flattenedOptions?._id}`);
+                window.open(`update-menu/${flattenedOptions?.value}`);
                 // handleActiveStatus(activeUser?._id);
               }}
             >
@@ -217,7 +214,15 @@ const MenuList = () => {
     return (
       <div className="d-flex justify-content-between align-items-center w-100">
         <div className="d-flex justify-content-between align-items-center w-25">
-        <h2 style={{fontSize:'24px', fontWeight:'bold',letterSpacing:'0.8px'}}>Menu list</h2>
+          <h2
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              letterSpacing: "0.8px",
+            }}
+          >
+            Menu list
+          </h2>
         </div>
         <FilterComponent
           onFilter={(e) => setFilterText(e.target.value)}
@@ -249,7 +254,6 @@ const MenuList = () => {
               subHeaderComponent={subHeaderComponent}
             />
           </div>
-       
         </div>
       </div>
     </div>

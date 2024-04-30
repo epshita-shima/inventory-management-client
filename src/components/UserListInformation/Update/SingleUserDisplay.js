@@ -35,11 +35,18 @@ const SingleUserDisplay = () => {
   useEffect(() => {
     setSingleUserData(singleUser);
   }, [singleUser]);
-console.log(singleUser)
+  console.log(singleUser);
 
   const [validated, setValidated] = useState(false);
   const parentIds = [];
-console.log(JSON.stringify(singleUserData))
+
+  useEffect(() => {
+    if (localStorage.length > 0) {
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
+
   const updateDropdownList = (updatedChild, menuList) => {
     return menuList?.map((item) => {
       console.log(item.trackId === updatedChild.parentIds);
@@ -136,12 +143,15 @@ console.log(JSON.stringify(singleUserData))
   // Example usage:
 
   return (
-    <div className="container-fluid p-0 m-0" style={{
-      alignItems: "center",
-      position: "absolute",
-      top: "10%",
-      overflow:"hidden"
-    }}>
+    <div
+      className="container-fluid p-0 m-0"
+      style={{
+        alignItems: "center",
+        position: "absolute",
+        top: "10%",
+        overflow: "hidden",
+      }}
+    >
       {/* <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
         <div class="container">
           <div

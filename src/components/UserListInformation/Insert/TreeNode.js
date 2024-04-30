@@ -42,13 +42,13 @@ console.log(clickedCheckboxes)
   //         permissions: [],
   //         isChecked:
   //           childCheckboxes.length > 0 ? childCheckboxes[0].isChecked : false,
-  //         insert:
-  //           childCheckboxes.length > 0 ? childCheckboxes[0].insert : false,
-  //         update:
-  //           childCheckboxes.length > 0 ? childCheckboxes[0].update : false,
-  //         pdf: childCheckboxes.length > 0 ? childCheckboxes[0].pdf : false,
-  //         delete:
-  //           childCheckboxes.length > 0 ? childCheckboxes[0].delete : false,
+  //         isInserted:
+  //           childCheckboxes.length > 0 ? childCheckboxes[0].isInserted : false,
+  //         isUpdated:
+  //           childCheckboxes.length > 0 ? childCheckboxes[0].isUpdated : false,
+  //         isPDF: childCheckboxes.length > 0 ? childCheckboxes[0].isPDF : false,
+  //         isRemoved:
+  //           childCheckboxes.length > 0 ? childCheckboxes[0].isRemoved : false,
   //         items: [],
   //       };
 
@@ -85,10 +85,10 @@ console.log(clickedCheckboxes)
           ...prevData,
           {
             childId: subNode?._id,
-            insert: subNode.insert,
-            update: subNode.update,
-            pdf: subNode.pdf,
-            delete: subNode.delete,
+            isInserted: subNode.isInserted,
+            isUpdated: subNode.isUpdated,
+            isPDF: subNode.isPDF,
+            isRemoved: subNode.isRemoved,
             isChecked: subNode.isChecked,
             parentIds: parentIds,
           },
@@ -98,10 +98,10 @@ console.log(clickedCheckboxes)
           ...prevData,
           {
             childId: subNode?._id,
-            insert: subNode.insert,
-            update: subNode.update,
-            pdf: subNode.pdf,
-            delete: subNode.delete,
+            isInserted: subNode.isInserted,
+            isUpdated: subNode.isUpdated,
+            isPDF: subNode.isPDF,
+            isRemoved: subNode.isRemoved,
             isChecked: subNode.isChecked,
             parentIds: parentIds,
           },
@@ -189,7 +189,7 @@ console.log(clickedCheckboxes)
                         <input
                           type="checkbox"
                           id={`${subNode?._id}`}
-                          // checked={subNode?.insert || false}
+                          // checked={subNode?.isInserted || false}
                           className="form-check-input border-success me-2 checkbox-design"
                           // checked={clickedCheckboxes.findIndex(
                           //   (item) => item.itemId === subNode._id
@@ -215,7 +215,7 @@ console.log(clickedCheckboxes)
                              
                               setClickedCheckboxes((prev) => {
                                 const tempDetails = [...prev];
-                                tempDetails[indexes]["insert"] = checked;
+                                tempDetails[indexes]["isInserted"] = checked;
                                 return tempDetails;
                               });
                             } else {
@@ -231,7 +231,7 @@ console.log(clickedCheckboxes)
 
                               setClickedCheckboxes((prev) => {
                                 const tempDetails = [...prev];
-                                tempDetails[indexes]["insert"] = checked;
+                                tempDetails[indexes]["isInserted"] = checked;
                                 return tempDetails;
                               });
                             }
@@ -242,7 +242,7 @@ console.log(clickedCheckboxes)
                       <div className="d-flex">
                         <input
                           type="checkbox"
-                          // checked={subNode?.update || false}
+                          // checked={subNode?.isUpdated || false}
                           className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
                             const { checked } = e.target;
@@ -262,7 +262,7 @@ console.log(clickedCheckboxes)
                               }
                               setClickedCheckboxes((prev) => {
                                 const tempDetails = [...prev];
-                                tempDetails[indexes]["update"] = checked;
+                                tempDetails[indexes]["isUpdated"] = checked;
                                 return tempDetails;
                               });
                             } else {
@@ -278,7 +278,7 @@ console.log(clickedCheckboxes)
                               }
                               setClickedCheckboxes((prev) => {
                                 const tempDetails = [...prev];
-                                tempDetails[indexes]["update"] = checked;
+                                tempDetails[indexes]["isUpdated"] = checked;
                                 return tempDetails;
                               });
                             }
@@ -289,7 +289,7 @@ console.log(clickedCheckboxes)
                       <div className="d-flex">
                         <input
                           type="checkbox"
-                          // checked={subNode?.delete || false}
+                          // checked={subNode?.isRemoved || false}
                           className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
                             const { checked } = e.target;
@@ -309,7 +309,7 @@ console.log(clickedCheckboxes)
                               }
                               setClickedCheckboxes((prev) => {
                                 const tempDetails = [...prev];
-                                tempDetails[indexes]["delete"] = checked;
+                                tempDetails[indexes]["isRemoved"] = checked;
                                 return tempDetails;
                               });
                             } else {
@@ -325,7 +325,7 @@ console.log(clickedCheckboxes)
                               }
                               setClickedCheckboxes((prev) => {
                                 const tempDetails = [...prev];
-                                tempDetails[indexes]["delete"] = checked;
+                                tempDetails[indexes]["isRemoved"] = checked;
                                 return tempDetails;
                               });
                             }
@@ -336,7 +336,7 @@ console.log(clickedCheckboxes)
                       <div className="d-flex">
                         <input
                           type="checkbox"
-                          // checked={subNode?.pdf || false}
+                          // checked={subNode?.isPDF || false}
                           className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
                             const { checked } = e.target;
@@ -358,7 +358,7 @@ console.log(clickedCheckboxes)
                               }
                               setClickedCheckboxes((prev) => {
                                 const tempDetails = [...prev];
-                                tempDetails[indexes]["pdf"] = checked;
+                                tempDetails[indexes]["isPDF"] = checked;
                                 return tempDetails;
                               });
                             } else {
@@ -374,7 +374,7 @@ console.log(clickedCheckboxes)
                               }
                               setClickedCheckboxes((prev) => {
                                 const tempDetails = [...prev];
-                                tempDetails[indexes]["pdf"] = checked;
+                                tempDetails[indexes]["isPDF"] = checked;
                                 return tempDetails;
                               });
                             }

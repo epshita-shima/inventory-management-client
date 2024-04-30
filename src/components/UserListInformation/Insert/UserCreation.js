@@ -70,7 +70,15 @@ console.log(JSON.stringify(menuItems))
     isactive: true,
     menulist: [],
   });
+  
+  useEffect(()=>{
+    if(localStorage.length>0){
 
+    }
+    else{
+      navigate('/')
+    }
+  },[navigate])
 
   function mergePermissions(mainData, permissionsData) {
     // Helper function to merge permissions for items items recursively
@@ -142,10 +150,10 @@ console.log(JSON.stringify(menuItems))
   //           ...item,
   //           trackId: clickedCheckbox.childId,
   //           permissions: [],
-  //           insert: clickedCheckbox.insert,
-  //           update: clickedCheckbox.update,
-  //           pdf: clickedCheckbox.pdf,
-  //           delete: clickedCheckbox.delete,
+  //           isInserted: clickedCheckbox.isInserted,
+  //           isUpdated: clickedCheckbox.isUpdated,
+  //           isPDF: clickedCheckbox.isPDF,
+  //           isRemoved: clickedCheckbox.isRemoved,
   //           isChecked: clickedCheckbox.isChecked,
   //           parentIds: clickedCheckbox.parentIds
   //         };
@@ -177,10 +185,10 @@ console.log(JSON.stringify(menuItems))
   //     return items?.map(item => {
   //       const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
   //       const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
-  //       const insert = clickedCheckbox ? clickedCheckbox.insert : false;
-  //       const update = clickedCheckbox ? clickedCheckbox.update : false;
-  //       const pdf = clickedCheckbox ? clickedCheckbox.pdf : false;
-  //       const del = clickedCheckbox ? clickedCheckbox.delete : false;
+  //       const isInserted = clickedCheckbox ? clickedCheckbox.isInserted : false;
+  //       const isUpdated = clickedCheckbox ? clickedCheckbox.isUpdated : false;
+  //       const isPDF = clickedCheckbox ? clickedCheckbox.isPDF : false;
+  //       const del = clickedCheckbox ? clickedCheckbox.isRemoved : false;
   //       const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
   //       const trackId = clickedCheckbox ? clickedCheckbox.childId : item._id;
   //       console.log(item.items?.length);
@@ -192,10 +200,10 @@ console.log(JSON.stringify(menuItems))
   //         ...item,
   //         trackId,
   //         isChecked,
-  //         insert,
-  //         update,
-  //         pdf,
-  //         delete: del,
+  //         isInserted,
+  //         isUpdated,
+  //         isPDF,
+  //         isRemoved: del,
   //         parentIds,
   //         items: mergedItems // Assign the merged items
   //       };
@@ -215,10 +223,10 @@ console.log(JSON.stringify(menuItems))
         return items?.map(item => {
             const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
             const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
-            const insert = clickedCheckbox ? clickedCheckbox.insert : false;
-            const update = clickedCheckbox ? clickedCheckbox.update : false;
-            const pdf = clickedCheckbox ? clickedCheckbox.pdf : false;
-            const del = clickedCheckbox ? clickedCheckbox.delete : false;
+            const isInserted = clickedCheckbox ? clickedCheckbox.isInserted : false;
+            const isUpdated = clickedCheckbox ? clickedCheckbox.isUpdated : false;
+            const isPDF = clickedCheckbox ? clickedCheckbox.isPDF : false;
+            const del = clickedCheckbox ? clickedCheckbox.isRemoved : false;
             const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
             const trackId = clickedCheckbox ? clickedCheckbox.childId : item._id;
 
@@ -235,10 +243,10 @@ console.log(JSON.stringify(menuItems))
                 ...item,
                 trackId,
                 isChecked: parentIsChecked,
-                insert,
-                update,
-                pdf,
-                delete: del,
+                isInserted,
+                isUpdated,
+                isPDF,
+                isRemoved: del,
                 parentIds,
                 items: mergedItems // Assign the merged items
             };
@@ -269,10 +277,10 @@ console.log(JSON.stringify(menuItems))
   //     const updatedDropdown = items.map(item => {
   //       const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
   //       const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
-  //       const insert = clickedCheckbox ? clickedCheckbox.insert : false;
-  //       const update = clickedCheckbox ? clickedCheckbox.update : false;
-  //       const pdf = clickedCheckbox ? clickedCheckbox.pdf : false;
-  //       const del = clickedCheckbox ? clickedCheckbox.delete : false;
+  //       const isInserted = clickedCheckbox ? clickedCheckbox.isInserted : false;
+  //       const isUpdated = clickedCheckbox ? clickedCheckbox.isUpdated : false;
+  //       const isPDF = clickedCheckbox ? clickedCheckbox.isPDF : false;
+  //       const del = clickedCheckbox ? clickedCheckbox.isRemoved : false;
   //       const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
   //       const trackId= clickedCheckbox ? clickedCheckbox.childId : item._id;
   
@@ -287,10 +295,10 @@ console.log(JSON.stringify(menuItems))
   //           ...item,
   //           trackId,
   //           isChecked,
-  //           insert,
-  //           update,
-  //           pdf,
-  //           delete: del,
+  //           isInserted,
+  //           isUpdated,
+  //           isPDF,
+  //           isRemoved: del,
   //           parentIds,
   //           items: mergeCheckboxIntoDropdown(item.items, clickedCheckboxes)
   //         };
@@ -300,10 +308,10 @@ console.log(JSON.stringify(menuItems))
   //         ...item,
   //         trackId,
   //         isChecked,
-  //         insert,
-  //         update,
-  //         pdf,
-  //         delete: del,
+  //         isInserted,
+  //         isUpdated,
+  //         isPDF,
+  //         isRemoved: del,
   //         parentIds
   //       };
   //     });

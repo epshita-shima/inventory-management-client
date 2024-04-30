@@ -23,6 +23,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import CreateMenu from "./components/MenuInformation/Insert/CreateMenu";
 import MenuList from "./components/MenuInformation/Index/MenuTableData/MenuList";
 import MenuDataList from "./components/MenuInformation/Index/MenuDataList";
+import UpdateMenu from "./components/MenuInformation/Update/UpdateMenu";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -143,6 +144,10 @@ function App() {
                 path="create-menu"
                 element={<CreateMenu></CreateMenu>}
               ></Route>
+              <Route
+                path="update-menu/:id"
+                element={<UpdateMenu></UpdateMenu>}></Route>
+
               <Route path="menu-list" element={<MenuDataList></MenuDataList>}></Route>
               <Route path="*" element={<NotFound></NotFound>}></Route>
             </Route>

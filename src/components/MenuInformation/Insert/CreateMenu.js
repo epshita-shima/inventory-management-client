@@ -35,6 +35,7 @@ const CreateMenu = () => {
       navigate('/')
     }
   },[navigate])
+  
   const {
     data: menuItems,
     isError: menuItemsIsError,
@@ -106,10 +107,10 @@ const CreateMenu = () => {
       isParent: "",
       _id: parentMenuName.value,
       trackId: parentMenuName.trackId,
-      insert: false,
-      update: false,
-      pdf: false,
-      delete: false,
+      isInserted: false,
+      isUpdated: false,
+      isPDF: false,
+      isRemoved: false,
       isChecked: false,
     };
     try {
@@ -144,10 +145,10 @@ const CreateMenu = () => {
             items: [],
             trackId: parentMenuName.value,
             isParent: menuType == "parent" ? true : false,
-            insert: false,
-            update: false,
-            pdf: false,
-            delete: false,
+            isInserted: false,
+            isUpdated: false,
+            isPDF: false,
+            isRemoved: false,
             isChecked: false,
           });
         });
@@ -197,10 +198,10 @@ const CreateMenu = () => {
                     permissions: [],
                     items: [],
                     isParent: menuType == "parent" ? true : false,
-                    insert: false,
-                    update: false,
-                    pdf: false,
-                    delete: false,
+                    isInserted: false,
+                    isUpdated: false,
+                    isPDF: false,
+                    isRemoved: false,
                     isChecked: false,
                   };
                 });

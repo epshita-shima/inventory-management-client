@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import swal from "sweetalert";
 
 const TreeSingleUserNode = ({
@@ -27,10 +27,10 @@ console.log(node)
       const updatedChild = {
         ...subNode,
         isChecked: checked,
-        insert: checked,
-        update: checked,
-        delete: checked,
-        pdf: checked,
+        isInserted: checked,
+        isUpdated: checked,
+        isRemoved: checked,
+        isPDF: checked,
         parentIds: parentId,
       };
       updateMenuItem(updatedChild);
@@ -38,19 +38,19 @@ console.log(node)
   };
 
   const handleCheckboxClickInsert = (subNode, parentId, checked) => {
-    const updatedChild = { ...subNode, insert: checked, parentIds: parentId };
+    const updatedChild = { ...subNode, isInserted: checked, parentIds: parentId };
     updateMenuItem(updatedChild);
   };
   const handleCheckboxClickUpdate = (subNode, parentId, checked) => {
-    const updatedChild = { ...subNode, update: checked, parentIds: parentId };
+    const updatedChild = { ...subNode, isUpdated: checked, parentIds: parentId };
     updateMenuItem(updatedChild);
   };
   const handleCheckboxClickDelete = (subNode, parentId, checked) => {
-    const updatedChild = { ...subNode, delete: checked, parentIds: parentId };
+    const updatedChild = { ...subNode, isRemoved: checked, parentIds: parentId };
     updateMenuItem(updatedChild);
   };
   const handleCheckboxClickPDF = (subNode, parentId, checked) => {
-    const updatedChild = { ...subNode, pdf: checked, parentIds: parentId };
+    const updatedChild = { ...subNode, isPDF: checked, parentIds: parentId };
     updateMenuItem(updatedChild);
   };
 
@@ -116,7 +116,7 @@ console.log(node)
                             <input
                               type="checkbox"
                               id={`${subNode?._id}`}
-                              checked={subNode?.insert}
+                              checked={subNode?.isInserted}
                               className="form-check-input border-success me-2"
                               onClick={(e) => {
                                 const { checked } = e.target;
@@ -141,7 +141,7 @@ console.log(node)
                           <div className="d-flex">
                             <input
                               type="checkbox"
-                              checked={subNode?.update}
+                              checked={subNode?.isUpdated}
                               className="form-check-input border-success me-2"
                               onClick={(e) => {
                                 const { checked } = e.target;
@@ -166,7 +166,7 @@ console.log(node)
                           <div className="d-flex">
                             <input
                               type="checkbox"
-                              checked={subNode?.delete}
+                              checked={subNode?.isRemoved}
                               className="form-check-input border-success me-2"
                               onClick={(e) => {
                                 const { checked } = e.target;
@@ -191,7 +191,7 @@ console.log(node)
                           <div className="d-flex">
                             <input
                               type="checkbox"
-                              checked={subNode?.pdf}
+                              checked={subNode?.isPDF}
                               className="form-check-input border-success me-2"
                               onClick={(e) => {
                                 console.log(subNode.isChecked)

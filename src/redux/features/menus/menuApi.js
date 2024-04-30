@@ -24,8 +24,17 @@ const menuApi = api.injectEndpoints({
         body: payload,
       }),
       invalidatesTags: ["createchildmenu"],
-    })
+    }),
+    getSingleMenu: builder.query({
+      query: (id) => {
+        if (id) {
+          return `/menuitems/singlemenu/${id}`;
+        } else {
+          throw new Error("User id is required");
+        }
+      },
+    }),
   }),
 });
 
-export const { useGetAllMenuItemsQuery, useCreateMenuMutation,useUpdateMenuMutation} = menuApi;
+export const { useGetAllMenuItemsQuery, useCreateMenuMutation,useUpdateMenuMutation,useGetSingleMenuQuery} = menuApi;

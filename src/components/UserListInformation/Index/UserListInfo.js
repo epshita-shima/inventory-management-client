@@ -51,11 +51,24 @@ const UserListInfo = ({
   const [extractedData, setExtractedData] = useState([]);
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
   const [demoData, setDemoData] = useState(null);
-  const getUserId = localStorage.getItem("user");
-  const userSingleId = JSON.parse(getUserId);
-  const userIdFromSession = userSingleId[0]?._id;
-  const permidionData = user?.filter((user) => user._id == userIdFromSession);
-  console.log(companyinfo);
+const [permissionResult,setPermissionResult]=useState([])
+const [ userIdFromLocalStorage ,setUserIdFromLocalStorage]=useState('')
+console.log(permissionResult,userIdFromLocalStorage)
+  console.log(localStorage.length)
+
+  useEffect(()=>{
+    if(localStorage.length>0){
+      const getUserId = localStorage.getItem("user");
+      const userSingleId = JSON.parse(getUserId);
+      const userIdFromSession = userSingleId[0]?._id;
+      const permidionData = user?.filter((user) => user._id == userIdFromSession);
+      setPermissionResult(permidionData)
+      setUserIdFromLocalStorage(userIdFromSession)
+    }
+    else{
+      navigate('/')
+    }
+  },[navigate,user])
 
   const extractUserListForCurrentUser = (userData, userId) => {
     let userList = null;
@@ -85,10 +98,12 @@ const UserListInfo = ({
     return userList;
   };
 
+ 
+
   // Call the function to get the user list for the current user
   const permission = extractUserListForCurrentUser(
-    permidionData,
-    userIdFromSession
+    permissionResult,
+    userIdFromLocalStorage
   );
 
   // Output the user list for the current user
