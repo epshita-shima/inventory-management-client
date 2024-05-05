@@ -1,0 +1,6 @@
+.disabled-link {
+    pointer-events: none; /* This disables mouse events on the element */
+    cursor: default; /* This changes the cursor to default, indicating it's not clickable */
+    color: inherit; /* Optionally, you can maintain the link color */
+    text-decoration: none; /* Optionally, remove any underline or formatting */
+}

@@ -13,7 +13,7 @@ import { useGetAllUserQuery } from "../../../../redux/features/user/userApi";
 import FilterComponent from "./FilterComponent";
 import DataTable from "react-data-table-component";
 import { useNavigate } from "react-router-dom";
-
+import './MenuList.css'
 const MenuList = () => {
   const { data: menuItems } = useGetAllMenuItemsQuery(undefined);
   const { data: user } = useGetAllUserQuery(undefined);
@@ -72,6 +72,7 @@ const MenuList = () => {
         result.push({
           value: option._id,
           label: parentLabel ? `${option.label}` : option.label,
+          items: parentLabel ? `${option.items}` : option.items
         });
         if (option.items && option.items.length > 0) {
           result = result.concat(flattenRecursive(option.items, option.label));
@@ -83,7 +84,7 @@ const MenuList = () => {
   };
 
   const flattenedOptions = flattenOptions(menuItems);
-  console.log(flattenedOptions);
+
 
   const columns = [
     {
@@ -110,20 +111,24 @@ const MenuList = () => {
           {permission?.update ? (
             <a
               target="_blank"
-              className="action-icon"
+              className={` action-icon `}
               data-toggle="tooltip"
               data-placement="bottom"
               title="Update menu"
+            
               style={{
-                color: "#56CCAD",
-                border: "2px solid #56CCAD",
+                color: `${flattenedOptions.items.length==0 ? 'gray' : '#56CCAD'} `,
+                border:`${flattenedOptions.items.length==0 ? '2px solid gray' : '2px solid #56CCAD'}`,
                 padding: "3px",
                 borderRadius: "5px",
                 marginLeft: "10px",
               }}
               onClick={() => {
+            
                 window.open(`update-menu/${flattenedOptions?.value}`);
                 // handleActiveStatus(activeUser?._id);
+                // navigate(`/main-view/update-menu/${flattenedOptions?.value}`)
+
               }}
             >
               <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>

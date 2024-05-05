@@ -25,6 +25,14 @@ const menuApi = api.injectEndpoints({
       }),
       invalidatesTags: ["createchildmenu"],
     }),
+    updateSingleMenu: builder.mutation({
+      query: (payload) => ({
+        url: "/menuitems/updatesingle-menu",
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: ["createchildmenu"],
+    }),
     getSingleMenu: builder.query({
       query: (id) => {
         if (id) {
@@ -34,7 +42,18 @@ const menuApi = api.injectEndpoints({
         }
       },
     }),
+    getSingleChangeParentMenu: builder.query({
+      query: (id) => {
+        console.log(id)
+        if (id) {
+          return `/menuitems/singlemenu/changingparent/${id}`;
+        } else {
+          throw new Error("User id is required");
+        }
+      },
+    }),
+
   }),
 });
 
-export const { useGetAllMenuItemsQuery, useCreateMenuMutation,useUpdateMenuMutation,useGetSingleMenuQuery} = menuApi;
+export const { useGetAllMenuItemsQuery, useCreateMenuMutation,useUpdateMenuMutation,useGetSingleMenuQuery,useGetSingleChangeParentMenuQuery,useUpdateSingleMenuMutation} = menuApi;

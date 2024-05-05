@@ -3,28 +3,41 @@ import { useParams } from "react-router-dom";
 import Select from "react-select";
 import {
   useGetAllMenuItemsQuery,
+  useGetSingleChangeParentMenuQuery,
   useGetSingleMenuQuery,
+  useUpdateSingleMenuMutation,
 } from "../../../redux/features/menus/menuApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 import { ErrorMessage, Form, Field, FieldArray, Formik } from "formik";
+import "./UpdateMenu.css";
 
 const UpdateMenu = () => {
   const ArrayHelperRef = useRef();
   const { id } = useParams();
 
-  const { data: singleMenu, isLoading: singleMenuLoading } =
-    useGetSingleMenuQuery(id);
   const [singleMenuData, setSingleMenuData] = useState([]);
   const [singleMatchedMenuData, setSingleMatchedMenuData] = useState([]);
-  console.log(singleMenuData);
-  console.log(singleMenu);
+  const [mainData, setMainData] = useState([]);
+  const [changingParentId, setChangingParentId] = useState("");
+  const [changeParentData, setChangeParentData] = useState([]);
+  const { data: singleMenu, isLoading: singleMenuLoading } =
+    useGetSingleMenuQuery(id);
 
+  const { data: changeParent } =
+    useGetSingleChangeParentMenuQuery(changingParentId);
+    const[updateSingleMenu]=useUpdateSingleMenuMutation()
+  console.log(JSON.stringify(singleMenuData));
+  console.log(JSON.stringify(singleMenu));
+  console.log(mainData);
+  console.log(changeParent);
+  console.log(changeParentData);
   const {
     data: menuItems,
     isError: menuItemsIsError,
     isLoading: menuItemsIsLoading,
   } = useGetAllMenuItemsQuery();
+  console.log(menuItems);
 
   const flattenOptions = (options) => {
     const flattenRecursive = (options, parentLabel) => {
@@ -49,28 +62,142 @@ const UpdateMenu = () => {
     };
     return flattenRecursive(options);
   };
+
   const flattenedOptions = flattenOptions(menuItems);
 
   const updatedSingleData = (data) => {
-    data?.items?.find((items) => console.log(items._id, id));
-    const matchedData = data?.items?.find((items) => items._id == id);
-    console.log(matchedData?.items?.length);
+    const matchedData = data?.items?.find((items) => {
+      if (items._id == id) {
+        console.log("checked");
+      } else {
+        if (items.items.length > 0) {
+          const matchingChild = items.items.find((x) => x._id == id);
+          console.log(matchingChild);
+          return matchingChild;
+        }
+      }
+    });
+    console.log(matchedData);
     if (matchedData?.items?.length > 0) {
       return matchedData;
     }
-    return data
+    return data;
   };
   const tableUpdatedData = updatedSingleData(singleMenu);
   console.log(tableUpdatedData);
+  function separateItem(data, id) {
+    console.log(data);
+    return data?.items?.find((item) => item?._id === id);
+  }
+
+  // Example usage: Separating the "PI Report" item
+  const piReportItem = separateItem(tableUpdatedData, id);
+  console.log(piReportItem);
+
   useEffect(() => {
     setSingleMenuData(tableUpdatedData);
-    // setSingleMenuData(singleMenu)
-  }, [singleMenu, tableUpdatedData]);
+    setMainData(singleMenu);
+    setChangeParentData(changeParent);
+  }, [singleMenu, changeParent, tableUpdatedData]);
+
+  useEffect(() => {
+    if (singleMenu !== undefined) {
+      const index = singleMenu?.items?.findIndex(
+        (item) => item._id === singleMenuData?._id
+      );
+      let indexTest = -1; // Initialize indexTest to -1
+
+      menuItems.some((data, i) => {
+        let index = -1; // Initialize index to -1
+
+        if (data.items.length > 0) {
+          data.items.some((child, i) => {
+            if (child.items.length > 0) {
+              const thirdIndex = child?.items?.findIndex(
+                (item) => item._id === singleMenuData?._id
+              );
+              if (thirdIndex !== -1) {
+                index = thirdIndex; // Set index to thirdIndex
+                return true; // Break out of the loop
+              }
+            } else {
+              const secondIndex = data?.items?.findIndex(
+                (item) => item._id === singleMenuData?._id
+              );
+              if (secondIndex !== -1) {
+                index = secondIndex; // Set index to secondIndex
+                return true; // Break out of the loop
+              }
+            }
+          });
+        } else {
+          const firstIndex = menuItems?.items?.findIndex(
+            (item) => item._id === singleMenuData?._id
+          );
+          if (firstIndex !== -1) {
+            index = firstIndex; // Set index to firstIndex
+            return true; // Break out of the loop
+          }
+        }
+
+        if (index !== -1) {
+          indexTest = index; // Update indexTest if index is not -1
+          return true; // Break out of the outer loop
+        }
+
+        return false;
+      });
+
+      console.log(indexTest);
+      console.log(singleMenuData);
+      console.log(index);
+      console.log(singleMenuData);
+      // If index is found, replace the item
+      if (index !== -1) {
+        const updatedItems = [...singleMenu?.items]; // Create a copy of the items array
+        updatedItems[index] = singleMenuData;
+
+        // Update the main data with the replaced portion
+        setMainData((prevState) => ({
+          ...prevState,
+          items: updatedItems,
+        }));
+      } else {
+        if (changeParent !== undefined) {
+          if (changeParent._id === singleMenuData?._id) {
+          } else {
+            const index = changeParent.items?.findIndex(
+              (item) => item._id === singleMenuData?._id
+            );
+            if (index !== 1) {
+              console.log("hello");
+            }
+          }
+
+          console.error("Item not found for replacement");
+        }
+      }
+    }
+  }, [singleMenu, menuItems, changeParent, singleMenuData]);
+
   const menuTypeOptions = [
     { value: "child", label: "Child" },
     { value: "parent", label: "Parent" },
   ];
-  const handleSubmit = () => {};
+
+  const removeItem = (index) => {
+    setSingleMenuData((prev) => {
+      const temp__details = [...prev.items];
+      if (temp__details.length > 1) temp__details.splice(index, 1);
+      return {
+        ...prev,
+        items: [...temp__details],
+      };
+    });
+  };
+  const handleSubmit = () => {
+    updateSingleMenu(changeParentData)
+  };
 
   return (
     <div
@@ -115,7 +242,6 @@ const UpdateMenu = () => {
                   className="mb-3 mt-1"
                   aria-label="Default select example"
                   name="itemType"
-                  // isDisabled={menuType == "parent"}
                   options={flattenedOptions}
                   value={flattenedOptions?.find(
                     (x) => x.value == singleMenuData?._id
@@ -142,11 +268,33 @@ const UpdateMenu = () => {
                       _id: e.value, // Update _id property with new value
                       label: e.label,
                     }));
-                    setSingleMenuData((prevState) => {
-                      const updatedItems = [...prevState.items]; // Create a new array
-                      updatedItems[0] = { ...updatedItems, trackId: e.value }; // Create a new object for the item with updated label
-                      return { ...prevState, items: updatedItems }; // Return a new object with updated items array
-                    });
+                    console.log(e.value);
+                    setChangingParentId(e.value);
+                    const updatedPiReportItem = {
+                      ...piReportItem,
+                      trackId: e.value, // Update trackId with the new value
+                    };
+                    console.log(updatedPiReportItem)
+                 
+                    setChangeParentData((prev) => ({
+                      ...prev, // Copy previous state
+                      items: prev?.items?.concat(updatedPiReportItem),
+                    }));
+                    // let index = singleMenu?.findIndex(
+                    //   (item) => item.id == e.value
+                    // );
+
+                    // setSingleMenuData((prevState) => {
+                    //   const updatedItems = [...prevState.items];
+                    //   console.log(updatedItems); // Create a new array
+                    //   updatedItems.map((data, index) => {
+                    //     // updatedItems[index] = { ...updatedItems, trackId: e.value };
+                    //     console.log(data.trackId);
+                    //     // return data.trackId=e.value
+                    //   });
+                    //   // Create a new object for the item with updated label
+                    //   return { ...prevState, items: updatedItems }; // Return a new object with updated items array
+                    // });
                   }}
                 ></Select>
               </div>
@@ -224,9 +372,25 @@ const UpdateMenu = () => {
                 marginLeft: "5px",
               }}
               onClick={() => {
-                ArrayHelperRef.current.push({
-                  //   menu_type: menuType,
-                  menu_name: "",
+                setSingleMenuData((prev) => {
+                  const temp__details = [...prev.items];
+                  temp__details.push({
+                    label: "",
+                    url: "",
+                    permissions: [],
+                    trackId: "",
+                    items: [],
+                    isParent: false,
+                    isChecked: false,
+                    isInserted: false,
+                    isRemoved: false,
+                    isUpdated: false,
+                    isPDF: false,
+                  });
+                  return {
+                    ...prev,
+                    items: [...temp__details],
+                  };
                 });
               }}
             >
@@ -282,7 +446,7 @@ const UpdateMenu = () => {
                                   </th>
                                 </tr>
                               </thead>
-                              
+
                               {singleMenuData?.items?.map((detail, index) => {
                                 return (
                                   <tbody>
@@ -341,7 +505,7 @@ const UpdateMenu = () => {
                                           type="button"
                                           className=" border-0 rounded  bg-transparent"
                                           onClick={() => {
-                                            arrayHelpers.remove(index, 1);
+                                            removeItem(index);
                                           }}
                                         >
                                           <FontAwesomeIcon
