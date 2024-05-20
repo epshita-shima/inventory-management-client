@@ -1,46 +1,54 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import {
   useGetAllMenuItemsQuery,
   useGetSingleChangeParentMenuQuery,
   useGetSingleMenuQuery,
-  useUpdateSingleMenuMutation,
+  useUpdateNestedMenuMutation,
+  useUpdateSingleProtionMenuMutation,
 } from "../../../redux/features/menus/menuApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 import { ErrorMessage, Form, Field, FieldArray, Formik } from "formik";
 import "./UpdateMenu.css";
+import swal from "sweetalert";
 
 const UpdateMenu = () => {
   const ArrayHelperRef = useRef();
   const { id } = useParams();
-
+const navigate=useNavigate()
   const [singleMenuData, setSingleMenuData] = useState([]);
   const [singleMatchedMenuData, setSingleMatchedMenuData] = useState([]);
   const [mainData, setMainData] = useState([]);
+  const [isUpdateAsChangeParent,setIsUpdateAsChangeParent]=useState(false)
   const [changingParentId, setChangingParentId] = useState("");
   const [changeParentData, setChangeParentData] = useState([]);
+  const [singleMatchingItemData, setSingleMatchingItemData] = useState([]);
+
   const { data: singleMenu, isLoading: singleMenuLoading } =
     useGetSingleMenuQuery(id);
-
   const { data: changeParent } =
     useGetSingleChangeParentMenuQuery(changingParentId);
-    const[updateSingleMenu]=useUpdateSingleMenuMutation()
-  console.log(JSON.stringify(singleMenuData));
-  console.log(JSON.stringify(singleMenu));
-  console.log(mainData);
+  const [updateSingleMenus] = useUpdateNestedMenuMutation();
+  const [updateSingleMenu] = useUpdateSingleProtionMenuMutation();
+
+
   console.log(changeParent);
   console.log(changeParentData);
+  console.log(singleMatchingItemData);
+  console.log(JSON.stringify(singleMenuData));
+  console.log(isUpdateAsChangeParent)
+
   const {
     data: menuItems,
     isError: menuItemsIsError,
     isLoading: menuItemsIsLoading,
   } = useGetAllMenuItemsQuery();
-  console.log(menuItems);
 
-  const flattenOptions = (options) => {
-    const flattenRecursive = (options, parentLabel) => {
+  console.log(menuItems)
+  const parentMenuFunction = (options) => {
+    const parentMenuRecursive = (options, parentLabel) => {
       let result = [];
       options?.forEach((option) => {
         if (option.isParent == true) {
@@ -48,142 +56,106 @@ const UpdateMenu = () => {
             value: option._id,
             label: option.label,
           });
-        } else {
-          // result.push({
-          //   value: option._id,
-          //   label: parentLabel ? `${parentLabel} > ${option.label}` : option.label,
-          // });
         }
         if (option.items && option.items.length > 0) {
-          result = result.concat(flattenRecursive(option.items, option.label));
+          result = result.concat(
+            parentMenuRecursive(option.items, option.label)
+          );
         }
       });
       return result;
     };
-    return flattenRecursive(options);
+    return parentMenuRecursive(options);
   };
 
-  const flattenedOptions = flattenOptions(menuItems);
-
-  const updatedSingleData = (data) => {
-    const matchedData = data?.items?.find((items) => {
-      if (items._id == id) {
-        console.log("checked");
-      } else {
-        if (items.items.length > 0) {
-          const matchingChild = items.items.find((x) => x._id == id);
-          console.log(matchingChild);
-          return matchingChild;
-        }
-      }
-    });
-    console.log(matchedData);
-    if (matchedData?.items?.length > 0) {
-      return matchedData;
-    }
-    return data;
-  };
-  const tableUpdatedData = updatedSingleData(singleMenu);
-  console.log(tableUpdatedData);
-  function separateItem(data, id) {
-    console.log(data);
-    return data?.items?.find((item) => item?._id === id);
-  }
-
-  // Example usage: Separating the "PI Report" item
-  const piReportItem = separateItem(tableUpdatedData, id);
-  console.log(piReportItem);
-
-  useEffect(() => {
-    setSingleMenuData(tableUpdatedData);
-    setMainData(singleMenu);
-    setChangeParentData(changeParent);
-  }, [singleMenu, changeParent, tableUpdatedData]);
-
-  useEffect(() => {
-    if (singleMenu !== undefined) {
-      const index = singleMenu?.items?.findIndex(
-        (item) => item._id === singleMenuData?._id
-      );
-      let indexTest = -1; // Initialize indexTest to -1
-
-      menuItems.some((data, i) => {
-        let index = -1; // Initialize index to -1
-
-        if (data.items.length > 0) {
-          data.items.some((child, i) => {
-            if (child.items.length > 0) {
-              const thirdIndex = child?.items?.findIndex(
-                (item) => item._id === singleMenuData?._id
-              );
-              if (thirdIndex !== -1) {
-                index = thirdIndex; // Set index to thirdIndex
-                return true; // Break out of the loop
-              }
-            } else {
-              const secondIndex = data?.items?.findIndex(
-                (item) => item._id === singleMenuData?._id
-              );
-              if (secondIndex !== -1) {
-                index = secondIndex; // Set index to secondIndex
-                return true; // Break out of the loop
-              }
-            }
-          });
-        } else {
-          const firstIndex = menuItems?.items?.findIndex(
-            (item) => item._id === singleMenuData?._id
-          );
-          if (firstIndex !== -1) {
-            index = firstIndex; // Set index to firstIndex
-            return true; // Break out of the loop
-          }
-        }
-
-        if (index !== -1) {
-          indexTest = index; // Update indexTest if index is not -1
-          return true; // Break out of the outer loop
-        }
-
-        return false;
-      });
-
-      console.log(indexTest);
-      console.log(singleMenuData);
-      console.log(index);
-      console.log(singleMenuData);
-      // If index is found, replace the item
-      if (index !== -1) {
-        const updatedItems = [...singleMenu?.items]; // Create a copy of the items array
-        updatedItems[index] = singleMenuData;
-
-        // Update the main data with the replaced portion
-        setMainData((prevState) => ({
-          ...prevState,
-          items: updatedItems,
-        }));
-      } else {
-        if (changeParent !== undefined) {
-          if (changeParent._id === singleMenuData?._id) {
-          } else {
-            const index = changeParent.items?.findIndex(
-              (item) => item._id === singleMenuData?._id
-            );
-            if (index !== 1) {
-              console.log("hello");
-            }
-          }
-
-          console.error("Item not found for replacement");
-        }
-      }
-    }
-  }, [singleMenu, menuItems, changeParent, singleMenuData]);
+  const parentMenuOptions = parentMenuFunction(menuItems);
+  console.log(parentMenuOptions);
 
   const menuTypeOptions = [
     { value: "child", label: "Child" },
     { value: "parent", label: "Parent" },
   ];
+
+  useEffect(() => {
+    const parentMenuOptionsData = (options) => {
+      const parentMenuRecursive = (options, parentLabel) => {
+        let result = [];
+        options?.forEach((option) => {
+          if (option.isParent == true) {
+            result.push({
+              _id: option._id,
+              label: option.label,
+              trackId: option.trackId,
+              items: option.items,
+              isParent: option.isParent,
+              url: option.url,
+              permissions: option.permissions,
+              createdAt: option.createdAt,
+              updatedAt: option.updatedAt,
+            });
+          } else {
+          }
+          if (option.items && option.items.length > 0) {
+            result = result.concat(
+              parentMenuRecursive(option.items, option.label)
+            );
+          }
+        });
+        return result;
+      };
+      return parentMenuRecursive(options);
+    };
+    const parentMenusOptionsData = parentMenuOptionsData(menuItems);
+    console.log(parentMenusOptionsData);
+    const updatedSingleData = (data) => {
+      const matchedData = data?.items?.find((items) => {
+        if (items._id == id) {
+          console.log("checked");
+        } else {
+          if (items.items.length > 0) {
+            const matchingChild = items.items.find((x) => x._id == id);
+            console.log(matchingChild);
+            return matchingChild;
+          }
+        }
+      });
+      console.log(matchedData);
+      if (matchedData?.items?.length > 0) {
+        return matchedData;
+      }
+      return data;
+    };
+    const matchingData = parentMenusOptionsData?.find(
+      (x) => x._id == changingParentId
+    );
+
+    console.log(matchingData);
+    const tableUpdatedData = updatedSingleData(singleMenu);
+
+    function separateItem(data, id) {
+      console.log(data);
+      const isExisting = data?.items?.find((item) => item?._id === id);
+      return isExisting;
+    }
+
+    // Example usage: Separating the "PI Report" item
+    const piReportItem = separateItem(singleMenu, id);
+
+    console.log(piReportItem);
+
+    function searchParentWithItem(data) {
+      console.log("test", id);
+      return {
+        ...data,
+        items: data?.items.filter((item) => item._id === id || item.isParent),
+      };
+    }
+    const parentItem = searchParentWithItem(singleMenu);
+    console.log(JSON.stringify(parentItem));
+    // Example usage: Separating the "PI Report" item
+    setSingleMenuData(singleMenu);
+    // setSingleMatchingItemData(piReportItem);
+  }, [singleMenu, id, changingParentId, menuItems]);
 
   const removeItem = (index) => {
     setSingleMenuData((prev) => {
@@ -195,8 +167,18 @@ const UpdateMenu = () => {
       };
     });
   };
-  const handleSubmit = () => {
-    updateSingleMenu(changeParentData)
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(changeParentData);
+    if(isUpdateAsChangeParent){
+      updateSingleMenus({singleMenuData, singleMenu });
+    }
+    else{
+      updateSingleMenu(singleMenuData);
+    }
+    swal("Done", "Data Save Successfully", "success");
+    navigate('/main-view/menu-list')
   };
 
   return (
@@ -242,8 +224,8 @@ const UpdateMenu = () => {
                   className="mb-3 mt-1"
                   aria-label="Default select example"
                   name="itemType"
-                  options={flattenedOptions}
-                  value={flattenedOptions?.find(
+                  options={parentMenuOptions}
+                  value={parentMenuOptions?.find(
                     (x) => x.value == singleMenuData?._id
                   )}
                   styles={{
@@ -263,38 +245,33 @@ const UpdateMenu = () => {
                   })}
                   onChange={(e) => {
                     console.log(e);
+                    if(e.value==singleMenu._id){
+                      setIsUpdateAsChangeParent(false)
+                    }
+                    else{
+                      setIsUpdateAsChangeParent(true)
+                    }
+                    const updatedItems = singleMenuData.items.map((item) => {
+                      return {
+                        ...item,
+                        trackId: e.value, // replace this with the new trackId value
+                      };
+                    });
                     setSingleMenuData((prev) => ({
                       ...prev, // Copy previous state
                       _id: e.value, // Update _id property with new value
                       label: e.label,
+                      items: updatedItems,
                     }));
                     console.log(e.value);
-                    setChangingParentId(e.value);
-                    const updatedPiReportItem = {
-                      ...piReportItem,
-                      trackId: e.value, // Update trackId with the new value
-                    };
-                    console.log(updatedPiReportItem)
-                 
-                    setChangeParentData((prev) => ({
-                      ...prev, // Copy previous state
-                      items: prev?.items?.concat(updatedPiReportItem),
-                    }));
-                    // let index = singleMenu?.findIndex(
-                    //   (item) => item.id == e.value
-                    // );
+                    // setChangingParentId(e.value);
 
-                    // setSingleMenuData((prevState) => {
-                    //   const updatedItems = [...prevState.items];
-                    //   console.log(updatedItems); // Create a new array
-                    //   updatedItems.map((data, index) => {
-                    //     // updatedItems[index] = { ...updatedItems, trackId: e.value };
-                    //     console.log(data.trackId);
-                    //     // return data.trackId=e.value
-                    //   });
-                    //   // Create a new object for the item with updated label
-                    //   return { ...prevState, items: updatedItems }; // Return a new object with updated items array
-                    // });
+                    
+            
+                    // setSingleMenuData((prev) => ({
+                    //   ...prev, // Copy previous state
+                     
+                    // }));
                   }}
                 ></Select>
               </div>
@@ -364,7 +341,7 @@ const UpdateMenu = () => {
             <button
               className="border-0 "
               style={{
-                backgroundColor: "#00B987",
+                backgroundColor: "#0A203F",
                 color: "white",
                 padding: "5px 10px",
                 fontSize: "14px",
@@ -378,7 +355,7 @@ const UpdateMenu = () => {
                     label: "",
                     url: "",
                     permissions: [],
-                    trackId: "",
+                    trackId: singleMenuData?._id,
                     items: [],
                     isParent: false,
                     isChecked: false,
@@ -448,6 +425,7 @@ const UpdateMenu = () => {
                               </thead>
 
                               {singleMenuData?.items?.map((detail, index) => {
+                                console.log(detail)
                                 return (
                                   <tbody>
                                     <tr key={index}>

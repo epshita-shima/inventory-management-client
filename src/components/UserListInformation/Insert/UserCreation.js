@@ -140,84 +140,6 @@ console.log(JSON.stringify(menuItems))
     return <p>Loading...</p>;
   }
  
- 
-  //   const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
-  //     return items.map(item => {
-  //       const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
-  //       if (clickedCheckbox) {
-  //         // Merge the clicked checkbox data into the items item
-  //         return {
-  //           ...item,
-  //           trackId: clickedCheckbox.childId,
-  //           permissions: [],
-  //           isInserted: clickedCheckbox.isInserted,
-  //           isUpdated: clickedCheckbox.isUpdated,
-  //           isPDF: clickedCheckbox.isPDF,
-  //           isRemoved: clickedCheckbox.isRemoved,
-  //           isChecked: clickedCheckbox.isChecked,
-  //           parentIds: clickedCheckbox.parentIds
-  //         };
-  //       } else if (item.items) {
-  //         // Recursively merge into nested dropdowns
-  //         return {
-  //           ...item,
-  //           items: mergeCheckboxIntoDropdown(item.items, clickedCheckboxes)
-  //         };
-  //       }
-  //       return item;
-  //     });
-  //   };
-  
-  //   const clickedCheckboxe = clickedCheckboxes.filter(checkbox => checkbox.parentIds.includes(dataItem._id));
-  
-  //   if (clickedCheckboxe.length > 0) {
-  //     // Clone dataItem to avoid modifying the original array
-  //     const clonedDataItem = { ...dataItem };
-  //     // Merge the checkbox data into the items array
-  //     clonedDataItem.items = mergeCheckboxIntoDropdown(clonedDataItem.items, clickedCheckboxe);
-  //     return clonedDataItem;
-  //   }
-  //   return dataItem;
-  // });
-  // const mergedArray = mergedData?.map(dataItem => {
-  //   const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
-  //     console.log(items);
-  //     return items?.map(item => {
-  //       const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
-  //       const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
-  //       const isInserted = clickedCheckbox ? clickedCheckbox.isInserted : false;
-  //       const isUpdated = clickedCheckbox ? clickedCheckbox.isUpdated : false;
-  //       const isPDF = clickedCheckbox ? clickedCheckbox.isPDF : false;
-  //       const del = clickedCheckbox ? clickedCheckbox.isRemoved : false;
-  //       const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
-  //       const trackId = clickedCheckbox ? clickedCheckbox.childId : item._id;
-  //       console.log(item.items?.length);
-  
-  //       // Recursively merge checkboxes into nested items
-  //       const mergedItems = mergeCheckboxIntoDropdown(item?.items, clickedCheckboxes);
-  // console.log(mergedItems)
-  //       return {
-  //         ...item,
-  //         trackId,
-  //         isChecked,
-  //         isInserted,
-  //         isUpdated,
-  //         isPDF,
-  //         isRemoved: del,
-  //         parentIds,
-  //         items: mergedItems // Assign the merged items
-  //       };
-  //     });
-  //   };
-  
-  //   const clickedCheckboxe = clickedCheckboxes.filter(checkbox => checkbox.parentIds.includes(dataItem._id));
-  // console.log(clickedCheckboxe)
-  //   return {
-  //     ...dataItem,
-  //     items: mergeCheckboxIntoDropdown(dataItem?.items || [], clickedCheckboxe) // Use empty array if items is undefined
-  //   };
-  // });
-
   const mergedArray = mergedData?.map(dataItem => {
     const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
         return items?.map(item => {
@@ -268,75 +190,7 @@ console.log(JSON.stringify(menuItems))
         items: mergeCheckboxIntoDropdown(dataItem?.items || [], clickedCheckboxe) // Use empty array if items is undefined
     };
 });
-
   
- 
-  // const mergedArray = mergedData.map(dataItem => {
-  //   const mergeCheckboxIntoDropdown = (items, clickedCheckboxes) => {
-  //     let parentIsChecked = false; // Local variable to track if any child is checked
-  //     const updatedDropdown = items.map(item => {
-  //       const clickedCheckbox = clickedCheckboxes.find(checkbox => checkbox.childId === item._id);
-  //       const isChecked = clickedCheckbox ? clickedCheckbox.isChecked : false;
-  //       const isInserted = clickedCheckbox ? clickedCheckbox.isInserted : false;
-  //       const isUpdated = clickedCheckbox ? clickedCheckbox.isUpdated : false;
-  //       const isPDF = clickedCheckbox ? clickedCheckbox.isPDF : false;
-  //       const del = clickedCheckbox ? clickedCheckbox.isRemoved : false;
-  //       const parentIds = clickedCheckbox ? clickedCheckbox.parentIds : [];
-  //       const trackId= clickedCheckbox ? clickedCheckbox.childId : item._id;
-  
-  //       // Check if any child item is checked
-  //       if (isChecked) {
-  //         parentIsChecked = true;
-  //       }
-  
-  //       // Recursively merge checkboxes into nested dropdowns
-  //       if (item.items) {
-  //         return {
-  //           ...item,
-  //           trackId,
-  //           isChecked,
-  //           isInserted,
-  //           isUpdated,
-  //           isPDF,
-  //           isRemoved: del,
-  //           parentIds,
-  //           items: mergeCheckboxIntoDropdown(item.items, clickedCheckboxes)
-  //         };
-  //       }
-  
-  //       return {
-  //         ...item,
-  //         trackId,
-  //         isChecked,
-  //         isInserted,
-  //         isUpdated,
-  //         isPDF,
-  //         isRemoved: del,
-  //         parentIds
-  //       };
-  //     });
-  
-  //     // Update parent's isChecked field if any child is checked
-  //     if (parentIsChecked) {
-  //       return updatedDropdown.map(item => {
-  //         return {
-  //           ...item,
-  //           isChecked: true
-  //         };
-  //       });
-  //     }
-  
-  //     return updatedDropdown;
-  //   };
-  
-  //   const clickedCheckboxe = clickedCheckboxes.filter(checkbox => checkbox.parentIds.includes(dataItem._id));
-  //   console.log(clickedCheckboxe)
-
-  //   return {
-  //     ...dataItem,
-  //     items: mergeCheckboxIntoDropdown(dataItem.items, clickedCheckboxe)
-  //   };
-  // });
   console.log(mergedArray)
 const checkedData=mergedArray.filter(x=>x.isChecked==true)
 console.log(checkedData)
@@ -414,29 +268,7 @@ console.log(checkedData)
       overflowY:"scroll",
       height:'500px'
     }}>
-      {/* <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
-        <div class="container">
-          <div
-            class="collapse navbar-collapse d-flex justify-content-start align-items-center"
-            id="navbarNav"
-          >
-            <ul class="navbar-nav ">
-              <li class="nav-item nav-button-active">
-                <a class="active nav-link text-uppercase">User List</a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link text-uppercase
-          "
-                  href="#"
-                >
-                  {isUpdate ? "Update User" : "Add User(s)"}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav> */}
+
       <div class="container">
         <div className="shadow-lg mt-2 mt-sm-5 mt-md-5 mt-lg-5 p-5 rounded-4">
           <div className="d-flex justify-content-between align-items-center border-bottom">

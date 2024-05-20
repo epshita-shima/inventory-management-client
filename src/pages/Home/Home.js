@@ -3,7 +3,7 @@ import Navbar from "../Navbar/Navbar";
 import "../../components/NestedDropdown.css";
 import { useGetNavbarQuery } from "../../redux/features/user/navbar/navbarApi";
 import DynamicNestedDropdown from "../../components/DynamicNestedDropdown";
-import { useGetAllUserQuery } from "../../redux/features/user/userApi";
+import { useGetAllUserQuery, useUpdateMultipleUserFieldMutation } from "../../redux/features/user/userApi";
 import { useEffect, useState } from "react";
 import { Menubar } from "primereact/menubar";
 import "./Home.css";
@@ -26,6 +26,7 @@ console.log(menus)
     var menuListSingleData = menuListData[0]?.menulist;
   }
   const [showComponent, setShowComponent] = useState(false);
+  const [setAllMenuData]=useUpdateMultipleUserFieldMutation()
   const navigate = useNavigate();
 
   useEffect(()=>{
@@ -81,20 +82,6 @@ console.log(menus)
     window.open(url, "_blank");
   };
 
-  // const handleRefreshData = async () => {
-  //   console.log(menuListData);
-  //   await refetch().then(({ data }) => {
-  //     const userData = data?.filter(
-  //       (item) =>
-  //         item?.username === menuListData[0]?.username &&
-  //         item.password === menuListData[0]?.password
-  //     );
-
-  //     console.log(JSON.stringify(userData));
-  //     // Update localStorage with the filtered userData
-  //     // localStorage.setItem("user", JSON.stringify(userData));
-  //   });
-  // };
 
   const handleRefreshData = async () => {
     await refetch().then(({ data }) => {
@@ -104,10 +91,6 @@ console.log(menus)
           item?.username === menuListData[0]?.username &&
           item.password === menuListData[0]?.password
       );
-      // Update localStorage with the filtered userData
-      // localStorage.setItem("user", JSON.stringify(userData));
-
-      // Define a function to recursively isUpdated properties
       console.log(userData[0]?.roleId)
       if (userData[0]?.roleId === "65d48768a106fcb4f5c28071") {
         const updateProperties = (item) => {
@@ -126,7 +109,6 @@ console.log(menus)
           newItem.items = newItem?.items?.map((child) =>
             updateProperties(child)
           );
-
           return newItem;
         };
 
@@ -138,6 +120,7 @@ console.log(menus)
           return { ...item, menulist: updatedMenuList };
         });
         console.log(updatedUserData)
+        setAllMenuData(updatedUserData)
         localStorage.setItem("user", JSON.stringify(updatedUserData));
       } else {
         // localStorage.setItem("user", JSON.stringify(userData));
@@ -154,7 +137,7 @@ console.log(menus)
         >
           <div class="d-block d-md-none">
             <div className="d-flex justify-content-between align-items-center">
-              {/* Dropdown button with custom icon */}
+          
               <div className="position-relative">
                 <Dropdown>
                   <Dropdown.Toggle
@@ -215,9 +198,7 @@ console.log(menus)
                         />
                       </Dropdown.Menu>
                     </Dropdown>
-                    {/* <div className="overflow-auto">
-                      <Menubar model={filteredMenuItems} style={menubarStyle} />
-                    </div> */}
+              
 
                     <Dropdown.Item
                       href="#"
@@ -239,7 +220,7 @@ console.log(menus)
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
-              {/* Show name for large screens */}
+             
               <span className="d-none d-md-block">
                 {menuListData !== null
                   ? `Hello, ${menuListData[0]?.firstname} ${menuListData[0]?.lastname}`

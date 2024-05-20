@@ -21,7 +21,6 @@ import RequireAuth from "./pages/RequireAuth/RequireAuth";
 import NotFound from "./pages/NotFound/NotFound";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import CreateMenu from "./components/MenuInformation/Insert/CreateMenu";
-import MenuList from "./components/MenuInformation/Index/MenuTableData/MenuList";
 import MenuDataList from "./components/MenuInformation/Index/MenuDataList";
 import UpdateMenu from "./components/MenuInformation/Update/UpdateMenu";
 
@@ -30,54 +29,9 @@ function App() {
   const [changePassword, setChangePassword] = useState(false);
   const [resetPassword, setResetPassword] = useState(false);
 
-  const dispatch = useDispatch();
-  const apiData = [
-    {
-      label: "Item 1",
-      children: [
-        {
-          label: "Subitem 1.1",
-          children: [
-            {
-              label: "Sub-subitem 1.1.1",
-              children: [],
-            },
-            // ... other sub-subitems
-          ],
-        },
-        {
-          label: "Subitem 1.2",
-          children: [],
-        },
-        // ... other subitems
-      ],
-    },
-    {
-      label: "Item 2",
-      children: [
-        {
-          label: "Subitem 1.1",
-          children: [],
-        },
-      ],
-    },
-    // ... other items
-  ];
   const getMenulistData = localStorage.getItem("user");
 
   const menuListData = JSON.parse(getMenulistData);
-  // useEffect(()=>{
-  //   dispatch(setLoading(true))
-  //   onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       dispatch(setUser(user.email));
-  //       dispatch(setLoading(false))
-  //     }
-  //     else{
-  //       dispatch(setLoading(false))
-  //     }
-  //   });
-  // },[dispatch])
 
   return (
     <div>

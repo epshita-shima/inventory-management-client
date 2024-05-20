@@ -14,56 +14,8 @@ import FilterComponent from "./FilterComponent";
 import DataTable from "react-data-table-component";
 import { useNavigate } from "react-router-dom";
 import './MenuList.css'
-const MenuList = () => {
+const MenuList = ({permission}) => {
   const { data: menuItems } = useGetAllMenuItemsQuery(undefined);
-  const { data: user } = useGetAllUserQuery(undefined);
-  const [permission, setPermission] = useState();
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (localStorage.length > 0) {
-      const getUserId = localStorage.getItem("user");
-      const userSingleId = JSON.parse(getUserId);
-      const userIdFromSession = userSingleId[0]?._id;
-      const permidionData = user?.filter(
-        (user) => user._id == userIdFromSession
-      );
-      const extractUserListForCurrentUser = (userData, userId) => {
-        let userList = null;
-
-        // Find the user object matching the provided userId
-        const currentUser = userData?.find((user) => user._id === userId);
-
-        if (currentUser) {
-          // Loop through the menus of the current user
-          currentUser?.menulist?.forEach((menu) => {
-            menu?.items?.forEach((subMenu) => {
-              // Check if the subMenu is the "User Profile" menu
-              if (subMenu?.label === "User Profile") {
-                // Find the "User List" sub-item
-                const userListSubMenu = subMenu?.items.find(
-                  (subItem) => subItem?.label === "User List"
-                );
-                if (userListSubMenu) {
-                  // Set the user list property
-                  userList = userListSubMenu;
-                }
-              }
-            });
-          });
-        }
-
-        return userList;
-      };
-
-      var permission = extractUserListForCurrentUser(
-        permidionData,
-        userIdFromSession
-      );
-      setPermission(permission);
-    } else {
-      navigate("/");
-    }
-  }, [user, navigate]);
 
   const flattenOptions = (options) => {
     const flattenRecursive = (options, parentLabel) => {
@@ -84,7 +36,6 @@ const MenuList = () => {
   };
 
   const flattenedOptions = flattenOptions(menuItems);
-
 
   const columns = [
     {
@@ -108,7 +59,7 @@ const MenuList = () => {
       grow: 2,
       cell: (flattenedOptions) => (
         <div className="d-flex justify-content-between align-content-center">
-          {permission?.update ? (
+          {permission?.isUpdated ? (
             <a
               target="_blank"
               className={` action-icon `}
@@ -124,11 +75,7 @@ const MenuList = () => {
                 marginLeft: "10px",
               }}
               onClick={() => {
-            
                 window.open(`update-menu/${flattenedOptions?.value}`);
-                // handleActiveStatus(activeUser?._id);
-                // navigate(`/main-view/update-menu/${flattenedOptions?.value}`)
-
               }}
             >
               <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
@@ -137,7 +84,7 @@ const MenuList = () => {
             ""
           )}
 
-          {permission?.delete ? (
+          {permission?.isRemoved ? (
             <a
               target="_blank"
               className="action-icon "

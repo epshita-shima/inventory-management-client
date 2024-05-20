@@ -28,8 +28,7 @@ import "jspdf-autotable";
 import { useGetCompanyInfoQuery } from "../../../redux/features/companyinfo/compayApi";
 import { downloadPDF } from "../../ReportProperties/HeaderFooter";
 import handleDownload from "../../ReportProperties/HandelExcelDownload";
-import { Button } from 'react-bootstrap';
-
+import { Button } from "react-bootstrap";
 
 const UserListInfo = ({
   setChangePassword,
@@ -51,24 +50,25 @@ const UserListInfo = ({
   const [extractedData, setExtractedData] = useState([]);
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
   const [demoData, setDemoData] = useState(null);
-const [permissionResult,setPermissionResult]=useState([])
-const [ userIdFromLocalStorage ,setUserIdFromLocalStorage]=useState('')
-console.log(permissionResult,userIdFromLocalStorage)
-  console.log(localStorage.length)
+  const [permissionResult, setPermissionResult] = useState([]);
+  const [userIdFromLocalStorage, setUserIdFromLocalStorage] = useState("");
+  console.log(permissionResult, userIdFromLocalStorage);
+  console.log(localStorage.length);
 
-  useEffect(()=>{
-    if(localStorage.length>0){
+  useEffect(() => {
+    if (localStorage.length > 0) {
       const getUserId = localStorage.getItem("user");
       const userSingleId = JSON.parse(getUserId);
       const userIdFromSession = userSingleId[0]?._id;
-      const permidionData = user?.filter((user) => user._id == userIdFromSession);
-      setPermissionResult(permidionData)
-      setUserIdFromLocalStorage(userIdFromSession)
+      const permidionData = user?.filter(
+        (user) => user._id == userIdFromSession
+      );
+      setPermissionResult(permidionData);
+      setUserIdFromLocalStorage(userIdFromSession);
+    } else {
+      navigate("/");
     }
-    else{
-      navigate('/')
-    }
-  },[navigate,user])
+  }, [navigate, user]);
 
   const extractUserListForCurrentUser = (userData, userId) => {
     let userList = null;
@@ -97,8 +97,6 @@ console.log(permissionResult,userIdFromLocalStorage)
 
     return userList;
   };
-
- 
 
   // Call the function to get the user list for the current user
   const permission = extractUserListForCurrentUser(
@@ -339,9 +337,8 @@ console.log(permissionResult,userIdFromLocalStorage)
 
     return (
       <div className="d-block d-sm-flex justify-content-center align-items-center ">
-        <button >Create User</button>
+        <button>Create User</button>
         <div className="d-flex justify-content-end align-items-center">
-          
           <div className="table-head-icon d-flex ">
             <div>
               <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp;
@@ -385,14 +382,14 @@ console.log(permissionResult,userIdFromLocalStorage)
             </div>
           </div>
         </div>
-   
-       <div className="mt-2 mt-sm-0 ms-2 mb-2 mb-sm-0">
-       <FilterComponent
-          onFilter={(e) => setFilterText(e.target.value)}
-          onClear={handleClear}
-          filterText={filterText}
-        />
-       </div>
+
+        <div className="mt-2 mt-sm-0 ms-2 mb-2 mb-sm-0">
+          <FilterComponent
+            onFilter={(e) => setFilterText(e.target.value)}
+            onClear={handleClear}
+            filterText={filterText}
+          />
+        </div>
       </div>
     );
   }, [
@@ -568,9 +565,7 @@ console.log(permissionResult,userIdFromLocalStorage)
                 subHeader
                 subHeaderComponent={subHeaderComponent}
               />
-             
             </div>
-           
           </div>
         </div>
       </div>
@@ -618,8 +613,6 @@ console.log(permissionResult,userIdFromLocalStorage)
       ) : (
         ""
       )}
-
-
     </div>
   );
 };

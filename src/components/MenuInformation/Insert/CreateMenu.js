@@ -1,6 +1,5 @@
 import {
   faPlus,
-  faTrash,
   faXmarkCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,19 +13,18 @@ import {
 } from "../../../redux/features/menus/menuApi";
 import "./CreateMenu.css";
 import * as Yup from "yup";
-import { InputGroup } from "react-bootstrap";
 import swal from "sweetalert";
 import { useNavigate } from "react-router-dom";
 
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
-  const [parentMenuName, setParentMenuName] = useState("");
+  const [parentMenuName,setParentMenuName] = useState("");
   const [menuType, setMenuType] = useState("");
   const [createMenu] = useCreateMenuMutation();
   const [updateMenu] = useUpdateMenuMutation();
-  const [selectedTopParentValue, setSelectedTopParentValue] = useState(null);
   const navigate = useNavigate();
-
+  const [selectedTopParentValue, setSelectedTopParentValue] = useState(null);
+console.log(parentMenuName)
   useEffect(()=>{
     if(localStorage.length>0){
 
@@ -38,17 +36,17 @@ const CreateMenu = () => {
   
   const {
     data: menuItems,
-    isError: menuItemsIsError,
-    isLoading: menuItemsIsLoading,
   } = useGetAllMenuItemsQuery();
 
+ 
   const menuTypeOptions = [
     { value: "child", label: "Child" },
     { value: "parent", label: "Parent" },
   ];
 
-  const flattenOptions = (options) => {
-    const flattenRecursive = (options, parentLabel) => {
+
+  const parentMenuOptions = (options) => {
+    const parentMenuRecursive = (options, parentLabel) => {
       let result = [];
       options?.forEach((option) => {
         if (option.isParent == true) {
@@ -63,17 +61,18 @@ const CreateMenu = () => {
           // });
         }
         if (option.items && option.items.length > 0) {
-          result = result.concat(flattenRecursive(option.items, option.label));
+          result = result.concat(parentMenuRecursive(option.items, option.label));
         }
       });
       return result;
     };
-    return flattenRecursive(options);
+    return parentMenuRecursive(options);
   };
-  const flattenedOptions = flattenOptions(menuItems);
-  console.log(flattenedOptions);
+  const parentOptions = parentMenuOptions(menuItems);
+  console.log(parentOptions);
+
   const flattenOptionsData = (options) => {
-    const flattenRecursive = (options, parentLabel) => {
+    const parentMenuRecursive = (options, parentLabel) => {
       let result = [];
       options?.forEach((option) => {
         if (option.isParent == true) {
@@ -85,12 +84,12 @@ const CreateMenu = () => {
         } else {
         }
         if (option.items && option.items.length > 0) {
-          result = result.concat(flattenRecursive(option.items, option.label));
+          result = result.concat(parentMenuRecursive(option.items, option.label));
         }
       });
       return result;
     };
-    return flattenRecursive(options);
+    return parentMenuRecursive(options);
   };
   const flattenedOptionsData = flattenOptionsData(menuItems);
   console.log(flattenedOptionsData);
@@ -282,10 +281,18 @@ const CreateMenu = () => {
                   className="mb-3 mt-1"
                   aria-label="Default select example"
                   name="itemType"
-                  // isDisabled={menuType == "parent"}
-                  options={flattenedOptions}
-                  // value={flattenedOptions?.find((x) => x.value == parentMenuName.value)}
-
+                 options={parentOptions}
+                 value={parentOptions?.find(
+                  (x) => x.value == selectedTopParentValue
+                )}
+                onChange={(e) => {
+                  setSelectedTopParentValue(e.value);
+                  const filterData = flattenedOptionsData.find(
+                    (x) => x.value == e.value
+                  );
+                  console.log(filterData);
+                  setParentMenuName(filterData);
+                }}
                   styles={{
                     control: (baseStyles, state) => ({
                       ...baseStyles,
@@ -301,19 +308,8 @@ const CreateMenu = () => {
                       primary: "#00B987",
                     },
                   })}
-                  // style={{ border: "1px solid #00B987" }}
-                  // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
-                  value={flattenedOptions?.find(
-                    (x) => x.value == selectedTopParentValue
-                  )}
-                  onChange={(e) => {
-                    setSelectedTopParentValue(e.value);
-                    const filterData = flattenedOptionsData.find(
-                      (x) => x.value == e.value
-                    );
-                    console.log(filterData);
-                    setParentMenuName(filterData);
-                  }}
+                 
+                
                 ></Select>
               </div>
               <div className=" mt-4" style={{ width: "40%" }}>
@@ -324,8 +320,7 @@ const CreateMenu = () => {
                   aria-label="Default select example"
                   name="menuType"
                   options={menuTypeOptions}
-                  // value={menuTypeOptions?.find((x) => x.value == menuType.value)}
-
+                 
                   styles={{
                     control: (baseStyles, state) => ({
                       ...baseStyles,
@@ -341,11 +336,7 @@ const CreateMenu = () => {
                       primary: "#00B987",
                     },
                   })}
-                  // style={{ border: "1px solid #00B987" }}
-                  // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
-                  // value={menuTypeOptions?.find(
-                  //   (x) => x.value == selectedTopParentValue
-                  // )}
+                 
                   onChange={(e) => {
                     console.log(e);
                     if (e.value == "child") {
@@ -465,51 +456,7 @@ const CreateMenu = () => {
                                           <td className="bg-white text-center align-middle">
                                             {index + 1}
                                           </td>
-                                          {/* <td className="text-center align-middle">
-                                            <div class="d-flex align-items-center justify-content-center">
-                                              <span
-                                                style={{
-                                                  color: "orangered",
-                                                  fontWeight: "bold",
-                                                  fontSize: "16px",
-                                                }}
-                                              >
-                                                C
-                                              </span>
-                                              <div class="form-switch ms-2">
-                                                <input
-                                                  type="checkbox"
-                                                  class="form-check-input"
-                                                  name={`detailsData.${index}.menu_type`}
-                                                  id="site_state"
-                                                  onClick={(e) => {
-                                                    setFieldValue(
-                                                      `detailsData.${index}.menu_type`,
-                                                      e.target.checked
-                                                    );
-                                                  }}
-                                                />
-                                              </div>
-                                              <label
-                                                for="site_state"
-                                                class="form-check-label"
-                                                style={{
-                                                  color: "#00B987",
-                                                  fontWeight: "bold",
-                                                  fontSize: "16px",
-                                                  marginTop: "5px",
-                                                  marginLeft: "5px",
-                                                }}
-                                              >
-                                                P
-                                              </label>
-                                            </div>
-                                            <span className="text-danger">
-                                              <ErrorMessage
-                                                name={`detailsData.${index}.menu_type`}
-                                              />
-                                            </span>
-                                          </td> */}
+                                       
                                           <td className="text-center align-middle">
                                             <Field
                                               type="text"

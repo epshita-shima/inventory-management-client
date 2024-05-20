@@ -15,7 +15,7 @@ const menuApi = api.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["createmenu"],
+      invalidatesTags: ["createmenu,createchildmenu"],
     }),
     updateMenu: builder.mutation({
       query: (payload) => ({
@@ -23,7 +23,15 @@ const menuApi = api.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["createchildmenu"],
+      invalidatesTags: ["createmenu,createchildmenu"],
+    }),
+    updateNestedMenu: builder.mutation({
+      query: (payload) => ({
+        url: "/menuitems/updatenesteditems/menu",
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["createmenu,createchildmenu"],
     }),
     updateSingleMenu: builder.mutation({
       query: (payload) => ({
@@ -31,7 +39,15 @@ const menuApi = api.injectEndpoints({
         method: "PUT",
         body: payload,
       }),
-      invalidatesTags: ["createchildmenu"],
+      invalidatesTags: ["createmenu,createchildmenu"],
+    }),
+    updateSingleProtionMenu: builder.mutation({
+      query: (payload) => ({
+        url: `/menuitems/singlemenu/singleupdate/${payload._id}`,
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: ["createmenu,createchildmenu"],
     }),
     getSingleMenu: builder.query({
       query: (id) => {
@@ -56,4 +72,4 @@ const menuApi = api.injectEndpoints({
   }),
 });
 
-export const { useGetAllMenuItemsQuery, useCreateMenuMutation,useUpdateMenuMutation,useGetSingleMenuQuery,useGetSingleChangeParentMenuQuery,useUpdateSingleMenuMutation} = menuApi;
+export const { useGetAllMenuItemsQuery, useCreateMenuMutation,useUpdateMenuMutation,useGetSingleMenuQuery,useGetSingleChangeParentMenuQuery,useUpdateSingleMenuMutation,useUpdateNestedMenuMutation,useUpdateSingleProtionMenuMutation} = menuApi;

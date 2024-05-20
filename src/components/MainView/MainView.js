@@ -9,8 +9,8 @@ const MainView = ({singleUserData, setSingleUserData,setChangePassword, setReset
   return (
     <div style={{ position: 'relative' ,height: '100vh'}}>
       <div style={{
-        '@media (max-width: 575.98px)': { height: extraSmallScreenHeight },
-        '@media (min-width: 576px) and (max-width: 768px)': { height: smallToMediumScreenHeight },
+        '@media (maxWidth: 575.98px)': { height: extraSmallScreenHeight },
+        '@media (minWidth: 576px) and (maxWidth: 768px)': { height: smallToMediumScreenHeight },
       }}>
 
       <Home singleUserData={singleUserData} setSingleUserData={setSingleUserData} setChangePassword={setChangePassword} setResetPassword={setResetPassword}></Home>
