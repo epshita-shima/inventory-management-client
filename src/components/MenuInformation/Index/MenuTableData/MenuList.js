@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
-import { useGetAllMenuItemsQuery } from "../../../../redux/features/menus/menuApi";
+import { useDeleteMenuDataMutation, useGetAllMenuItemsQuery } from "../../../../redux/features/menus/menuApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye,
@@ -14,9 +14,8 @@ import FilterComponent from "./FilterComponent";
 import DataTable from "react-data-table-component";
 import { useNavigate } from "react-router-dom";
 import './MenuList.css'
-const MenuList = ({permission}) => {
-  const { data: menuItems } = useGetAllMenuItemsQuery(undefined);
-
+const MenuList = ({permission, menuItems}) => {
+const [deleteMenu]=useDeleteMenuDataMutation()
   const flattenOptions = (options) => {
     const flattenRecursive = (options, parentLabel) => {
       let result = [];
@@ -99,6 +98,7 @@ const MenuList = ({permission}) => {
                 marginLeft: "10px",
               }}
               onClick={() => {
+                console.log(flattenedOptions?.value)
                 swal({
                   title: "Are you sure?",
                   text: "Once deleted, you will not be able to recover this data!",
@@ -107,7 +107,7 @@ const MenuList = ({permission}) => {
                   dangerMode: true,
                 }).then((willDelete) => {
                   if (willDelete) {
-                    // deleteUser(activeUser?._id);
+                    deleteMenu(flattenedOptions?.value);
                     swal("Poof! Your data has been deleted!", {
                       icon: "success",
                     });

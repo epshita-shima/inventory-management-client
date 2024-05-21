@@ -19,8 +19,8 @@ import { useNavigate } from "react-router-dom";
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
   const [parentMenuName,setParentMenuName] = useState("");
-  const [menuType, setMenuType] = useState("");
-  const [createMenu] = useCreateMenuMutation();
+  const [menuType, setMenuType] = useState('');
+  const [createMenus] = useCreateMenuMutation();
   const [updateMenu] = useUpdateMenuMutation();
   const navigate = useNavigate();
   const [selectedTopParentValue, setSelectedTopParentValue] = useState(null);
@@ -44,7 +44,15 @@ console.log(parentMenuName)
     { value: "parent", label: "Parent" },
   ];
 
-
+  const initialValues={
+    parentmenu: parentMenuName,
+    detailsData: [
+      {
+        menu_type: menuType,
+        menu_name: "",
+      },
+    ],
+  }
   const parentMenuOptions = (options) => {
     const parentMenuRecursive = (options, parentLabel) => {
       let result = [];
@@ -93,10 +101,11 @@ console.log(parentMenuName)
   };
   const flattenedOptionsData = flattenOptionsData(menuItems);
   console.log(flattenedOptionsData);
-
-  const handleSubmit = async (e, values) => {
+  console.log(menuType !=='',menuType )
+  const handleSubmit = async (e, values,resetForm) => {
     e.preventDefault();
     console.log(values);
+
     const modelMenuInsert = {
       children: [],
       label: parentMenuName.label,
@@ -118,6 +127,8 @@ console.log(parentMenuName)
           swal("Not Possible!", "Data Not Found", {
             icon: "warning",
           });
+          setSelectedTopParentValue(null)
+          setMenuType('')
           return;
         } else if (menuType == "child" && parentMenuName.value == undefined) {
           swal("Not possible", "Please select parent name", "warning");
@@ -125,6 +136,7 @@ console.log(parentMenuName)
       });
 
       if (parentMenuName) {
+        console.log('parentMenuName',parentMenuName)
         var errorCount = 0;
         values.detailsData.forEach((item) => {
           if (item.menu_name == "") {
@@ -153,14 +165,26 @@ console.log(parentMenuName)
         });
         console.log(errorCount);
         console.log(modelMenuInsert);
-        if (errorCount <= 0) {
+        if (errorCount ==0) {
+          console.log('updateMenu')
           updateMenu(modelMenuInsert);
           swal("Done", "Data Save Successfully", "success");
-          navigate("/main-view/menu-list");
+          // navigate("/main-view/menu-list");
+          resetForm({values:{parentmenu: '',
+          detailsData: [
+            {
+              menu_type: "",
+              menu_name: "",
+            },
+          ],}})
+         setSelectedTopParentValue(null)
+          setMenuType('')
         } else {
           swal("Not Possible!", "Data Not Found", {
             icon: "warning",
           });
+          setMenuType('')
+          setSelectedTopParentValue(null)
         }
       } else {
         values.detailsData.forEach((item) => {
@@ -168,6 +192,8 @@ console.log(parentMenuName)
             swal("Not Possible!", "Data Not Found", {
               icon: "warning",
             });
+            setMenuType('')
+            setSelectedTopParentValue(null)
           } else {
             if (menuType == "child" && parentMenuName.value == undefined) {
               swal(
@@ -222,8 +248,17 @@ console.log(parentMenuName)
                   swal("Done", "Data Save Successfully", {
                     icon: "success",
                   });
-                  createMenu(convertedData.menuItems);
-                  navigate("/main-view/menu-list");
+                  createMenus(convertedData.menuItems);
+                  // navigate("/main-view/menu-list");
+                  resetForm({values:{parentmenu: '',
+                  detailsData: [
+                    {
+                      menu_type: "",
+                      menu_name: "",
+                    },
+                  ],}})
+                 setSelectedTopParentValue(null)
+                  setMenuType('')
                 } else {
                   swal(" Cancel! Saving data ");
                 }
@@ -232,6 +267,7 @@ console.log(parentMenuName)
           }
         });
       }
+   
     } catch (error) {
       console.error("Error saving data:", error);
       swal("Error", "Failed to save data. Please try again later.", "error");
@@ -282,9 +318,9 @@ console.log(parentMenuName)
                   aria-label="Default select example"
                   name="itemType"
                  options={parentOptions}
-                 value={parentOptions?.find(
-                  (x) => x.value == selectedTopParentValue
-                )}
+                 value={selectedTopParentValue  !=null ? parentOptions?.find(
+                  (x) => x.value === selectedTopParentValue
+                ) :''}
                 onChange={(e) => {
                   setSelectedTopParentValue(e.value);
                   const filterData = flattenedOptionsData.find(
@@ -320,14 +356,16 @@ console.log(parentMenuName)
                   aria-label="Default select example"
                   name="menuType"
                   options={menuTypeOptions}
-                 
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      borderColor: state.isFocused ? "#fff" : "#fff",
-                      border: "1px solid #00B987",
-                    }),
-                  }}
+                 value={menuType !=='' ? menuTypeOptions?.find(
+                  (x) => x.value === menuType
+                ) : null}
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    borderColor: state.isFocused ? "#fff" : "#fff",
+                    border: "1px solid #00B987",
+                  }),
+                }}
                   theme={(theme) => ({
                     ...theme,
                     colors: {
@@ -354,10 +392,10 @@ console.log(parentMenuName)
               type="submit"
               form="menucreation-form"
               className="border-0 "
-              disabled={menuType == "" && parentMenuName.value == undefined}
+              disabled={menuType == '' && parentMenuName.value == undefined}
               style={{
                 backgroundColor: `${
-                  menuType === "" && parentMenuName.value === undefined
+                  menuType === '' && parentMenuName.value === undefined
                     ? "gray"
                     : "#00B987"
                 }`,
@@ -392,15 +430,7 @@ console.log(parentMenuName)
           </div>
           <div className="mt-3">
             <Formik
-              initialValues={{
-                parentmenu: parentMenuName,
-                detailsData: [
-                  {
-                    menu_type: menuType,
-                    menu_name: "",
-                  },
-                ],
-              }}
+              initialValues={initialValues}
               validationSchema={Yup.object({
                 detailsData: Yup.array().of(
                   Yup.object().shape({
@@ -409,14 +439,16 @@ console.log(parentMenuName)
                   })
                 ),
               })}
-              onSubmit={(values, formik) => {
-                formik.resetForm();
+              onSubmit={(values,  { setSubmitting ,resetForm}) => {
+                resetForm({ values: initialValues });
+                setSubmitting(false)
               }}
-              render={({ values, setFieldValue }) => (
+              >
+           {({ values,resetForm, setFieldValue,isSubmitting }) => (
                 <Form
                   id="menucreation-form"
                   onSubmit={(e) => {
-                    handleSubmit(e, values);
+                    handleSubmit(e, values,resetForm);
                   }}
                 >
                   <FieldArray
@@ -425,7 +457,6 @@ console.log(parentMenuName)
                       ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
                       return (
-                        <div>
                           <div
                             className=" flex-1 items-center d-flex-nowrap"
                             style={{ height: "250px", overflowY: "auto" }}
@@ -450,6 +481,7 @@ console.log(parentMenuName)
                               </thead>
                               {details && details.length > 0
                                 ? details.map((detail, index) => {
+                                  console.log(detail)
                                     return (
                                       <tbody>
                                         <tr key={index}>
@@ -470,8 +502,7 @@ console.log(parentMenuName)
                                                 borderRadius: "5px",
                                               }}
                                               onClick={(e) => {
-                                                console.log(menuType);
-                                                if (menuType == "") {
+                                                if (menuType == '') {
                                                   swal(
                                                     "Not possible",
                                                     "Please select menu type",
@@ -528,13 +559,12 @@ console.log(parentMenuName)
                                 : null}
                             </table>
                           </div>
-                        </div>
                       );
                     }}
                   />
                 </Form>
               )}
-            />
+            </Formik>
           </div>
         </div>
       </div>

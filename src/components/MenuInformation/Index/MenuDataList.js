@@ -4,10 +4,12 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import MenuList from "./MenuTableData/MenuList";
 import { useNavigate } from "react-router-dom";
 import { useGetAllUserQuery } from "../../../redux/features/user/userApi";
+import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
 
 const MenuDataList = () => {
   const clickhandler = (name) => console.log("delete", name);
   const { data: user } = useGetAllUserQuery(undefined);
+  const { data: menuItems } = useGetAllMenuItemsQuery(undefined);
   const [permission, setPermission] = useState();
   const navigate = useNavigate();
 
@@ -61,7 +63,7 @@ const MenuDataList = () => {
 
   return (
     <div>
-      <MenuList permission={permission} click={clickhandler} />
+      <MenuList permission={permission}  menuItems={menuItems} click={clickhandler} />
       {
         permission?.isInserted ? (<div
           className={`position-absolute`}
