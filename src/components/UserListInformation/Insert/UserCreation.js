@@ -45,8 +45,8 @@ const UserCreation = () => {
   const { data: serialNo } = useGetSerialNoQuery(undefined);
   const [createSerialNo] = useCreateSerialNoMutation();
   const [createNewUser] = useCreateUserMutation();
-console.log(JSON.stringify(menuItems))
   const navigate = useNavigate();
+
   useEffect(()=>{
     if( serialNo && serialNo.length > 0){
       const maxSerialNoObject = serialNo?.reduce((max, current) => {
@@ -73,7 +73,6 @@ console.log(JSON.stringify(menuItems))
   
   useEffect(()=>{
     if(localStorage.length>0){
-
     }
     else{
       navigate('/')
@@ -134,7 +133,6 @@ console.log(JSON.stringify(menuItems))
   }
 
   const mergedData = mergePermissions(menuItems,  formData?.menulist );
-  console.log(JSON.stringify(mergedData));
 
   if (menuItemsIsLoading) {
     return <p>Loading...</p>;
@@ -191,10 +189,9 @@ console.log(JSON.stringify(menuItems))
     };
 });
   
-  console.log(mergedArray)
 const checkedData=mergedArray.filter(x=>x.isChecked==true)
-console.log(checkedData)
-  const handleCreateUser = (e) => {
+
+  const handleCreateUser =async (e) => {
     e.preventDefault();
   
     const dataWithoutMenulistId = {
@@ -208,14 +205,13 @@ console.log(checkedData)
           const { _id, ...dropdownItemWithoutId } = d;
           return dropdownItemWithoutId;
         });
-    console.log(dropdownWithoutIds)
+
         return {
           ...itemWithoutId,
           items: dropdownWithoutIds
         };
       })
     };
-    console.log(dataWithoutMenulistId)
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
       e.stopPropagation();
@@ -238,10 +234,18 @@ console.log(checkedData)
       swal("Not possible", "Please fill up form correctly", "warning");
       return;
     } else {
-      createSerialNo(serialData);
-      createNewUser(dataWithoutMenulistId);
+     const responseSerial= await createSerialNo(serialData);
+     console.log(responseSerial)
+     const responseUser=await createNewUser(dataWithoutMenulistId);
+     console.log(responseUser)
+     if (responseSerial.data.status === 200 && responseUser.data.status === 200) {
       swal("Done", "Data Save Successfully", "success");
       navigate("/main-view/user-list");
+    } else {
+      swal("Error", "An error occurred while creating the user", "error");
+    }
+      // swal("Done", "Data Save Successfully", "success");
+      // navigate("/main-view/user-list");
     }
     // Handle form submission, for example, send data to backend
     console.log("Form submitted:", JSON.stringify(dataWithoutMenulistId ));

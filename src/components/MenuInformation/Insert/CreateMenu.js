@@ -1,7 +1,4 @@
-import {
-  faPlus,
-  faXmarkCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
@@ -18,33 +15,28 @@ import { useNavigate } from "react-router-dom";
 
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
-  const [parentMenuName,setParentMenuName] = useState("");
-  const [menuType, setMenuType] = useState('');
+  const [parentMenuName, setParentMenuName] = useState("");
+  const [menuType, setMenuType] = useState("");
   const [createMenus] = useCreateMenuMutation();
   const [updateMenu] = useUpdateMenuMutation();
   const navigate = useNavigate();
   const [selectedTopParentValue, setSelectedTopParentValue] = useState(null);
-console.log(parentMenuName)
-  useEffect(()=>{
-    if(localStorage.length>0){
-
+  console.log(parentMenuName);
+  useEffect(() => {
+    if (localStorage.length > 0) {
+    } else {
+      navigate("/");
     }
-    else{
-      navigate('/')
-    }
-  },[navigate])
-  
-  const {
-    data: menuItems,
-  } = useGetAllMenuItemsQuery();
+  }, [navigate]);
 
- 
+  const { data: menuItems } = useGetAllMenuItemsQuery();
+
   const menuTypeOptions = [
     { value: "child", label: "Child" },
     { value: "parent", label: "Parent" },
   ];
 
-  const initialValues={
+  const initialValues = {
     parentmenu: parentMenuName,
     detailsData: [
       {
@@ -52,7 +44,7 @@ console.log(parentMenuName)
         menu_name: "",
       },
     ],
-  }
+  };
   const parentMenuOptions = (options) => {
     const parentMenuRecursive = (options, parentLabel) => {
       let result = [];
@@ -69,7 +61,9 @@ console.log(parentMenuName)
           // });
         }
         if (option.items && option.items.length > 0) {
-          result = result.concat(parentMenuRecursive(option.items, option.label));
+          result = result.concat(
+            parentMenuRecursive(option.items, option.label)
+          );
         }
       });
       return result;
@@ -88,11 +82,22 @@ console.log(parentMenuName)
             value: option._id,
             label: option.label,
             trackId: option.trackId,
+            isParent: option.isParent,
+            isInserted: option.isInserted,
+            isUpdated: option.isUpdated,
+            isPDF: option.isPDF,
+            isRemoved: option.isRemoved,
+            isChecked: option.isChecked,
+            url: option.url,
+            permissions: option.permissions,
+            children: option.children,
           });
         } else {
         }
         if (option.items && option.items.length > 0) {
-          result = result.concat(parentMenuRecursive(option.items, option.label));
+          result = result.concat(
+            parentMenuRecursive(option.items, option.label)
+          );
         }
       });
       return result;
@@ -101,8 +106,8 @@ console.log(parentMenuName)
   };
   const flattenedOptionsData = flattenOptionsData(menuItems);
   console.log(flattenedOptionsData);
-  console.log(menuType !=='',menuType )
-  const handleSubmit = async (e, values,resetForm) => {
+  console.log(menuType !== "", menuType);
+  const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
     console.log(values);
 
@@ -110,25 +115,26 @@ console.log(parentMenuName)
       children: [],
       label: parentMenuName.label,
       url: "#",
-      permissions: [],
+      permissions: parentMenuName.permissions,
       items: [],
-      isParent: "",
+      isParent: parentMenuName.isParent,
       _id: parentMenuName.value,
       trackId: parentMenuName.trackId,
-      isInserted: false,
-      isUpdated: false,
-      isPDF: false,
-      isRemoved: false,
-      isChecked: false,
+      isInserted: parentMenuName.isInserted,
+      isUpdated: parentMenuName.isUpdated,
+      isPDF: parentMenuName.isPDF,
+      isRemoved: parentMenuName.isRemoved,
+      isChecked: parentMenuName.isChecked,
     };
+
     try {
       values.detailsData.forEach((item) => {
         if (item.menu_name == "") {
           swal("Not Possible!", "Data Not Found", {
             icon: "warning",
           });
-          setSelectedTopParentValue(null)
-          setMenuType('')
+          setSelectedTopParentValue(null);
+          setMenuType("");
           return;
         } else if (menuType == "child" && parentMenuName.value == undefined) {
           swal("Not possible", "Please select parent name", "warning");
@@ -136,7 +142,7 @@ console.log(parentMenuName)
       });
 
       if (parentMenuName) {
-        console.log('parentMenuName',parentMenuName)
+        console.log("parentMenuName", parentMenuName);
         var errorCount = 0;
         values.detailsData.forEach((item) => {
           if (item.menu_name == "") {
@@ -164,36 +170,53 @@ console.log(parentMenuName)
           });
         });
         console.log(errorCount);
-        console.log(modelMenuInsert);
-        if (errorCount ==0) {
-          console.log('updateMenu')
-          updateMenu(modelMenuInsert);
-          swal("Done", "Data Save Successfully", "success");
-          // navigate("/main-view/menu-list");
-          resetForm({values:{parentmenu: '',
-          detailsData: [
-            {
-              menu_type: "",
-              menu_name: "",
-            },
-          ],}})
-         setSelectedTopParentValue(null)
-          setMenuType('')
+        console.log(JSON.stringify(modelMenuInsert));
+        if (errorCount == 0) {
+          try {
+            const response = await updateMenu(modelMenuInsert);
+            console.log(response);
+            if (response.data.status === 200) {
+              swal("Done", "Data Updated Successfully", "success");
+              resetForm({
+                values: {
+                  parentmenu: "",
+                  detailsData: [
+                    {
+                      menu_type: "",
+                      menu_name: "",
+                    },
+                  ],
+                },
+              });
+              setSelectedTopParentValue(null);
+              setMenuType("");
+            } else {
+              swal(
+                "Error",
+                "An error occurred while updating the data",
+                "error"
+              );
+            }
+          } catch (err) {
+            console.error(err);
+            swal("Error", "An error occurred while updating the data", "error");
+          }
         } else {
           swal("Not Possible!", "Data Not Found", {
             icon: "warning",
           });
-          setMenuType('')
-          setSelectedTopParentValue(null)
+          setMenuType("");
+          setSelectedTopParentValue(null);
         }
-      } else {
-        values.detailsData.forEach((item) => {
+      } 
+      else {
+        values.detailsData.forEach( (item) => {
           if (item.menu_name == "") {
             swal("Not Possible!", "Data Not Found", {
               icon: "warning",
             });
-            setMenuType('')
-            setSelectedTopParentValue(null)
+            setMenuType("");
+            setSelectedTopParentValue(null);
           } else {
             if (menuType == "child" && parentMenuName.value == undefined) {
               swal(
@@ -204,7 +227,7 @@ console.log(parentMenuName)
                 }
               );
             } else {
-              function convertToMenuItem(data) {
+              function convertToMenuItem (data)  {
                 const { parentmenu, detailsData } = data;
                 console.log(detailsData);
                 const menuItems = detailsData?.map((item) => {
@@ -237,28 +260,42 @@ console.log(parentMenuName)
               }
 
               const convertedData = convertToMenuItem(values);
-              swal({
-                title: "Are you sure this menus are top parent ?",
-                text: "It will show as a top heading, because you are not select any parent",
+            swal({
+                title: "Are you sure these menus are top parent?",
+                text: "It will show as a top heading because you did not select any parent.",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
-              }).then((willDelete) => {
+              }).then(async (willDelete) => {
                 if (willDelete) {
-                  swal("Done", "Data Save Successfully", {
-                    icon: "success",
-                  });
-                  createMenus(convertedData.menuItems);
-                  // navigate("/main-view/menu-list");
-                  resetForm({values:{parentmenu: '',
-                  detailsData: [
-                    {
-                      menu_type: "",
-                      menu_name: "",
-                    },
-                  ],}})
-                 setSelectedTopParentValue(null)
-                  setMenuType('')
+                  const response = await createMenus(
+                    convertedData.menuItems
+                  ).unwrap();
+                  console.log(response);
+                  if (response.status === 200) {
+                    swal("Done", "Data Save Successfully", {
+                      icon: "success",
+                    });
+                    resetForm({
+                      values: {
+                        parentmenu: "",
+                        detailsData: [
+                          {
+                            menu_type: "",
+                            menu_name: "",
+                          },
+                        ],
+                      },
+                    });
+                    setSelectedTopParentValue(null);
+                    setMenuType("");
+                  } else {
+                    swal(
+                      "Error",
+                      "An error occurred while creating the data",
+                      "error"
+                    );
+                  }
                 } else {
                   swal(" Cancel! Saving data ");
                 }
@@ -267,7 +304,6 @@ console.log(parentMenuName)
           }
         });
       }
-   
     } catch (error) {
       console.error("Error saving data:", error);
       swal("Error", "Failed to save data. Please try again later.", "error");
@@ -317,18 +353,22 @@ console.log(parentMenuName)
                   className="mb-3 mt-1"
                   aria-label="Default select example"
                   name="itemType"
-                 options={parentOptions}
-                 value={selectedTopParentValue  !=null ? parentOptions?.find(
-                  (x) => x.value === selectedTopParentValue
-                ) :''}
-                onChange={(e) => {
-                  setSelectedTopParentValue(e.value);
-                  const filterData = flattenedOptionsData.find(
-                    (x) => x.value == e.value
-                  );
-                  console.log(filterData);
-                  setParentMenuName(filterData);
-                }}
+                  options={parentOptions}
+                  value={
+                    selectedTopParentValue != null
+                      ? parentOptions?.find(
+                          (x) => x.value === selectedTopParentValue
+                        )
+                      : ""
+                  }
+                  onChange={(e) => {
+                    setSelectedTopParentValue(e.value);
+                    const filterData = flattenedOptionsData.find(
+                      (x) => x.value == e.value
+                    );
+                    console.log(filterData);
+                    setParentMenuName(filterData);
+                  }}
                   styles={{
                     control: (baseStyles, state) => ({
                       ...baseStyles,
@@ -344,8 +384,6 @@ console.log(parentMenuName)
                       primary: "#00B987",
                     },
                   })}
-                 
-                
                 ></Select>
               </div>
               <div className=" mt-4" style={{ width: "40%" }}>
@@ -356,16 +394,18 @@ console.log(parentMenuName)
                   aria-label="Default select example"
                   name="menuType"
                   options={menuTypeOptions}
-                 value={menuType !=='' ? menuTypeOptions?.find(
-                  (x) => x.value === menuType
-                ) : null}
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    borderColor: state.isFocused ? "#fff" : "#fff",
-                    border: "1px solid #00B987",
-                  }),
-                }}
+                  value={
+                    menuType !== ""
+                      ? menuTypeOptions?.find((x) => x.value === menuType)
+                      : null
+                  }
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? "#fff" : "#fff",
+                      border: "1px solid #00B987",
+                    }),
+                  }}
                   theme={(theme) => ({
                     ...theme,
                     colors: {
@@ -374,7 +414,6 @@ console.log(parentMenuName)
                       primary: "#00B987",
                     },
                   })}
-                 
                   onChange={(e) => {
                     console.log(e);
                     if (e.value == "child") {
@@ -392,10 +431,10 @@ console.log(parentMenuName)
               type="submit"
               form="menucreation-form"
               className="border-0 "
-              disabled={menuType == '' && parentMenuName.value == undefined}
+              disabled={menuType == "" && parentMenuName.value == undefined}
               style={{
                 backgroundColor: `${
-                  menuType === '' && parentMenuName.value === undefined
+                  menuType === "" && parentMenuName.value === undefined
                     ? "gray"
                     : "#00B987"
                 }`,
@@ -439,16 +478,16 @@ console.log(parentMenuName)
                   })
                 ),
               })}
-              onSubmit={(values,  { setSubmitting ,resetForm}) => {
+              onSubmit={(values, { setSubmitting, resetForm }) => {
                 resetForm({ values: initialValues });
-                setSubmitting(false)
+                setSubmitting(false);
               }}
-              >
-           {({ values,resetForm, setFieldValue,isSubmitting }) => (
+            >
+              {({ values, resetForm, setFieldValue, isSubmitting }) => (
                 <Form
                   id="menucreation-form"
                   onSubmit={(e) => {
-                    handleSubmit(e, values,resetForm);
+                    handleSubmit(e, values, resetForm);
                   }}
                 >
                   <FieldArray
@@ -457,108 +496,108 @@ console.log(parentMenuName)
                       ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
                       return (
-                          <div
-                            className=" flex-1 items-center d-flex-nowrap"
-                            style={{ height: "250px", overflowY: "auto" }}
-                          >
-                            <table className="table w-full table-bordered ">
-                              <thead className="w-100">
-                                <tr>
-                                  <th className="bg-white text-center align-middle text-[#581C87] ">
-                                    Sl
-                                  </th>
+                        <div
+                          className=" flex-1 items-center d-flex-nowrap"
+                          style={{ height: "250px", overflowY: "auto" }}
+                        >
+                          <table className="table w-full table-bordered ">
+                            <thead className="w-100">
+                              <tr>
+                                <th className="bg-white text-center align-middle text-[#581C87] ">
+                                  Sl
+                                </th>
 
-                                  <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
-                                    Menu Name
-                                    <span className="text-danger fw-bold fs-2">
-                                      *
-                                    </span>
-                                  </th>
-                                  <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
-                                    Action
-                                  </th>
-                                </tr>
-                              </thead>
-                              {details && details.length > 0
-                                ? details.map((detail, index) => {
-                                  console.log(detail)
-                                    return (
-                                      <tbody>
-                                        <tr key={index}>
-                                          <td className="bg-white text-center align-middle">
-                                            {index + 1}
-                                          </td>
-                                       
-                                          <td className="text-center align-middle">
-                                            <Field
-                                              type="text"
-                                              name={`detailsData.${index}.menu_name`}
-                                              placeholder="Parent / Child"
-                                              value={detail?.menu_name}
-                                              style={{
-                                                border: "1px solid #00B987",
-                                                padding: "5px",
-                                                width: "75%",
-                                                borderRadius: "5px",
-                                              }}
-                                              onClick={(e) => {
-                                                if (menuType == '') {
-                                                  swal(
-                                                    "Not possible",
-                                                    "Please select menu type",
-                                                    "warning"
+                                <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
+                                  Menu Name
+                                  <span className="text-danger fw-bold fs-2">
+                                    *
+                                  </span>
+                                </th>
+                                <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
+                                  Action
+                                </th>
+                              </tr>
+                            </thead>
+                            {details && details.length > 0
+                              ? details.map((detail, index) => {
+                                  console.log(detail);
+                                  return (
+                                    <tbody>
+                                      <tr key={index}>
+                                        <td className="bg-white text-center align-middle">
+                                          {index + 1}
+                                        </td>
+
+                                        <td className="text-center align-middle">
+                                          <Field
+                                            type="text"
+                                            name={`detailsData.${index}.menu_name`}
+                                            placeholder="Parent / Child"
+                                            value={detail?.menu_name}
+                                            style={{
+                                              border: "1px solid #00B987",
+                                              padding: "5px",
+                                              width: "75%",
+                                              borderRadius: "5px",
+                                            }}
+                                            onClick={(e) => {
+                                              if (menuType == "") {
+                                                swal(
+                                                  "Not possible",
+                                                  "Please select menu type",
+                                                  "warning"
+                                                );
+                                              } else {
+                                                if (menuType == "parent") {
+                                                  setFieldValue(
+                                                    `detailsData.${index}.menu_name`,
+                                                    e.target.value
+                                                  );
+                                                  setFieldValue(
+                                                    `detailsData.${index}.menu_type`,
+                                                    true
                                                   );
                                                 } else {
-                                                  if (menuType == "parent") {
-                                                    setFieldValue(
-                                                      `detailsData.${index}.menu_name`,
-                                                      e.target.value
-                                                    );
-                                                    setFieldValue(
-                                                      `detailsData.${index}.menu_type`,
-                                                      true
-                                                    );
-                                                  } else {
-                                                    setFieldValue(
-                                                      `detailsData.${index}.menu_name`,
-                                                      e.target.value
-                                                    );
-                                                    setFieldValue(
-                                                      `detailsData.${index}.menu_type`,
-                                                      false
-                                                    );
-                                                  }
+                                                  setFieldValue(
+                                                    `detailsData.${index}.menu_name`,
+                                                    e.target.value
+                                                  );
+                                                  setFieldValue(
+                                                    `detailsData.${index}.menu_type`,
+                                                    false
+                                                  );
                                                 }
-                                              }}
+                                              }
+                                            }}
+                                          />
+                                          <br />
+                                          <span className="text-danger">
+                                            <ErrorMessage
+                                              name={`detailsData.${index}.menu_name`}
                                             />
-                                            <br />
-                                            <span className="text-danger">
-                                              <ErrorMessage
-                                                name={`detailsData.${index}.menu_name`}
-                                              />
-                                            </span>
-                                          </td>
-                                          <td className="text-center align-middle">
-                                            <button
-                                              type="button"
-                                              className=" border-0 rounded  bg-transparent"
-                                              onClick={() => {
-                                                arrayHelpers.remove(index, 1);
-                                              }}
-                                            >
-                                              <FontAwesomeIcon
-                                                icon={faXmarkCircle}
-                                                className="text-danger fs-1"
-                                              ></FontAwesomeIcon>
-                                            </button>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    );
-                                  })
-                                : null}
-                            </table>
-                          </div>
+                                          </span>
+                                        </td>
+                                        <td className="text-center align-middle">
+                                          <button
+                                            type="button"
+                                            className=" border-0 rounded  bg-transparent"
+                                            onClick={() => {
+                                              arrayHelpers.remove(index, 1);
+                                            }}
+                                          >
+                                            <FontAwesomeIcon
+                                              icon={faXmarkCircle}
+                                              className="text-danger fs-1"
+                                            ></FontAwesomeIcon>
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  );
+                                })
+                              : null}
+                          </table>
+                        </div>
                       );
                     }}
                   />

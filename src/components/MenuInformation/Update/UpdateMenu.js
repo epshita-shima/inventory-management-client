@@ -17,11 +17,9 @@ import swal from "sweetalert";
 const UpdateMenu = () => {
   const ArrayHelperRef = useRef();
   const { id } = useParams();
-const navigate=useNavigate()
+  const navigate = useNavigate();
   const [singleMenuData, setSingleMenuData] = useState([]);
-  const [singleMatchedMenuData, setSingleMatchedMenuData] = useState([]);
-  const [mainData, setMainData] = useState([]);
-  const [isUpdateAsChangeParent,setIsUpdateAsChangeParent]=useState(false)
+  const [isUpdateAsChangeParent, setIsUpdateAsChangeParent] = useState(false);
   const [changingParentId, setChangingParentId] = useState("");
   const [changeParentData, setChangeParentData] = useState([]);
   const [singleMatchingItemData, setSingleMatchingItemData] = useState([]);
@@ -33,12 +31,11 @@ const navigate=useNavigate()
   const [updateSingleMenus] = useUpdateNestedMenuMutation();
   const [updateSingleMenu] = useUpdateSingleProtionMenuMutation();
 
-
   console.log(changeParent);
   console.log(changeParentData);
   console.log(singleMatchingItemData);
   console.log(JSON.stringify(singleMenuData));
-  console.log(isUpdateAsChangeParent)
+  console.log(isUpdateAsChangeParent);
 
   const {
     data: menuItems,
@@ -46,7 +43,7 @@ const navigate=useNavigate()
     isLoading: menuItemsIsLoading,
   } = useGetAllMenuItemsQuery();
 
-  console.log(menuItems)
+  console.log(menuItems);
   const parentMenuFunction = (options) => {
     const parentMenuRecursive = (options, parentLabel) => {
       let result = [];
@@ -77,84 +74,78 @@ const navigate=useNavigate()
   ];
 
   useEffect(() => {
-    const parentMenuOptionsData = (options) => {
-      const parentMenuRecursive = (options, parentLabel) => {
-        let result = [];
-        options?.forEach((option) => {
-          if (option.isParent == true) {
-            result.push({
-              _id: option._id,
-              label: option.label,
-              trackId: option.trackId,
-              items: option.items,
-              isParent: option.isParent,
-              url: option.url,
-              permissions: option.permissions,
-              createdAt: option.createdAt,
-              updatedAt: option.updatedAt,
-            });
-          } else {
-          }
-          if (option.items && option.items.length > 0) {
-            result = result.concat(
-              parentMenuRecursive(option.items, option.label)
-            );
-          }
-        });
-        return result;
-      };
-      return parentMenuRecursive(options);
-    };
-    const parentMenusOptionsData = parentMenuOptionsData(menuItems);
-    console.log(parentMenusOptionsData);
-    const updatedSingleData = (data) => {
-      const matchedData = data?.items?.find((items) => {
-        if (items._id == id) {
-          console.log("checked");
-        } else {
-          if (items.items.length > 0) {
-            const matchingChild = items.items.find((x) => x._id == id);
-            console.log(matchingChild);
-            return matchingChild;
-          }
-        }
-      });
-      console.log(matchedData);
-      if (matchedData?.items?.length > 0) {
-        return matchedData;
-      }
-      return data;
-    };
-    const matchingData = parentMenusOptionsData?.find(
-      (x) => x._id == changingParentId
-    );
+    // const parentMenuOptionsData = (options) => {
+    //   const parentMenuRecursive = (options, parentLabel) => {
+    //     let result = [];
+    //     options?.forEach((option) => {
+    //       if (option.isParent == true) {
+    //         result.push({
+    //           _id: option._id,
+    //           label: option.label,
+    //           trackId: option.trackId,
+    //           items: option.items,
+    //           isParent: option.isParent,
+    //           url: option.url,
+    //           permissions: option.permissions,
+    //           createdAt: option.createdAt,
+    //           updatedAt: option.updatedAt,
+    //         });
+    //       } else {
+    //       }
+    //       if (option.items && option.items.length > 0) {
+    //         result = result.concat(
+    //           parentMenuRecursive(option.items, option.label)
+    //         );
+    //       }
+    //     });
+    //     return result;
+    //   };
+    //   return parentMenuRecursive(options);
+    // };
+    // const parentMenusOptionsData = parentMenuOptionsData(menuItems);
 
-    console.log(matchingData);
-    const tableUpdatedData = updatedSingleData(singleMenu);
+    // const updatedSingleData = (data) => {
+    //   const matchedData = data?.items?.find((items) => {
+    //     if (items._id == id) {
+    //       console.log("checked");
+    //     } else {
+    //       if (items.items.length > 0) {
+    //         const matchingChild = items.items.find((x) => x._id == id);
+    //         console.log(matchingChild);
+    //         return matchingChild;
+    //       }
+    //     }
+    //   });
+    //   console.log(matchedData);
+    //   if (matchedData?.items?.length > 0) {
+    //     return matchedData;
+    //   }
+    //   return data;
+    // };
+    // const matchingData = parentMenusOptionsData?.find(
+    //   (x) => x._id == changingParentId
+    // );
 
-    function separateItem(data, id) {
-      console.log(data);
-      const isExisting = data?.items?.find((item) => item?._id === id);
-      return isExisting;
-    }
+    // const tableUpdatedData = updatedSingleData(singleMenu);
+
+    // function separateItem(data, id) {
+    //   console.log(data);
+    //   const isExisting = data?.items?.find((item) => item?._id === id);
+    //   return isExisting;
+    // }
 
     // Example usage: Separating the "PI Report" item
-    const piReportItem = separateItem(singleMenu, id);
+    // const piReportItem = separateItem(singleMenu, id);
 
-    console.log(piReportItem);
+    // function searchParentWithItem(data) {
+    //   console.log("test", id);
+    //   return {
+    //     ...data,
+    //     items: data?.items.filter((item) => item._id === id || item.isParent),
+    //   };
+    // }
 
-    function searchParentWithItem(data) {
-      console.log("test", id);
-      return {
-        ...data,
-        items: data?.items.filter((item) => item._id === id || item.isParent),
-      };
-    }
-    const parentItem = searchParentWithItem(singleMenu);
-    console.log(JSON.stringify(parentItem));
-    // Example usage: Separating the "PI Report" item
     setSingleMenuData(singleMenu);
-    // setSingleMatchingItemData(piReportItem);
   }, [singleMenu, id, changingParentId, menuItems]);
 
   const removeItem = (index) => {
@@ -168,17 +159,29 @@ const navigate=useNavigate()
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(changeParentData);
-    if(isUpdateAsChangeParent){
-      updateSingleMenus({singleMenuData, singleMenu });
+    if (isUpdateAsChangeParent) {
+      const response = await updateSingleMenus({ singleMenuData, singleMenu });
+      if (response.data.status === 200) {
+        swal("Done", "Data Update Successfully", {
+          icon: "success",
+        });
+        navigate("/main-view/menu-list");
+      } else {
+        swal("Error", "An error occurred while creating the data", "error");
+      }
+    } else {
+      const response = await updateSingleMenu(singleMenuData);
+      if (response.data.status === 200) {
+        swal("Done", "Data Update Successfully", {
+          icon: "success",
+        });
+        navigate("/main-view/menu-list");
+      } else {
+        swal("Error", "An error occurred while creating the data", "error");
+      }
     }
-    else{
-      updateSingleMenu(singleMenuData);
-    }
-    swal("Done", "Data Save Successfully", "success");
-    navigate('/main-view/menu-list')
   };
 
   return (
@@ -245,11 +248,10 @@ const navigate=useNavigate()
                   })}
                   onChange={(e) => {
                     console.log(e);
-                    if(e.value==singleMenu._id){
-                      setIsUpdateAsChangeParent(false)
-                    }
-                    else{
-                      setIsUpdateAsChangeParent(true)
+                    if (e.value == singleMenu._id) {
+                      setIsUpdateAsChangeParent(false);
+                    } else {
+                      setIsUpdateAsChangeParent(true);
                     }
                     const updatedItems = singleMenuData.items.map((item) => {
                       return {
@@ -266,11 +268,9 @@ const navigate=useNavigate()
                     console.log(e.value);
                     // setChangingParentId(e.value);
 
-                    
-            
                     // setSingleMenuData((prev) => ({
                     //   ...prev, // Copy previous state
-                     
+
                     // }));
                   }}
                 ></Select>
@@ -425,7 +425,7 @@ const navigate=useNavigate()
                               </thead>
 
                               {singleMenuData?.items?.map((detail, index) => {
-                                console.log(detail)
+                                console.log(detail);
                                 return (
                                   <tbody>
                                     <tr key={index}>

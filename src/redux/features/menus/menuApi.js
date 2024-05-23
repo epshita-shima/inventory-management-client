@@ -4,7 +4,7 @@ const menuApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAllMenuItems: builder.query({
       query: () => "/menuitems",
-      providesTags: ["getallmenu", "getallchildmenu", "deletemenu",],
+      providesTags: ["getallmenu", "getallchildmenu", "deletemenu","updatenestedmenudata","updatesinglemenudata"],
       refetchOnReconnect: true,
       refetchOnFocus: true,
       refetchOnTags: ["getallmenu", "getallchildmenu"],
@@ -15,13 +15,17 @@ const menuApi = api.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      async onQueryStarted(payload, { dispatch, queryFulfilled }) {
-        try {
-          dispatch(api.util.invalidateTags(["getallmenu", "getallchildmenu"]));
-          await dispatch(api.endpoints.getAllMenuItems.initiate());
-        } catch {}
-      },
+      // async onQueryStarted(payload, { dispatch, queryFulfilled }) {
+      //   try {
+      //     dispatch(api.util.invalidateTags(["getallmenu", "getallchildmenu"]));
+      //     await dispatch(api.endpoints.getAllMenuItems.initiate());
+      //   } catch {}
+      // },
       invalidatesTags: ["getallmenu"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status
+      }),
     }),
     updateMenu: builder.mutation({
       query: (payload) => (
@@ -29,10 +33,13 @@ const menuApi = api.injectEndpoints({
         url: "/menuitems/update/menu",
         method: "POST",
         body: payload,
-      }
-    ),
+      }),
 
       invalidatesTags: ["getallchildmenu"],
+      transformResponse: (response, meta, arg) => ({
+        data: response,
+        status: meta.response.status
+      }),
     }),
     updateNestedMenu: builder.mutation({
       query: (payload) => ({
@@ -40,7 +47,11 @@ const menuApi = api.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["getallmenu,getallchildmenu"],
+      invalidatesTags: ["updatenestedmenudata"],
+      transformResponse: (response, meta, arg) => ({
+        data: response,
+        status: meta.response.status
+      }),
     }),
     updateSingleMenu: builder.mutation({
       query: (payload) => ({
@@ -48,7 +59,11 @@ const menuApi = api.injectEndpoints({
         method: "PUT",
         body: payload,
       }),
-      invalidatesTags: ["getallmenu,getallchildmenu"],
+      invalidatesTags: ["updatesinglemenudata"],
+      transformResponse: (response, meta, arg) => ({
+        data: response,
+        status: meta.response.status
+      }),
     }),
     updateSingleProtionMenu: builder.mutation({
       query: (payload) => ({
