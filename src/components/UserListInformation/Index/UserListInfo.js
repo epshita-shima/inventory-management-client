@@ -190,8 +190,8 @@ const UserListInfo = ({
             data-placement="bottom"
             title="View user"
             style={{
-              color: "#56CCAD",
-              border: "2px solid #56CCAD",
+              color: "#2DDC1B",
+              border: "2px solid #2DDC1B",
               padding: "3px",
               borderRadius: "5px",
             }}
@@ -213,8 +213,8 @@ const UserListInfo = ({
               data-placement="bottom"
               title="Update user"
               style={{
-                color: "#56CCAD",
-                border: "2px solid #56CCAD",
+                color: "#2DDC1B",
+                border: "2px solid #2DDC1B",
                 padding: "3px",
                 borderRadius: "5px",
                 marginLeft: "10px",
@@ -234,9 +234,9 @@ const UserListInfo = ({
             target="_blank"
             className="action-icon "
             style={{
-              background: "#1EDFBD",
+              background: "#2DDC1B",
               padding: "5px",
-              color: "white",
+              color: "#000",
               borderRadius: "5px",
               marginLeft: "10px",
             }}
@@ -304,7 +304,7 @@ const UserListInfo = ({
     },
     headCells: {
       style: {
-        backgroundColor: "#CBF3F0",
+        backgroundColor: "#B8FEB3",
         color: "#000",
         fontWeight: "bold",
         textAlign: "center",
@@ -337,7 +337,20 @@ const UserListInfo = ({
 
     return (
       <div className="d-block d-sm-flex justify-content-center align-items-center ">
-        <button>Create User</button>
+        <button
+          style={{
+            backgroundColor: "#2DDC1B",
+            color: "#000",
+            marginRight: "15px",
+            border: "1px solid #2DDC1B",
+          }}
+          onClick={()=>{
+            const url = `/main-view/create-user`;
+                window.open(url, "_blank");
+          }}
+        >
+          Create User
+        </button>
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon d-flex ">
             <div>
@@ -450,7 +463,7 @@ const UserListInfo = ({
           <div class="col-sm-3">
             <div
               class="cardbox shadow-lg"
-              style={{ borderLeft: "12px solid #1EDFBD", borderRadius: "10px" }}
+              style={{ borderLeft: "12px solid #2DDC1B", borderRadius: "10px" }}
             >
               <div
                 class="card-body"
@@ -480,7 +493,7 @@ const UserListInfo = ({
             <div
               class="cardbox shadow-lg"
               style={{
-                borderLeft: "12px solid  #CBF3F0",
+                borderLeft: "12px solid  #B8FEB3",
                 borderRadius: "10px",
               }}
             >

@@ -36,22 +36,22 @@
 }
 .table-head-icon{
     font-size: 24px;
-    color:#00B987
+    color:#2DDC1B
 }
 .action-icon{
     font-size: 16px;
 }
 .btn-download{
-    background-color:#15BF91;
-    color:white !important
+    background-color:#2DDC1B;
+    color:black !important
 } 
 .btn-download.active{
-    background-color:#15BF91;
-    color:white !important
+    background-color:#2DDC1B;
+    color:black !important
 }
 .btn-download:hover{
-    background-color:#15BF91;
-    color:white !important
+    background-color:#2DDC1B;
+    color:black !important
 }
 @media only screen and (max-width: 575px){
     .userlist-table{

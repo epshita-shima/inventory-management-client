@@ -78,6 +78,15 @@ function App() {
                 }
               ></Route>
               <Route
+                path="/main-view/user-setting"
+                element={
+                  // <RequireAuth>
+                  <UserListInfo></UserListInfo>
+                  //  </RequireAuth>
+                }
+              ></Route>
+
+              <Route
                 path="user-update/:id"
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>

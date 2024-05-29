@@ -102,7 +102,7 @@ console.log(clickedCheckboxes)
             isUpdated: subNode.isUpdated,
             isPDF: subNode.isPDF,
             isRemoved: subNode.isRemoved,
-            isChecked: subNode.isChecked,
+            isChecked: checked,
             parentIds: parentIds,
           },
         ]);
@@ -128,7 +128,7 @@ console.log(clickedCheckboxes)
               style={{
                 textAlign: "left",
                 paddingLeft: "20px",
-                background: "#00B987",
+                background: "#2DDC1B",
                 color: "white",
                 fontWeight: "bold",
               }}
@@ -158,7 +158,7 @@ console.log(clickedCheckboxes)
                         <input
                           type="checkbox"
                           id={`${subNode?._id}`}
-                          checked={subNode?.isChecked || false}
+                          // checked={subNode?.isChecked || false}
                           name="check"
                           className="form-check-input border-success checkbox-design me-2"
                           onClick={(e) => {
@@ -166,6 +166,7 @@ console.log(clickedCheckboxes)
                             if (checked) {
                               parentIds.push(node._id);
                               console.log(node._id)
+                              console.log(subNode.isChecked)
                               handleCheckboxClick(subNode,node.trackId, checked);
                             } else {
                               const updatedData = clickedCheckboxes.filter(

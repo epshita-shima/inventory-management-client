@@ -278,11 +278,11 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
           <div className="d-flex justify-content-between align-items-center border-bottom">
             <p>
               <FontAwesomeIcon
-                style={{ fontSize: "20px", color: "#00B987" }}
+                style={{ fontSize: "20px", color: "#2DDC1B" }}
                 icon={faUserAlt}
               />
               <FontAwesomeIcon
-                style={{ fontSize: "14px", color: "#00B987" }}
+                style={{ fontSize: "14px", color: "#2DDC1B" }}
                 icon={faPlus}
               />
               &nbsp;
@@ -404,15 +404,15 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
                           ...baseStyles,
                           borderColor: state.isFocused ? "#fff" : "#fff",
                           border: "none",
-                          borderBottom: "1px solid #00B987",
+                          borderBottom: "1px solid #2DDC1B",
                         }),
                       }}
                       theme={(theme) => ({
                         ...theme,
                         colors: {
                           ...theme.colors,
-                          primary25: "#CBF3F0",
-                          primary: "#00B987",
+                          primary25: "#B8FEB3",
+                          primary: "#2DDC1B",
                         },
                       })}
                       value={
@@ -422,7 +422,7 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
                             )
                           : options?.find((x) => x.value == formData.roleId)
                       }
-                      // style={{ border: "1px solid #00B987" }}
+                      // style={{ border: "1px solid #2DDC1B" }}
                       // value={typeOption.find((x)=>x.value==itemInformation.itemType)}
                       onChange={(e) => {
                         if (isUpdate) {
@@ -445,7 +445,7 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
                   <div className="ms-2">
                     <FontAwesomeIcon
                       className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
-                      style={{ background: "#00B987" }}
+                      style={{ background: "#2DDC1B" }}
                       icon={faPlus}
                       data-toggle="modal"
                       data-target="#exampleModal"
@@ -476,8 +476,8 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
             <button
               className="btn text-uppercase rounded-4"
               style={{
-                border: "1px solid #00B987",
-                color: "#00B987",
+                border: "1px solid #2DDC1B",
+                color: "#2DDC1B",
                 fontWeight: "700",
                 outline: "none",
               }}
@@ -488,7 +488,7 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
             <button
               className="btn text-uppercase rounded-4"
               style={{
-                background: "#00B987",
+                background: "#2DDC1B",
                 color: "#fff",
                 fontWeight: "700",
                 outline: "none",
