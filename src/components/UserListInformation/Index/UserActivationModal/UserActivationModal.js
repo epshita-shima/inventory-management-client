@@ -110,7 +110,7 @@ const UserActivationModal = ({userId}) => {
                           }}
                         />
 
-                        {/* <FontAwesomeIcon style={{color:'#00B987'}} icon={faEyeSlash}/> */}
+                        {/* <FontAwesomeIcon style={{color:'#2DDC1B'}} icon={faEyeSlash}/> */}
                       </td>
                     </tr>
                   </tbody>
@@ -125,10 +125,10 @@ const UserActivationModal = ({userId}) => {
               data-dismiss="modal"
               style={{
                 background: "transparent",
-                color: "#00B987",
+                color: "#2DDC1B",
                 fontSize: "16px",
                 borderRadius: "10px",
-                border: "2px solid #00B987",
+                border: "2px solid #2DDC1B",
                 textTransform: "uppercase",
               }}
             >
@@ -139,7 +139,7 @@ const UserActivationModal = ({userId}) => {
               class="btn"
               data-dismiss="modal"
               style={{
-                background: "#00B987",
+                background: "#2DDC1B",
                 color: "white",
                 fontSize: "16px",
                 borderRadius: "10px",

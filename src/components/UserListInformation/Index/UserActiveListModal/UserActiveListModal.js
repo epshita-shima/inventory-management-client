@@ -127,7 +127,7 @@ console.log(user)
     },
     headCells: {
       style: {
-        backgroundColor: "#CBF3F0",
+        backgroundColor: "#B8FEB3",
         color: "#000",
         fontWeight: "bold",
         textAlign: "center",

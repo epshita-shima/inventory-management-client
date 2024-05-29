@@ -81,7 +81,10 @@ function App() {
                 path="/main-view/user-setting"
                 element={
                   // <RequireAuth>
-                  <UserListInfo></UserListInfo>
+                  <UserListInfo  setChangePassword={setChangePassword}
+                  setResetPassword={setResetPassword}
+                  resetPassword={resetPassword}
+                  changePassword={changePassword}></UserListInfo>
                   //  </RequireAuth>
                 }
               ></Route>
@@ -90,7 +93,7 @@ function App() {
                 path="user-update/:id"
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>
-              <Route
+              {/* <Route
                 path="/main-view/user-list"
                 element={
                   // <RequireAuth>
@@ -102,7 +105,7 @@ function App() {
                     ></UserListInfo>
                   // </RequireAuth>
                 }
-              ></Route>
+              ></Route> */}
               <Route
                 path="create-menu"
                 element={<CreateMenu></CreateMenu>}

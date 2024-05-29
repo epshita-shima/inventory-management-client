@@ -114,7 +114,7 @@ const ChangePasswordModal = ({
                   variant="primary"
                   type="submit"
                   style={{
-                    backgroundColor: "#0A203F",
+                    backgroundColor: "#2DDC1B",
                     border: "none",
                     fontWeight: "bold",
                     fontSize: "15px",
@@ -131,7 +131,7 @@ const ChangePasswordModal = ({
                   className="btn-disabled"
                   disabled={formData.newPassword !== formData.confirmPassword || formData.newPassword =='' || formData.confirmPassword ==''}
                   style={{
-                    backgroundColor: "#1EDFBD",
+                    backgroundColor: "#2DDC1B",
                     border: "none",
                     fontWeight: "bold",
                     fontSize: "15px",
