@@ -13,6 +13,7 @@ import * as Yup from "yup";
 import swal from "sweetalert";
 import { useNavigate } from "react-router-dom";
 
+
 const CreateMenu = () => {
   const ArrayHelperRef = useRef();
   const [parentMenuName, setParentMenuName] = useState("");
@@ -325,8 +326,9 @@ const CreateMenu = () => {
               <FontAwesomeIcon
                 style={{
                   fontSize: "14px",
-                  color: "#fff",
-                  backgroundColor: "#00B987",
+                  color: "#000",
+                  // backgroundColor: "#00B987",
+                  backgroundColor: "#2DDC1B",
                   borderRadius: "50px",
                   padding: "3px",
                 }}
@@ -373,15 +375,17 @@ const CreateMenu = () => {
                     control: (baseStyles, state) => ({
                       ...baseStyles,
                       borderColor: state.isFocused ? "#fff" : "#fff",
-                      border: "1px solid #00B987",
+                      border: "1px solid #2DDC1B",
                     }),
                   }}
                   theme={(theme) => ({
                     ...theme,
                     colors: {
                       ...theme.colors,
-                      primary25: "#CBF3F0",
-                      primary: "#00B987",
+                      // primary25: "#CBF3F0",
+                      // primary: "#00B987",
+                      primary25: "#B8FEB3",
+                      primary: "#2DDC1B",
                     },
                   })}
                 ></Select>
@@ -403,15 +407,17 @@ const CreateMenu = () => {
                     control: (baseStyles, state) => ({
                       ...baseStyles,
                       borderColor: state.isFocused ? "#fff" : "#fff",
-                      border: "1px solid #00B987",
+                      border: "1px solid #2DDC1B",
                     }),
                   }}
                   theme={(theme) => ({
                     ...theme,
                     colors: {
                       ...theme.colors,
-                      primary25: "#CBF3F0",
-                      primary: "#00B987",
+                      primary25: "#B8FEB3",
+                      // primary25: "#CBF3F0",
+                      // primary: "#00B987",
+                      primary: "#2DDC1B",
                     },
                   })}
                   onChange={(e) => {
@@ -436,7 +442,7 @@ const CreateMenu = () => {
                 backgroundColor: `${
                   menuType === "" && parentMenuName.value === undefined
                     ? "gray"
-                    : "#00B987"
+                    : "#2DDC1B"
                 }`,
                 color: "white",
                 padding: "5px 10px",
@@ -450,8 +456,9 @@ const CreateMenu = () => {
             <button
               className="border-0 "
               style={{
-                backgroundColor: "#00B987",
-                color: "white",
+                // backgroundColor: "#00B987",
+                backgroundColor:"#2DDC1B",
+                color: "black",
                 padding: "5px 10px",
                 fontSize: "14px",
                 borderRadius: "5px",
@@ -534,8 +541,9 @@ const CreateMenu = () => {
                                             name={`detailsData.${index}.menu_name`}
                                             placeholder="Parent / Child"
                                             value={detail?.menu_name}
+                                            
                                             style={{
-                                              border: "1px solid #00B987",
+                                              border: "1px solid #2DDC1B",
                                               padding: "5px",
                                               width: "75%",
                                               borderRadius: "5px",

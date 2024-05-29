@@ -4,10 +4,10 @@ const menuApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAllMenuItems: builder.query({
       query: () => "/menuitems",
-      providesTags: ["getallmenu", "getallchildmenu", "deletemenu","updatenestedmenudata","updatesinglemenudata"],
+      providesTags: ["getallmenu", "getallchildmenu", "deletemenu","updatenestedmenudata","updatesinglemenudata,updatesingleportionmenu"],
       refetchOnReconnect: true,
       refetchOnFocus: true,
-      refetchOnTags: ["getallmenu", "getallchildmenu"],
+      // refetchOnTags: ["getallmenu", "getallchildmenu"],
     }),
     createMenu: builder.mutation({
       query: (payload) => ({
@@ -71,13 +71,18 @@ const menuApi = api.injectEndpoints({
         method: "PUT",
         body: payload,
       }),
-      async onQueryStarted(payload, { dispatch, queryFulfilled }) {
-        try {
-          dispatch(api.util.invalidateTags(["getallmenu", "getallchildmenu"]));
-          await dispatch(api.endpoints.getAllMenuItems.initiate());
-        } catch {}
-      },
-      invalidatesTags: ["getallmenu", "getallchildmenu"],
+      // async onQueryStarted(payload, { dispatch, queryFulfilled }) {
+      //   try {
+      //     dispatch(api.util.invalidateTags(["getallmenu", "getallchildmenu"]));
+      //     await dispatch(api.endpoints.getAllMenuItems.initiate());
+      //   } catch {}
+      // },
+      
+      invalidatesTags: ["updatesingleportionmenu"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status
+      }),
     }),
     getSingleMenu: builder.query({
       query: (id) => {
@@ -102,6 +107,10 @@ const menuApi = api.injectEndpoints({
       query: (id) => ({
         url: `/menuitems/deletemenu/${id}`,
         method: "DELETE",
+      }),
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status
       }),
       invalidatesTags: ["deletemenu"],
     }),

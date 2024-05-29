@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { useUserLoginMutation } from '../../redux/api/apiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../redux/features/user/userSlice';
-import logImage from "../../assets/images/cta1.1.jpg"
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+
 
 const LoginWithMongodb = () => {
     const [data]=useUserLoginMutation()
@@ -29,9 +29,9 @@ const LoginWithMongodb = () => {
   
   return (
     <div className="container-fluid vh-100">
-     <div className=" h-100 w-100 position-relative" >
+     {/* <div className=" h-100 w-100 position-relative" >
       <img className="h-100 w-100" src={logImage} alt="" />
-      </div>
+      </div> */}
       <div className="shadow-lg position-absolute w-50 rounded-4" style={{top:'30%',left:'25%',backgroundColor: 'rgba(0, 0, 0, 0.3)'}}>
       <div className="p-4">
        <h2 className=" mb-3 text-center text-white text-uppercase">Login</h2>

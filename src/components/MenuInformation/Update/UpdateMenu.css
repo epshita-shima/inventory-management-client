@@ -1,0 +1,44 @@
+.toggle-container {
+    width: 50px;
+    height: 20px;
+    background-color: #00B987;
+    border-radius: 10px;
+    padding: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .toggle-button {
+    width: 20px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 10px;
+    transition: 0.3s;
+  
+  }
+  
+  .toggle-button.P {
+    background-color: #e24975;
+    transform: translateX(30px);
+  }
+  
+  .toggle-handle {
+    width: 10px;
+    height: 10px;
+    background-color: #fff;
+    border-radius: 50%;
+    top: 5px;
+    left: 5px;
+    transition: 0.3s;
+  }
+  
+  .toggle-button.P .toggle-handle {
+    transform: translateX(10px);
+  }
+
+  .toggle-part{
+    display: flex;
+    justify-content: center;
+  }

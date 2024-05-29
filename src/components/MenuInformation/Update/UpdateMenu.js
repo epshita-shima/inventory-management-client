@@ -30,11 +30,12 @@ const UpdateMenu = () => {
     useGetSingleChangeParentMenuQuery(changingParentId);
   const [updateSingleMenus] = useUpdateNestedMenuMutation();
   const [updateSingleMenu] = useUpdateSingleProtionMenuMutation();
+  const [isToggled, setIsToggled] = useState(false);
 
   console.log(changeParent);
   console.log(changeParentData);
   console.log(singleMatchingItemData);
-  console.log(JSON.stringify(singleMenuData));
+  console.log(singleMenuData);
   console.log(isUpdateAsChangeParent);
 
   const {
@@ -148,6 +149,9 @@ const UpdateMenu = () => {
     setSingleMenuData(singleMenu);
   }, [singleMenu, id, changingParentId, menuItems]);
 
+  const handleToggle = () => {
+    setIsToggled(!isToggled);
+  };
   const removeItem = (index) => {
     setSingleMenuData((prev) => {
       const temp__details = [...prev.items];
@@ -163,6 +167,7 @@ const UpdateMenu = () => {
     e.preventDefault();
     if (isUpdateAsChangeParent) {
       const response = await updateSingleMenus({ singleMenuData, singleMenu });
+      console.log(response);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", {
           icon: "success",
@@ -173,6 +178,7 @@ const UpdateMenu = () => {
       }
     } else {
       const response = await updateSingleMenu(singleMenuData);
+      console.log(response);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", {
           icon: "success",
@@ -413,6 +419,12 @@ const UpdateMenu = () => {
                                   </th>
 
                                   <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
+                                    Menu Type
+                                    <span className="text-danger fw-bold fs-2">
+                                      *
+                                    </span>
+                                  </th>
+                                  <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
                                     Menu Name
                                     <span className="text-danger fw-bold fs-2">
                                       *
@@ -433,6 +445,42 @@ const UpdateMenu = () => {
                                         {index + 1}
                                       </td>
 
+                                      <td className="text-center align-middle toggle-part">
+                                        <div className="toggle-container">
+                                          <div
+                                            className={`toggle-button ${
+                                              detail.isParent ? "P" : "C"
+                                            }`}
+                                            onClick={() => {
+                                              handleToggle();
+                                              setSingleMenuData((prevState) => {
+                                                console.log(prevState);
+                                                const updatedItems = [
+                                                  ...prevState.items,
+                                                ]; // Create a new array
+                                                updatedItems[index] = {
+                                                  ...updatedItems[index],
+                                                  isParent: isToggled,
+                                                }; // Create a new object for the item with updated label
+                                                return {
+                                                  ...prevState,
+                                                  items: updatedItems,
+                                                }; // Return a new object with updated items array
+                                              });
+                                            }}
+                                            style={{color:'white'}}
+                                          >
+                                            {detail.isParent ? "P" : "C"}
+                                            <div className="toggle-handle" />
+                                          </div>
+                                        </div>
+                                        <br />
+                                        <span className="text-danger">
+                                          <ErrorMessage
+                                            name={`detailsData.${index}.menu_name`}
+                                          />
+                                        </span>
+                                      </td>
                                       <td className="text-center align-middle">
                                         <Field
                                           type="text"

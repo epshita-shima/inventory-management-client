@@ -42,18 +42,19 @@ console.log(menus)
     border: "1px solid #ccc",
     borderRadius: "5px",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    backgroundColor: "#CBF3F0",
+    backgroundColor: "rgba(21, 253, 4, 0.3)",
     height: "60px",
   };
 
   // Define your custom style for the Menubar
   const menubarStyle = {
-    backgroundColor: "#CBF3F0",
+    backgroundColor: "#EE4E4E",
     borderBottom: "1px solid #ccc",
   };
   const refreshBtnStyle = {
-    backgroundColor: "#0A203F",
-    color: "#fff",
+    // backgroundColor: "#0A203F",
+    backgroundColor: "#2DDC1B",
+    color: "#000",
   };
   // Define the menu items
   const filteredMenuItems = menuListSingleData?.map((menu) => {
@@ -182,7 +183,8 @@ console.log(menus)
                         style={{
                           overflowY: "auto",
                           height: "150px",
-                          backgroundColor: "#CBF3F0",
+                          // backgroundColor: "#CBF3F0",
+                          backgroundColor: "#2DDC1B",
                         }}
                       >
                         <Dropdown.Item
@@ -253,8 +255,9 @@ console.log(menus)
                   variant="secondary"
                   id="dropdown-basic"
                   style={{
-                    backgroundColor: "#0A203F",
-                    color: "white",
+                    // backgroundColor: "#0A203F",
+                    backgroundColor: "#2DDC1B",
+                    color: "black",
                     border: "none",
                     outline: "none",
                   }}
