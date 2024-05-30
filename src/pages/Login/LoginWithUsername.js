@@ -11,7 +11,7 @@ import './LoginWithUsername.css'
 
 const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   const [data] = useUserLoginMutation();
-  const { data: user } = useGetAllUserQuery(undefined);
+  const { data: user,isUserLoading } = useGetAllUserQuery(undefined);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -27,6 +27,9 @@ const LoginWithUsername = ({singleUserData,setSingleUserData}) => {
   };
   console.log(isButtonDisabled)
 console.log(singleUserData)
+if(isUserLoading){
+  <p>loding ....</p>
+}
   useEffect(() => {
     const userData = user?.filter(
       (item) => item.username == username && item.password == password

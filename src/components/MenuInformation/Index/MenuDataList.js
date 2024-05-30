@@ -9,10 +9,9 @@ import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
 const MenuDataList = () => {
   const clickhandler = (name) => console.log("delete", name);
   const { data: user } = useGetAllUserQuery(undefined);
-  const { data: menuItems } = useGetAllMenuItemsQuery(undefined);
+  const { data: menuItems, isMenuloading } = useGetAllMenuItemsQuery(undefined);
   const [permission, setPermission] = useState();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     if (localStorage.length > 0) {
@@ -54,32 +53,65 @@ const MenuDataList = () => {
         permidionData,
         userIdFromSession
       );
-      console.log(permission)
+      console.log(permission);
       setPermission(permission);
     } else {
       navigate("/");
     }
   }, [user, navigate]);
-
+  if (isMenuloading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center">
+        <button
+          class="btn"
+          style={{ backgroundColor: "#2DDC1B", color: "white" }}
+          type="button"
+          disabled
+        >
+          <span
+            class="spinner-grow spinner-grow-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Loading...
+        </button>
+      </div>
+    );
+  }
   return (
     <div>
-      <MenuList permission={permission}  menuItems={menuItems} click={clickhandler} />
-      {
-        permission?.isInserted ? (<div
+      <MenuList
+        permission={permission}
+        menuItems={menuItems}
+        click={clickhandler}
+      />
+      {permission?.isInserted ? (
+        <div
           className={`position-absolute`}
           style={{ right: "20%", bottom: "4%", zIndex: "9999" }}
         >
           <div className="">
-            <a href="/main-view/create-menu" target="_blank" className="text-white text-center d-flex justify-content-center align-items-center" style={{backgroundColor:'#00B987',height:'40px',width:'40px',borderRadius:'50px'}}>
+            <a
+              href="/main-view/create-menu"
+              target="_blank"
+              className="text-white text-center d-flex justify-content-center align-items-center"
+              style={{
+                backgroundColor: "#2DDC1B",
+                height: "40px",
+                width: "40px",
+                borderRadius: "50px",
+              }}
+            >
               <FontAwesomeIcon
                 className="text-white fs-4"
                 icon={faPlus}
               ></FontAwesomeIcon>
             </a>
           </div>
-        </div>) :''
-      }
-      
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

@@ -4,3 +4,6 @@
     color: inherit; /* Optionally, you can maintain the link color */
     text-decoration: none; /* Optionally, remove any underline or formatting */
 }
+.half-height{
+    height: 25% !important;
+}

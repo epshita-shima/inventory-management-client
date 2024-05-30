@@ -10,7 +10,6 @@ import { auth } from "./lib/firebase";
 import Home from "./pages/Home/Home";
 import SignUpMongodb from "./pages/SignUp/SignUpMongodb";
 import LoginWithMongodb from "./pages/Login/LoginWithMongodb";
-import UserListInfo from "./components/UserListInformation/Index/UserListInfo";
 import UserCreation from "./components/UserListInformation/Insert/UserCreation";
 import SingleUserDisplay from "./components/UserListInformation/Update/SingleUserDisplay";
 import LoginWithUsername from "./pages/Login/LoginWithUsername";
@@ -23,6 +22,8 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import CreateMenu from "./components/MenuInformation/Insert/CreateMenu";
 import MenuDataList from "./components/MenuInformation/Index/MenuDataList";
 import UpdateMenu from "./components/MenuInformation/Update/UpdateMenu";
+import UserListInfo from "./components/UserListInformation/Index/UserDataTable/UserListInfo";
+import UserDataList from "./components/UserListInformation/Index/UserDataList";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -81,10 +82,10 @@ function App() {
                 path="/main-view/user-setting"
                 element={
                   // <RequireAuth>
-                  <UserListInfo  setChangePassword={setChangePassword}
+                  <UserDataList  setChangePassword={setChangePassword}
                   setResetPassword={setResetPassword}
                   resetPassword={resetPassword}
-                  changePassword={changePassword}></UserListInfo>
+                  changePassword={changePassword}></UserDataList>
                   //  </RequireAuth>
                 }
               ></Route>

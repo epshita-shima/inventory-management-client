@@ -2,7 +2,7 @@
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useMemo, useState } from "react";
-import FilterComponent from "../FilterComponent";
+import FilterComponent from "../UserDataTable/FilterComponent";
 import DataTable from "react-data-table-component";
 import { useUpdateMultipleUserStatusMutation } from "../../../../redux/features/user/userApi";
 import swal from "sweetalert";

@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import {
+  faArrowAltCircleLeft,
   faExclamationCircle,
   faPlus,
   faUserAlt,
@@ -79,6 +80,19 @@ const UserCreation = () => {
     }
   },[navigate])
 
+
+  if(menuItemsIsLoading){
+  return <div className="d-flex justify-content-center align-items-center">
+    <button class="btn" style={{backgroundColor:'#2DDC1B',color:'white'}} type="button" disabled>
+  <span
+    class="spinner-grow spinner-grow-sm"
+    role="status"
+    aria-hidden="true"
+  ></span>
+  Loading...
+</button>
+  </div>
+  }
   function mergePermissions(mainData, permissionsData) {
     // Helper function to merge permissions for items items recursively
     console.log(permissionsData)
@@ -296,9 +310,18 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
                 {isUpdate ? "Update user" : "Add user(s)"}
               </span>
             </p>
-            <p style={{ fontSize: "20px", color: "red" }}>
+
+            <button 
+              style={{backgroundColor:'#E55566',outline:"none",border:'none',color:'white',height:'25px'}}
+              onClick={()=>{
+                navigate('/main-view/user-setting')
+              }}
+              ><FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon> Back to menulist</button>
+           
+            {/* <p style={{ fontSize: "20px", color: "red" }}>
               <FontAwesomeIcon icon={faExclamationCircle}></FontAwesomeIcon>
-            </p>
+            </p> */}
+            
           </div>
           <div className="mt-5">
             <Form validated={validated} onSubmit={handleCreateUser}>
@@ -428,10 +451,10 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
                         if (isUpdate) {
                           setSingleUserData({
                             ...singleUserData,
-                            ["roleId"]: e.value,
+                            "roleId": e.value,
                           });
                         } else {
-                          setFormData({ ...formData, ["roleId"]: e.value });
+                          setFormData({ ...formData, "roleId": e.value });
                         }
                       }}
                     ></Select>

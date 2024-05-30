@@ -1,4 +1,4 @@
-import { faPlus, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
+import { faArrowAltCircleLeft, faPlus, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const CreateMenu = () => {
+  const { data: menuItems,isMenuloading } = useGetAllMenuItemsQuery();
   const ArrayHelperRef = useRef();
   const [parentMenuName, setParentMenuName] = useState("");
   const [menuType, setMenuType] = useState("");
@@ -22,15 +23,30 @@ const CreateMenu = () => {
   const [updateMenu] = useUpdateMenuMutation();
   const navigate = useNavigate();
   const [selectedTopParentValue, setSelectedTopParentValue] = useState(null);
-  console.log(parentMenuName);
   useEffect(() => {
     if (localStorage.length > 0) {
     } else {
       navigate("/");
     }
   }, [navigate]);
+  
+if(isMenuloading){
+ return <div className="d-flex justify-content-center align-items-center">
+  <button class="btn" style={{backgroundColor:'#2DDC1B',color:'white'}} type="button" disabled>
+<span
+  class="spinner-grow spinner-grow-sm"
+  role="status"
+  aria-hidden="true"
+></span>
+Loading...
+</button>
+</div>
+}
 
-  const { data: menuItems } = useGetAllMenuItemsQuery();
+  console.log(parentMenuName);
+ 
+
+
 
   const menuTypeOptions = [
     { value: "child", label: "Child" },
@@ -106,11 +122,9 @@ const CreateMenu = () => {
     return parentMenuRecursive(options);
   };
   const flattenedOptionsData = flattenOptionsData(menuItems);
-  console.log(flattenedOptionsData);
-  console.log(menuType !== "", menuType);
+
   const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
-    console.log(values);
 
     const modelMenuInsert = {
       children: [],
@@ -313,13 +327,13 @@ const CreateMenu = () => {
 
   return (
     <div
-      className="container-fluid usercreation-table"
+      className=" row px-4 mx-4"
       style={{
         overflowY: "scroll",
         height: "500px",
       }}
     >
-      <div class="container overflow-hidden">
+      <div class="overflow-hidden">
         <div className="shadow-lg mt-2 mt-sm-5 mt-md-5 mt-lg-5 p-5 rounded-4">
           <div className="d-flex justify-content-between align-items-center ">
             <div className="d-flex align-items-center">
@@ -344,6 +358,15 @@ const CreateMenu = () => {
               >
                 Create Menu
               </span>
+            </div>
+            <div>
+
+              <button 
+              style={{backgroundColor:'#E55566',outline:"none",border:'none',color:'white',height:'25px'}}
+              onClick={()=>{
+                navigate('/main-view/menu-list')
+              }}
+              ><FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon> Back to menulist</button>
             </div>
           </div>
           <div>
@@ -505,9 +528,9 @@ const CreateMenu = () => {
                       return (
                         <div
                           className=" flex-1 items-center d-flex-nowrap"
-                          style={{ height: "250px", overflowY: "auto" }}
+                          style={{ height: "200px", overflowY: "auto" }}
                         >
-                          <table className="table w-full table-bordered ">
+                          <table className="table w-full table-bordered">
                             <thead className="w-100">
                               <tr>
                                 <th className="bg-white text-center align-middle text-[#581C87] ">

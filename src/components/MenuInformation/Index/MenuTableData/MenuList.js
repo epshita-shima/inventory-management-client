@@ -16,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 import './MenuList.css'
 const MenuList = ({permission, menuItems}) => {
 const [deleteMenu]=useDeleteMenuDataMutation()
+const [filterText, setFilterText] = React.useState("");
+
   const flattenOptions = (options) => {
     const flattenRecursive = (options, parentLabel) => {
       let result = [];
@@ -67,8 +69,8 @@ const [deleteMenu]=useDeleteMenuDataMutation()
               title="Update menu"
             
               style={{
-                color: `${flattenedOptions.items.length==0 ? 'gray' : '#56CCAD'} `,
-                border:`${flattenedOptions.items.length==0 ? '2px solid gray' : '2px solid #56CCAD'}`,
+                color: `${flattenedOptions.items.length==0 ? 'gray' : '#2DDC1B'} `,
+                border:`${flattenedOptions.items.length==0 ? '2px solid gray' : '2px solid #2DDC1B'}`,
                 padding: "3px",
                 borderRadius: "5px",
                 marginLeft: "10px",
@@ -134,7 +136,7 @@ const [deleteMenu]=useDeleteMenuDataMutation()
     },
     headCells: {
       style: {
-        backgroundColor: "#CBF3F0",
+        backgroundColor: "#B8FEB3",
         color: "#000",
         fontWeight: "bold",
         textAlign: "center",
@@ -147,7 +149,7 @@ const [deleteMenu]=useDeleteMenuDataMutation()
       },
     },
   };
-  const [filterText, setFilterText] = React.useState("");
+ 
   const [resetPaginationToggle, setResetPaginationToggle] =
     React.useState(false);
   const filteredItems = flattenedOptions?.filter(
@@ -184,9 +186,9 @@ const [deleteMenu]=useDeleteMenuDataMutation()
       </div>
     );
   }, [filterText, resetPaginationToggle]);
+
   return (
-    <div className="container">
-      <div className="row p-5">
+      <div className="row p-5 mx-4">
         <div
           className="col userlist-table"
           style={{
@@ -208,7 +210,6 @@ const [deleteMenu]=useDeleteMenuDataMutation()
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

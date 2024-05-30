@@ -12,22 +12,22 @@ import {
   faRefresh,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import UserListModal from "./UserListModal/UserListModal";
-import UserActivationModal from "./UserActivationModal/UserActivationModal";
+import UserListModal from "../UserListModal/UserListModal";
+import UserActivationModal from "../UserActivationModal/UserActivationModal";
 
 import { useNavigate } from "react-router-dom";
 import {
   useDeleteUserMutation,
   useGetAllUserQuery,
-} from "../../../redux/features/user/userApi";
-import UserActiveListModal from "./UserActiveListModal/UserActiveListModal";
+} from "../../../../redux/features/user/userApi";
+import UserActiveListModal from "../UserActiveListModal/UserActiveListModal";
 import { Font } from "@react-pdf/renderer";
 
 import swal from "sweetalert";
 import "jspdf-autotable";
-import { useGetCompanyInfoQuery } from "../../../redux/features/companyinfo/compayApi";
-import { downloadPDF } from "../../ReportProperties/HeaderFooter";
-import handleDownload from "../../ReportProperties/HandelExcelDownload";
+import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
+import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
+import handleDownload from "../../../ReportProperties/HandelExcelDownload";
 import { Button } from "react-bootstrap";
 
 const UserListInfo = ({
@@ -35,6 +35,7 @@ const UserListInfo = ({
   setResetPassword,
   resetPassword,
   changePassword,
+  permission
 }) => {
   const [userId, setUserId] = useState(null);
   const { data: user } = useGetAllUserQuery(undefined);
@@ -50,62 +51,62 @@ const UserListInfo = ({
   const [extractedData, setExtractedData] = useState([]);
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
   const [demoData, setDemoData] = useState(null);
-  const [permissionResult, setPermissionResult] = useState([]);
-  const [userIdFromLocalStorage, setUserIdFromLocalStorage] = useState("");
-  console.log(permissionResult, userIdFromLocalStorage);
+
+
+ 
   console.log(localStorage.length);
 
-  useEffect(() => {
-    if (localStorage.length > 0) {
-      const getUserId = localStorage.getItem("user");
-      const userSingleId = JSON.parse(getUserId);
-      const userIdFromSession = userSingleId[0]?._id;
-      const permidionData = user?.filter(
-        (user) => user._id == userIdFromSession
-      );
-      setPermissionResult(permidionData);
-      setUserIdFromLocalStorage(userIdFromSession);
-    } else {
-      navigate("/");
-    }
-  }, [navigate, user]);
+  // useEffect(() => {
+  //   if (localStorage.length > 0) {
+  //     const getUserId = localStorage.getItem("user");
+  //     const userSingleId = JSON.parse(getUserId);
+  //     const userIdFromSession = userSingleId[0]?._id;
+  //     const permidionData = user?.filter(
+  //       (user) => user._id == userIdFromSession
+  //     );
+  //     setPermissionResult(permidionData);
+  //     setUserIdFromLocalStorage(userIdFromSession);
+  //   } else {
+  //     navigate("/");
+  //   }
+  // }, [navigate, user]);
 
-  const extractUserListForCurrentUser = (userData, userId) => {
-    let userList = null;
+  // const extractUserListForCurrentUser = (userData, userId) => {
+  //   let userList = null;
 
-    // Find the user object matching the provided userId
-    const currentUser = userData?.find((user) => user._id === userId);
+  //   // Find the user object matching the provided userId
+  //   const currentUser = userData?.find((user) => user._id === userId);
 
-    if (currentUser) {
-      // Loop through the menus of the current user
-      currentUser?.menulist?.forEach((menu) => {
-        menu?.items?.forEach((subMenu) => {
-          // Check if the subMenu is the "User Profile" menu
-          if (subMenu?.label === subMenu?.label) {
-            // Find the "User List" sub-item
-            const userListSubMenu = subMenu?.items.find(
-              (subItem) => subItem?.label === subItem?.label
-            );
-            if (userListSubMenu) {
-              // Set the user list property
-              userList = userListSubMenu;
-            }
-          }
-        });
-      });
-    }
+  //   if (currentUser) {
+  //     // Loop through the menus of the current user
+  //     currentUser?.menulist?.forEach((menu) => {
+  //       menu?.items?.forEach((subMenu) => {
+  //         // Check if the subMenu is the "User Profile" menu
+  //         if (subMenu?.label === subMenu?.label) {
+  //           // Find the "User List" sub-item
+  //           const userListSubMenu = subMenu?.items.find(
+  //             (subItem) => subItem?.label === subItem?.label
+  //           );
+  //           if (userListSubMenu) {
+  //             // Set the user list property
+  //             userList = userListSubMenu;
+  //           }
+  //         }
+  //       });
+  //     });
+  //   }
 
-    return userList;
-  };
+  //   return userList;
+  // };
 
-  // Call the function to get the user list for the current user
-  const permission = extractUserListForCurrentUser(
-    permissionResult,
-    userIdFromLocalStorage
-  );
+  // // Call the function to get the user list for the current user
+  // const permission = extractUserListForCurrentUser(
+  //   permissionResult,
+  //   userIdFromLocalStorage
+  // );
 
-  // Output the user list for the current user
-  console.log(permission);
+  // // Output the user list for the current user
+  // console.log(permission);
 
   useEffect(() => {
     const activeUsers = user?.filter((user) => user.isactive == true);
@@ -337,7 +338,7 @@ const UserListInfo = ({
 
     return (
       <div className="d-block d-sm-flex justify-content-center align-items-center ">
-        <button
+        {/* <button
           style={{
             backgroundColor: "#2DDC1B",
             color: "#000",
@@ -350,7 +351,7 @@ const UserListInfo = ({
           }}
         >
           Create User
-        </button>
+        </button> */}
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon d-flex ">
             <div>
@@ -415,49 +416,6 @@ const UserListInfo = ({
 
   return (
     <div className="row px-4 mx-4">
-      {/* <nav class="navbar navbar-expand-lg" style={{ background: "#CBF3F0" }}>
-        <div class="container">
-          <div
-            class="collapse navbar-collapse d-flex justify-content-start align-items-center"
-            id="navbarNav"
-          >
-            <ul class="navbar-nav ">
-              <li class="nav-item nav-button-active">
-                <a class="active nav-link text-uppercase">Product List</a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link text-uppercase
-          "
-                  href="#"
-                >
-                  Product Creation
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-uppercase" href="#">
-                  Product Creation Rules
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-uppercase" href="#">
-                  Sustainable Fibercoin(s)
-                </a>
-              </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-              <button
-                class="btn text-light bg-dark my-2 my-sm-0"
-                onClick={() => {
-                  navigate("/user-creation");
-                }}
-              >
-                Create User
-              </button>
-            </form>
-          </div>
-        </div>
-      </nav> */}
       <div class=" mt-4">
         <div class="row">
           <div class="col-sm-3">
