@@ -12,8 +12,8 @@ const MainView = ({singleUserData, setSingleUserData,setChangePassword, setReset
         '@media (maxWidth: 575.98px)': { height: extraSmallScreenHeight },
         '@media (minWidth: 576px) and (maxWidth: 768px)': { height: smallToMediumScreenHeight },
       }}>
-
-      <Home singleUserData={singleUserData} setSingleUserData={setSingleUserData} setChangePassword={setChangePassword} setResetPassword={setResetPassword}></Home>
+<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData} setChangePassword={setChangePassword} setResetPassword={setResetPassword}></Home>
+      
       <div style={{paddingTop: '20px',width:'100%'}}>
         <Outlet></Outlet>
       </div>
