@@ -189,7 +189,7 @@ Loading...
         if (errorCount == 0) {
           try {
             const response = await updateMenu(modelMenuInsert);
-            console.log(response);
+            console.log(response.data.status);
             if (response.data.status === 200) {
               swal("Done", "Data Updated Successfully", "success");
               resetForm({

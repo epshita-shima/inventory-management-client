@@ -24,6 +24,7 @@ import MenuDataList from "./components/MenuInformation/Index/MenuDataList";
 import UpdateMenu from "./components/MenuInformation/Update/UpdateMenu";
 import UserListInfo from "./components/UserListInformation/Index/UserDataTable/UserListInfo";
 import UserDataList from "./components/UserListInformation/Index/UserDataList";
+import InsertRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Insert/InsertRmItemInfo";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -94,6 +95,7 @@ function App() {
                 path="user-update/:id"
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>
+              <Route path="/main-view/item-list" element={<InsertRmItemInfo></InsertRmItemInfo>}></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={
