@@ -25,6 +25,8 @@ import UpdateMenu from "./components/MenuInformation/Update/UpdateMenu";
 import UserListInfo from "./components/UserListInformation/Index/UserDataTable/UserListInfo";
 import UserDataList from "./components/UserListInformation/Index/UserDataList";
 import InsertRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Insert/InsertRmItemInfo";
+import RMItemInfoTableData from "./components/RMItemProfile/ItemProfileInformation/Index/RMItemInfoTableData";
+import UpdateRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Update/UpdateRmItemInfo";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -83,10 +85,12 @@ function App() {
                 path="/main-view/user-setting"
                 element={
                   // <RequireAuth>
-                  <UserDataList  setChangePassword={setChangePassword}
-                  setResetPassword={setResetPassword}
-                  resetPassword={resetPassword}
-                  changePassword={changePassword}></UserDataList>
+                  <UserDataList
+                    setChangePassword={setChangePassword}
+                    setResetPassword={setResetPassword}
+                    resetPassword={resetPassword}
+                    changePassword={changePassword}
+                  ></UserDataList>
                   //  </RequireAuth>
                 }
               ></Route>
@@ -95,7 +99,14 @@ function App() {
                 path="user-update/:id"
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>
-              <Route path="/main-view/item-list" element={<InsertRmItemInfo></InsertRmItemInfo>}></Route>
+              <Route
+                path="/main-view/item-list"
+                element={<RMItemInfoTableData></RMItemInfoTableData>}
+              ></Route>
+              <Route
+                path="/main-view/create-item"
+                element={<InsertRmItemInfo></InsertRmItemInfo>}
+              ></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={
@@ -115,9 +126,16 @@ function App() {
               ></Route>
               <Route
                 path="update-menu/:id"
-                element={<UpdateMenu></UpdateMenu>}></Route>
-
-              <Route path="menu-list" element={<MenuDataList></MenuDataList>}></Route>
+                element={<UpdateMenu></UpdateMenu>}
+              ></Route>
+              <Route
+                path="update-items/:id"
+                element={<UpdateRmItemInfo></UpdateRmItemInfo>}
+              ></Route>
+              <Route
+                path="menu-list"
+                element={<MenuDataList></MenuDataList>}
+              ></Route>
               <Route path="*" element={<NotFound></NotFound>}></Route>
             </Route>
             {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}

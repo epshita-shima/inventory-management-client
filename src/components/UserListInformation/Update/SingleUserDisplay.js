@@ -35,7 +35,7 @@ const SingleUserDisplay = () => {
   useEffect(() => {
     setSingleUserData(singleUser);
   }, [singleUser]);
-  console.log(singleUser);
+
 
   const [validated, setValidated] = useState(false);
   const parentIds = [];

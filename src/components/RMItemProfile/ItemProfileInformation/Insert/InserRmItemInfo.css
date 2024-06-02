@@ -2,7 +2,15 @@
     border: 1px solid #2DDC1B;
     padding: 8px;
     border-radius: 5px;
+   
     outline: #2DDC1B;
+  }
+  .custom-datepicker-update{
+    border: 1px solid #2DDC1B;
+    padding: 8px;
+    border-radius: 5px;
+    outline: #2DDC1B;
+    width:540px;
   }
 .custom-calendar .react-datepicker__current-month,
 .custom-calendar .react-datepicker__day,

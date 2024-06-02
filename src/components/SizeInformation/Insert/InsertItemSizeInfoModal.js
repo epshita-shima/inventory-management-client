@@ -14,7 +14,8 @@ const InsertItemSizeInfoModal = () => {
   const makebyUser = getUserParse[0].username;
   const [existingUserRoles, setExistingUserRoles] = useState([]);
   const [insertItemsize] = useInsertItemSizeMutation();
-  const [sizeInfo, setSizeInfo] = useState("");
+  const [sizeInfoData, setSizeInfoData] = useState("");
+  
   const initialValues = {
     detailsData: [
       {
@@ -29,7 +30,7 @@ const InsertItemSizeInfoModal = () => {
   const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
     console.log(values.detailsData);
-    if (existingUserRoles.includes(sizeInfo)) {
+    if (existingUserRoles.includes(sizeInfoData)) {
       alert("This size info already exists!");
       return;
     }
@@ -114,7 +115,14 @@ const InsertItemSizeInfoModal = () => {
                   setSubmitting(false);
                 }}
               >
-                {({ values, resetForm, setFieldValue, isSubmitting }) => (
+                {({
+                  values,
+                  resetForm,
+                  setFieldValue,
+                  isSubmitting,
+                  errors,
+                  touched,
+                }) => (
                   <Form
                     id="menucreation-form"
                     onSubmit={(e) => {
@@ -151,7 +159,6 @@ const InsertItemSizeInfoModal = () => {
                               </thead>
                               {details && details.length > 0
                                 ? details.map((detail, index) => {
-                                   
                                     return (
                                       <tbody>
                                         <tr key={index}>
@@ -179,11 +186,17 @@ const InsertItemSizeInfoModal = () => {
                                               }}
                                             />
                                             <br />
-                                            <span className="text-danger">
-                                              <ErrorMessage
-                                                name={`detailsData.${index}.sizeInfo`}
-                                              />
-                                            </span>
+                                            {touched.detailsData?.[index]
+                                              ?.sizeInfo &&
+                                              errors.detailsData?.[index]
+                                                ?.sizeInfo && (
+                                                <div className="text-danger">
+                                                  {
+                                                    errors.detailsData[index]
+                                                      .sizeInfo
+                                                  }
+                                                </div>
+                                              )}
                                           </td>
                                           <td className="text-center align-middle">
                                             <button

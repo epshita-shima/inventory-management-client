@@ -14,13 +14,20 @@ import DatePicker from "react-datepicker";
 import "./InserRmItemInfo.css";
 import InsertItemSizeInfoModal from "../../../SizeInformation/Insert/InsertItemSizeInfoModal";
 import { useGetAllItemSizeQuery } from "../../../../redux/features/itemsizeinfo/itemSizeInfoApi";
+import InsertUnitInfoModal from "./../../../UnitInformation/Insert/InsertUnitInfoModal";
+import { useGetAllItemUnitQuery } from "../../../../redux/features/itemUnitInfo/itemUnitInfoApi";
+import { useInsertItemInformationMutation } from "../../../../redux/features/iteminformation/iteminfoApi";
 const InsertRmItemInfo = () => {
   const ArrayHelperRef = useRef();
   const [startDate, setStartDate] = useState(new Date());
   const { data: itemSize } = useGetAllItemSizeQuery(undefined);
-  console.log(itemSize);
+  const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
+  const [insertIteminfo] = useInsertItemInformationMutation();
+  const getUser = localStorage.getItem("user");
+  const getUserParse = JSON.parse(getUser);
+  const makebyUser = getUserParse[0].username;
+
   const itemSizeConvertSelectOption = (options) => {
-    console.log(options)
     let result = [];
     options?.forEach((option) => {
       result.push({
@@ -32,27 +39,56 @@ const InsertRmItemInfo = () => {
   };
 
   const itemSizeConvertedOptions = itemSizeConvertSelectOption(itemSize);
-  console.log(itemSizeConvertedOptions);
+
+  const itemUnitConvertSelectOption = (options) => {
+    let result = [];
+    options?.forEach((option) => {
+      result.push({
+        value: option._id,
+        label: option.unitInfo,
+      });
+    });
+    return result;
+  };
+
+  const itemUnitConvertedOptions = itemUnitConvertSelectOption(itemUnitData);
+
   const initialValues = {
     detailsData: [
       {
-        itemname: "",
+        itemName: "",
         sizeId: "",
         unitId: "",
         openingStock: "",
+        itemStatus: false,
         openingDate: startDate,
-        ItemStatus: "",
         ladgerApproveStatus: false,
-        LadgerApproveDate: null,
-        makeBy: "",
+        ladgerApproveDate: null,
+        makeBy: makebyUser,
         updateBy: null,
-        makeDate: startDate,
+        makeDate: new Date().toLocaleDateString("en-CA"),
         updateDate: null,
       },
     ],
   };
-  console.log(startDate);
-  const handleSubmit = async (e, values, resetForm) => {};
+
+  const handleSubmit = async (e, values, resetForm) => {
+    e.preventDefault();
+
+    try {
+      const response = await insertIteminfo(values.detailsData);
+      console.log(response.data.status);
+      if (response.data.status === 200) {
+        swal("Done", "Data Save Successfully", "success");
+        resetForm();
+      } else {
+        swal("Error", "An error occurred while creating the data", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      swal("Error", "An error occurred while creating the data", "error");
+    }
+  };
   return (
     <div
       className=" row px-4 mx-4"
@@ -129,62 +165,51 @@ const InsertRmItemInfo = () => {
                 }}
               />
             </div>
+            <div className="text-right">
+              <button
+                className="border-0 "
+                style={{
+                  // backgroundColor: "#00B987",
+                  backgroundColor: "#2DDC1B",
+                  color: "black",
+                  padding: "5px 10px",
+                  fontSize: "14px",
+                  borderRadius: "5px",
+                  marginLeft: "5px",
+                }}
+                onClick={() => {
+                  console.log("ArrayHelperRef ");
+                  ArrayHelperRef.current.push({
+                    itemName: "",
+                    sizeId: "",
+                    unitId: "",
+                    openingStock: "",
+                    openingDate: startDate,
+                    itemStatus: false,
+                    ladgerApproveStatus: false,
+                    ladgerApproveDate: null,
+                    makeBy: makebyUser,
+                    updateBy: null,
+                    makeDate: new Date().toLocaleDateString("en-CA"),
+                    updateDate: null,
+                  });
+                }}
+              >
+                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> Add Row
+              </button>
+            </div>
           </div>
-          <div className="d-flex justify-content-between align-items-center mt-4">
-            <button
-              type="submit"
-              form="itemcreation-form"
-              className="border-0 "
-              style={{
-                backgroundColor: "#2DDC1B",
-                color: "white",
-                padding: "5px 10px",
-                fontSize: "14px",
-                borderRadius: "5px",
-                width: "100px",
-              }}
-            >
-              Save
-            </button>
-            <button
-              className="border-0 "
-              style={{
-                // backgroundColor: "#00B987",
-                backgroundColor: "#2DDC1B",
-                color: "black",
-                padding: "5px 10px",
-                fontSize: "14px",
-                borderRadius: "5px",
-                marginLeft: "5px",
-              }}
-              onClick={() => {
-                ArrayHelperRef.current.push({
-                  itemname: "",
-                  sizeId: "",
-                  unitId: "",
-                  openingStock: "",
-                  openingDate: startDate,
-                  ItemStatus: "",
-                  ladgerApproveStatus: false,
-                  LadgerApproveDate: null,
-                  makeBy: "",
-                  updateBy: null,
-                  makeDate: "",
-                  updateDate: null,
-                });
-              }}
-            >
-              <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> Add Row
-            </button>
-          </div>
+
           <div className="mt-3">
             <Formik
               initialValues={initialValues}
               validationSchema={Yup.object({
                 detailsData: Yup.array().of(
                   Yup.object().shape({
-                    menu_type: Yup.string().required("Required"),
                     itemName: Yup.string().required("Required"),
+                    sizeId: Yup.string().required("Required"),
+                    unitId: Yup.string().required("Required"),
+                    openingStock: Yup.string().required("Required"),
                   })
                 ),
               })}
@@ -193,13 +218,38 @@ const InsertRmItemInfo = () => {
                 setSubmitting(false);
               }}
             >
-              {({ values, resetForm, setFieldValue, isSubmitting }) => (
+              {({
+                values,
+                resetForm,
+                setFieldValue,
+                isSubmitting,
+                errors,
+                touched,isValid,dirty
+              }) => (
                 <Form
-                  id="menucreation-form"
+                  id="itemcreation-form"
                   onSubmit={(e) => {
                     handleSubmit(e, values, resetForm);
                   }}
                 >
+                  <div className="d-flex justify-content-between align-items-center mt-4 mb-4">
+                    <button
+                      type="submit"
+                      form="itemcreation-form"
+                      className="border-0 "
+                      style={{
+                        backgroundColor:isValid && dirty ? "#2DDC1B" : "gray",
+                        color: "white",
+                        padding: "5px 10px",
+                        fontSize: "14px",
+                        borderRadius: "5px",
+                        width: "100px",
+                      }}
+                      disabled={!(isValid && dirty)}
+                    >
+                      Save
+                    </button>
+                  </div>
                   <FieldArray
                     name="detailsData"
                     render={(arrayHelpers) => {
@@ -265,23 +315,34 @@ const InsertRmItemInfo = () => {
                                         <td className="text-center align-middle">
                                           <Field
                                             type="text"
-                                            name={`detailsData.${index}.menu_name`}
+                                            name={`detailsData.${index}.itemName`}
                                             placeholder="item name"
-                                            value={detail?.menu_name}
+                                            value={detail?.itemName}
                                             style={{
                                               border: "1px solid #2DDC1B",
                                               padding: "5px",
                                               width: "75%",
                                               borderRadius: "5px",
                                             }}
-                                            onClick={(e) => {}}
+                                            onClick={(e) => {
+                                              setFieldValue(
+                                                `detailsData.${index}.itemName`,
+                                                e.target.value
+                                              );
+                                            }}
                                           />
                                           <br />
-                                          <span className="text-danger">
-                                            <ErrorMessage
-                                              name={`detailsData.${index}.menu_name`}
-                                            />
-                                          </span>
+                                          {touched.detailsData?.[index]
+                                            ?.itemName &&
+                                            errors.detailsData?.[index]
+                                              ?.itemName && (
+                                              <div className="text-danger">
+                                                {
+                                                  errors.detailsData[index]
+                                                    .itemName
+                                                }
+                                              </div>
+                                            )}
                                         </td>
 
                                         <td>
@@ -292,7 +353,13 @@ const InsertRmItemInfo = () => {
                                                 className=" mb-3"
                                                 aria-label="Default select example"
                                                 name="sizeinfo"
-                                                  options={itemSizeConvertedOptions}
+                                                options={
+                                                  itemSizeConvertedOptions
+                                                }
+                                                value={itemSizeConvertedOptions.find(
+                                                  (x) =>
+                                                    x.value == detail.sizeId
+                                                )}
                                                 styles={{
                                                   control: (
                                                     baseStyles,
@@ -313,10 +380,25 @@ const InsertRmItemInfo = () => {
                                                     primary: "#2DDC1B",
                                                   },
                                                 })}
-                                                onChange={(e) => {}}
+                                                onChange={(e) => {
+                                                  setFieldValue(
+                                                    `detailsData.${index}.sizeId`,
+                                                    e.value
+                                                  );
+                                                }}
                                               ></Select>
 
-                                              <div className=""></div>
+                                              {touched.detailsData?.[index]
+                                                ?.sizeId &&
+                                                errors.detailsData?.[index]
+                                                  ?.sizeId && (
+                                                  <div className="text-danger">
+                                                    {
+                                                      errors.detailsData[index]
+                                                        .sizeId
+                                                    }
+                                                  </div>
+                                                )}
                                             </div>
                                             <div className="ms-2">
                                               <FontAwesomeIcon
@@ -340,7 +422,13 @@ const InsertRmItemInfo = () => {
                                                 className=" mb-3"
                                                 aria-label="Default select example"
                                                 name="unitinfo"
-                                                //   options={options}
+                                                options={
+                                                  itemUnitConvertedOptions
+                                                }
+                                                value={itemUnitConvertedOptions.find(
+                                                  (x) =>
+                                                    x.value == detail.unitId
+                                                )}
                                                 styles={{
                                                   control: (
                                                     baseStyles,
@@ -361,10 +449,13 @@ const InsertRmItemInfo = () => {
                                                     primary: "#2DDC1B",
                                                   },
                                                 })}
-                                                onChange={(e) => {}}
+                                                onChange={(e) => {
+                                                  setFieldValue(
+                                                    `detailsData.${index}.unitId`,
+                                                    e.value
+                                                  );
+                                                }}
                                               ></Select>
-
-                                              <div className=""></div>
                                             </div>
                                             <div className="ms-2">
                                               <FontAwesomeIcon
@@ -374,7 +465,7 @@ const InsertRmItemInfo = () => {
                                                 }}
                                                 icon={faPlus}
                                                 data-toggle="modal"
-                                                data-target="#exampleModal"
+                                                data-target="#exampleModal3"
                                               />
                                             </div>
                                           </div>
@@ -382,16 +473,21 @@ const InsertRmItemInfo = () => {
                                         <td className="text-center align-middle">
                                           <Field
                                             type="text"
-                                            name={`detailsData.${index}.menu_name`}
+                                            name={`detailsData.${index}.openingStock`}
                                             placeholder="opening stock"
-                                            value={detail?.menu_name}
+                                            value={detail?.openingStock}
                                             style={{
                                               border: "1px solid #2DDC1B",
                                               padding: "5px",
                                               width: "75%",
                                               borderRadius: "5px",
                                             }}
-                                            onClick={(e) => {}}
+                                            onClick={(e) => {
+                                              setFieldValue(
+                                                `detailsData.${index}.openingStock`,
+                                                e.target.value
+                                              );
+                                            }}
                                           />
                                           <br />
                                           <span className="text-danger">
@@ -404,10 +500,12 @@ const InsertRmItemInfo = () => {
                                           <div class="form-check">
                                             <input
                                               type="checkbox"
-                                              value=""
                                               id="flexCheckDefault"
                                               onClick={(e) => {
-                                                console.log(e.target.checked);
+                                                setFieldValue(
+                                                  `detailsData.${index}.itemStatus`,
+                                                  e.target.checked
+                                                );
                                               }}
                                             />
                                           </div>
@@ -443,6 +541,7 @@ const InsertRmItemInfo = () => {
         </div>
       </div>
       <InsertItemSizeInfoModal></InsertItemSizeInfoModal>
+      <InsertUnitInfoModal></InsertUnitInfoModal>
     </div>
   );
 };
