@@ -17,12 +17,14 @@ import { useGetAllItemSizeQuery } from "../../../../redux/features/itemsizeinfo/
 import InsertUnitInfoModal from "./../../../UnitInformation/Insert/InsertUnitInfoModal";
 import { useGetAllItemUnitQuery } from "../../../../redux/features/itemUnitInfo/itemUnitInfoApi";
 import { useInsertItemInformationMutation } from "../../../../redux/features/iteminformation/iteminfoApi";
+import { useNavigate } from "react-router-dom";
 const InsertRmItemInfo = () => {
   const ArrayHelperRef = useRef();
   const [startDate, setStartDate] = useState(new Date());
   const { data: itemSize } = useGetAllItemSizeQuery(undefined);
   const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
   const [insertIteminfo] = useInsertItemInformationMutation();
+  const navigate = useNavigate();
   const getUser = localStorage.getItem("user");
   const getUserParse = JSON.parse(getUser);
   const makebyUser = getUserParse[0].username;
@@ -82,11 +84,15 @@ const InsertRmItemInfo = () => {
         swal("Done", "Data Save Successfully", "success");
         resetForm();
       } else {
-        swal("Error", "An error occurred while creating the data", "error");
+        swal(
+          "Not Possible!",
+          "An problem occurred while creating the data",
+          "error"
+        );
       }
     } catch (err) {
       console.error(err);
-      swal("Error", "An error occurred while creating the data", "error");
+      swal("Relax!", "An problem occurred while creating the data", "error");
     }
   };
   return (
@@ -133,7 +139,7 @@ const InsertRmItemInfo = () => {
                   height: "25px",
                 }}
                 onClick={() => {
-                  // navigate('/main-view/menu-list')
+                  navigate("/main-view/item-list");
                 }}
               >
                 <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>{" "}
@@ -224,7 +230,9 @@ const InsertRmItemInfo = () => {
                 setFieldValue,
                 isSubmitting,
                 errors,
-                touched,isValid,dirty
+                touched,
+                isValid,
+                dirty,
               }) => (
                 <Form
                   id="itemcreation-form"
@@ -238,7 +246,7 @@ const InsertRmItemInfo = () => {
                       form="itemcreation-form"
                       className="border-0 "
                       style={{
-                        backgroundColor:isValid && dirty ? "#2DDC1B" : "gray",
+                        backgroundColor: isValid && dirty ? "#2DDC1B" : "gray",
                         color: "white",
                         padding: "5px 10px",
                         fontSize: "14px",

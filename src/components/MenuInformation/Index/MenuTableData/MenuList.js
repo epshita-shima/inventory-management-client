@@ -17,6 +17,7 @@ import './MenuList.css'
 const MenuList = ({permission, menuItems}) => {
 const [deleteMenu]=useDeleteMenuDataMutation()
 const [filterText, setFilterText] = React.useState("");
+const [resetPaginationToggle, setResetPaginationToggle] =React.useState(false);
 
   const flattenOptions = (options) => {
     const flattenRecursive = (options, parentLabel) => {
@@ -150,8 +151,6 @@ const [filterText, setFilterText] = React.useState("");
     },
   };
  
-  const [resetPaginationToggle, setResetPaginationToggle] =
-    React.useState(false);
   const filteredItems = flattenedOptions?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==

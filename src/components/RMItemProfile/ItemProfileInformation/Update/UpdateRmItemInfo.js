@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useGetSingleItemQuery } from "../../../../redux/features/iteminformation/iteminfoApi";
-import { useParams } from "react-router-dom";
+import { useGetSingleItemQuery, useUpdateItemInfoMutation } from "../../../../redux/features/iteminformation/iteminfoApi";
+import { useNavigate, useParams } from "react-router-dom";
 import InsertItemSizeInfoModal from "../../../SizeInformation/Insert/InsertItemSizeInfoModal";
 import InsertUnitInfoModal from "../../../UnitInformation/Insert/InsertUnitInfoModal";
 import { Field, FieldArray, Formik } from "formik";
@@ -24,6 +24,8 @@ const UpdateRmItemInfo = () => {
   const { data: singleItemData } = useGetSingleItemQuery(id);
   const { data: itemSize } = useGetAllItemSizeQuery(undefined);
   const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
+  const [updateItemInfo]=useUpdateItemInfoMutation()
+  const navigate=useNavigate()
   const getUser = localStorage.getItem("user");
   const getUserParse = JSON.parse(getUser);
   const updatebyUser = getUserParse[0].username;
@@ -61,6 +63,20 @@ const UpdateRmItemInfo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      const response = await updateItemInfo(singleItemInfoData);
+      console.log(response.data.status);
+      if (response.data.status === 200) {
+        swal("Done", "Data Update Successfully", "success");
+        navigate('/main-view/item-list')
+      } else {
+        swal("Not Possible!", "An problem occurred while updating the data", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      swal("Relax!", "An problem occurred while updating the data", "error");
+    }
   };
 
   return (
@@ -146,7 +162,14 @@ const UpdateRmItemInfo = () => {
                     aria-describedby="basic-addon2"
                     value={singleItemInfoData?.itemName}
                     autoComplete="off"
-                    // onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => {
+                      setSingleItemInfoData((prevData)=> ({
+                        ...prevData,
+                        itemName:e.target.value,
+                        updateBy: updatebyUser,
+                        updateDate: new Date().toLocaleDateString("en-CA"),
+                    }))
+                    }}
                     style={{ border: "1px solid #B8FEB3", background: "white" }}
                   />
                 </InputGroup>
@@ -183,7 +206,14 @@ const UpdateRmItemInfo = () => {
                           primary: "#2DDC1B",
                         },
                       })}
-                      onChange={(e) => {}}
+                      onChange={(e) => {
+                        setSingleItemInfoData((prevData)=> ({
+                          ...prevData,
+                          sizeId:e.value,
+                          updateBy: updatebyUser,
+                          updateDate: new Date().toLocaleDateString("en-CA"),
+                      }))
+                      }}
                     ></Select>
                   </div>
                   <div className="ms-2 mt-5">
@@ -231,7 +261,14 @@ const UpdateRmItemInfo = () => {
                           primary: "#2DDC1B",
                         },
                       })}
-                      onChange={(e) => {}}
+                      onChange={(e) => {
+                        setSingleItemInfoData((prevData)=> ({
+                          ...prevData,
+                          unitId:e.value,
+                          updateBy: updatebyUser,
+                          updateDate: new Date().toLocaleDateString("en-CA"),
+                      }))
+                      }}
                     ></Select>
                   </div>
                   <div className="ms-2 mt-5">
@@ -295,7 +332,14 @@ const UpdateRmItemInfo = () => {
                     aria-describedby="basic-addon2"
                     value={singleItemInfoData?.openingStock}
                     autoComplete="off"
-                    // onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => {
+                      setSingleItemInfoData((prevData)=> ({
+                        ...prevData,
+                        openingStock:e.target.value,
+                        updateBy: updatebyUser,
+                        updateDate: new Date().toLocaleDateString("en-CA"),
+                    }))
+                    }}
                     style={{ border: "1px solid #B8FEB3", background: "white" }}
                   />
                 </InputGroup>
@@ -310,7 +354,14 @@ const UpdateRmItemInfo = () => {
                     type="checkbox"
                     checked={singleItemInfoData?.itemStatus}
                     id="flexCheckDefault"
-                    onClick={(e) => {}}
+                    onClick={(e) => {
+                      setSingleItemInfoData((prevData)=> ({
+                        ...prevData,
+                        itemStatus:e.target.checked,
+                        updateBy: updatebyUser,
+                        updateDate: new Date().toLocaleDateString("en-CA"),
+                    }))
+                    }}
                   />
                 </div>
               </div>
@@ -326,7 +377,7 @@ const UpdateRmItemInfo = () => {
                     padding: "5px 10px",
                     fontSize: "14px",
                     borderRadius: "5px",
-                    width: "25%",
+                    width: "20%",
                   }}
                 >
                   Save

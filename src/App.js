@@ -24,9 +24,9 @@ import MenuDataList from "./components/MenuInformation/Index/MenuDataList";
 import UpdateMenu from "./components/MenuInformation/Update/UpdateMenu";
 import UserListInfo from "./components/UserListInformation/Index/UserDataTable/UserListInfo";
 import UserDataList from "./components/UserListInformation/Index/UserDataList";
-import InsertRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Insert/InsertRmItemInfo";
-import RMItemInfoTableData from "./components/RMItemProfile/ItemProfileInformation/Index/RMItemInfoTableData";
-import UpdateRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Update/UpdateRmItemInfo";
+import FGItemInfoTableData from "./components/FGItemProfile/ItemProfileInformation/Index/FGItemInfoTableData";
+import InsertFgItemInfo from "./components/FGItemProfile/ItemProfileInformation/Insert/InsertFgItemInfo";
+import UpdateFgItemInfo from "./components/FGItemProfile/ItemProfileInformation/Update/UpdateFgItemInfo";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -100,12 +100,12 @@ function App() {
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>
               <Route
-                path="/main-view/item-list"
-                element={<RMItemInfoTableData></RMItemInfoTableData>}
+                path="/main-view/item-list-(fg)"
+                element={<FGItemInfoTableData></FGItemInfoTableData>}
               ></Route>
               <Route
-                path="/main-view/create-item"
-                element={<InsertRmItemInfo></InsertRmItemInfo>}
+                path="/main-view/create-item-(fg)"
+                element={<InsertFgItemInfo></InsertFgItemInfo>}
               ></Route>
               {/* <Route
                 path="/main-view/user-list"
@@ -130,7 +130,7 @@ function App() {
               ></Route>
               <Route
                 path="update-items/:id"
-                element={<UpdateRmItemInfo></UpdateRmItemInfo>}
+                element={<UpdateFgItemInfo></UpdateFgItemInfo>}
               ></Route>
               <Route
                 path="menu-list"

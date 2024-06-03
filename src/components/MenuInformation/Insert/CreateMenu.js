@@ -157,7 +157,6 @@ Loading...
       });
 
       if (parentMenuName) {
-        console.log("parentMenuName", parentMenuName);
         var errorCount = 0;
         values.detailsData.forEach((item) => {
           if (item.menu_name == "") {

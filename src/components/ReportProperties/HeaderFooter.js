@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 
 const downloadPDF = (companyinfo,reportTitle) => {
+  const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
   const doc = new jsPDF();
-  console.log(companyinfo)
   doc.autoTable({
     html: "#my-table",
     startY: 50,
@@ -28,7 +28,7 @@ const downloadPDF = (companyinfo,reportTitle) => {
   addFooter(doc, companyinfo,reportTitle);
 
   // Save the PDF
-  doc.save("userlist.pdf");
+  doc.save(`${fileName}.pdf`);
 };
 const downloadAllPDF = (companyinfo,reportTitle) => {
   const doc = new jsPDF();

@@ -22,13 +22,13 @@ import {
 } from "../../../../redux/features/user/userApi";
 import UserActiveListModal from "../UserActiveListModal/UserActiveListModal";
 import { Font } from "@react-pdf/renderer";
-
 import swal from "sweetalert";
 import "jspdf-autotable";
 import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
 import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../ReportProperties/HandelExcelDownload";
 import { Button } from "react-bootstrap";
+import ListHeading from "../../../Common/ListHeading/ListHeading";
 
 const UserListInfo = ({
   setChangePassword,
@@ -44,17 +44,16 @@ const UserListInfo = ({
   const [inActiveUserModal, setInActiveUserModal] = useState(false);
   const [deleteUser, { isLoading, isSuccess, isError }] =
     useDeleteUserMutation();
-  var reportTitle = "All Active User";
   const navigate = useNavigate();
   const activeUser = user?.filter((user) => user.isactive == true);
   const inActiveUser = user?.filter((user) => user.isactive == false);
   const [extractedData, setExtractedData] = useState([]);
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
   const [demoData, setDemoData] = useState(null);
-
-
- 
-  console.log(localStorage.length);
+  const [filterText, setFilterText] = React.useState("");
+  const [resetPaginationToggle, setResetPaginationToggle] =
+    React.useState(false);
+    var reportTitle = "All Active User";
 
   // useEffect(() => {
   //   if (localStorage.length > 0) {
@@ -319,9 +318,7 @@ const UserListInfo = ({
     },
   };
 
-  const [filterText, setFilterText] = React.useState("");
-  const [resetPaginationToggle, setResetPaginationToggle] =
-    React.useState(false);
+
   const filteredItems = activeUser?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==
@@ -338,20 +335,7 @@ const UserListInfo = ({
 
     return (
       <div className="d-block d-sm-flex justify-content-center align-items-center ">
-        {/* <button
-          style={{
-            backgroundColor: "#2DDC1B",
-            color: "#000",
-            marginRight: "15px",
-            border: "1px solid #2DDC1B",
-          }}
-          onClick={()=>{
-            const url = `/main-view/create-user`;
-                window.open(url, "_blank");
-          }}
-        >
-          Create User
-        </button> */}
+      
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon d-flex ">
             <div>
@@ -416,106 +400,13 @@ const UserListInfo = ({
 
   return (
     <div className="row px-4 mx-4">
-      <div class=" mt-4">
-        <div class="row">
-          <div class="col-sm-3">
-            <div
-              class="cardbox shadow-lg"
-              style={{ borderLeft: "12px solid #2DDC1B", borderRadius: "10px" }}
-            >
-              <div
-                class="card-body"
-                data-toggle="modal"
-                data-target="#exampleModal"
-              >
-                <p
-                  class="card-title"
-                  style={{
-                    color: "#8091a5",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                  }}
-                >
-                  Total User
-                </p>
-                <h5
-                  class="card-text"
-                  style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
-                >
-                  {user?.length}
-                </h5>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-3 mt-4 mt-sm-0">
-            <div
-              class="cardbox shadow-lg"
-              style={{
-                borderLeft: "12px solid  #B8FEB3",
-                borderRadius: "10px",
-              }}
-            >
-              <div
-                class="card-body"
-                data-toggle="modal"
-                data-target="#exampleModalCenter"
-                onClick={() => {
-                  setActiveUserModal(true);
-                }}
-              >
-                <p
-                  class="card-title"
-                  style={{
-                    color: "#8091a5",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                  }}
-                >
-                  Total Active User
-                </p>
-                <h5
-                  class="card-text"
-                  style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
-                >
-                  {activeUser?.length}
-                </h5>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-3 mt-4 mt-sm-0">
-            <div
-              class="cardbox shadow-lg"
-              style={{ borderLeft: "12px solid red", borderRadius: "10px" }}
-            >
-              <div
-                class="card-body"
-                data-toggle="modal"
-                data-target="#exampleModalCenter"
-                onClick={() => {
-                  setInActiveUserModal(true);
-                }}
-              >
-                <p
-                  class="card-title"
-                  style={{
-                    color: "#8091a5",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                  }}
-                >
-                  Total Inactive User
-                </p>
-                <h5
-                  class="card-text"
-                  style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
-                >
-                  {inActiveUser?.length}
-                </h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+     <ListHeading 
+     user={user}
+     setActiveUserModal={setActiveUserModal}
+     activeUser={activeUser}
+     setInActiveUserModal={setInActiveUserModal}
+     inActiveUser={inActiveUser}
+     ></ListHeading>
       <div class=" mt-5">
         <div class="row">
           <div
