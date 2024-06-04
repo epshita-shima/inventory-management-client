@@ -1,166 +1,190 @@
-import React, { useEffect, useState } from 'react'
-import { useGetAllMenuItemsQuery } from '../../../redux/features/menus/menuApi'
+import React, { useEffect, useMemo, useState } from "react";
+import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
+import MenuIdCollection from "../MenuIdCollection/MenuIdCollection";
 
-const ListHeading = ({user,setActiveUserModal,activeUser,setInActiveUserModal,inActiveUser,itemInfoData,
+const ListHeading = ({
+  user,
+  setActiveUserModal,
+  activeUser,
+  setInActiveUserModal,
+  inActiveUser,
+  itemInfoData,
   itemActiveStatus,
-  itemInActiveStatus}) => {
-    const {data:menuListData}=useGetAllMenuItemsQuery(undefined)
-  const [FGItemList,setFGItemList]=useState(false)
-  const [menuList,setMenuList]=useState(false)
-  const [totalTitle,setTotalTitle]=useState('')
-  const [totalActiveTitle,setTotalActiveTitle]=useState('')
-  const [totalInActiveTitle,setTotalInActiveTitle]=useState('')
-const[grandTotal,setGrandTotal]=useState('')
-const[totalActive,setTotalActive]=useState('')
-const[totalInActive,setTotalInActive]=useState('')
-  
-const checkPathname = (data, pathname) => {
-  if (data?.url === pathname) {
-    return true;
-  }
+  itemInActiveStatus,
+}) => {
+  const [FGItemList, setFGItemList] = useState(false);
+  // const [menuList, setMenuList] = useState(false);
+  const [totalTitle, setTotalTitle] = useState("");
+  const [totalActiveTitle, setTotalActiveTitle] = useState("");
+  const [totalInActiveTitle, setTotalInActiveTitle] = useState("");
+  const [grandTotal, setGrandTotal] = useState("");
+  const [totalActive, setTotalActive] = useState("");
+  const [totalInActive, setTotalInActive] = useState("");
+  // const [urls, setUrls] = useState([]);
+  const currentUrl = window.location.href;
+  const pathname = new URL(currentUrl).pathname;
+  const getUserFromLocal = localStorage.getItem("user");
+  const getUserFromLocalConvert = JSON.parse(getUserFromLocal);
+  const getMenuListFromLOcalUser = getUserFromLocalConvert[0]?.menulist;
 
-  if (data?.items && data.items.length >0) {
-    return data?.items?.some(item => checkPathname(item, pathname));
-  }
+  const traverse = (items) => {
+    const urls = [];
+    items.forEach((item) => {
+      if (item.url && item.url !== "#") {
+        urls.push({
+          menuId: item._id,
+          headerLabelName: item.label,
+          url: item.url,
+        });
+      }
+      if (item.items && item.items.length > 0) {
+        // Concatenate the arrays returned by recursive calls
+        urls.push(...traverse(item.items));
+      }
+    });
+    return urls; // Return the complete urls array after all iterations are done
+  };
 
-  return false;
-};
-const currentUrl = window.location.href;
-const pathname = new URL(currentUrl).pathname;
-const isPathnameExist = checkPathname(menuListData, pathname);
+  const mainData = traverse(getMenuListFromLOcalUser);
 
-console.log(`Does the pathname '${pathname}' exist? ${isPathnameExist}`);
+  useEffect(() => {
+    const searchItem = mainData?.filter((x) => x.url == pathname);
+    const wordsURL = pathname.split("/");
+    const repStr = wordsURL[2].replaceAll("-", " ");
+    let grandTotal, totalActive, totalInActive;
 
-  useEffect(()=>{
-    if(pathname=='/main-view/item-list-(fg)'){
-      setFGItemList(true)
-      setTotalTitle('Total Item')
-      setTotalActiveTitle('Total Active Item')
-      setTotalInActiveTitle('Total InActive Item')
-      setGrandTotal(itemInfoData?.length)
-      setTotalActive(itemActiveStatus?.length)
-      setTotalInActive(itemInActiveStatus?.length)
+    if (searchItem) {
+      setTotalTitle(`Total ${searchItem[0]?.headerLabelName}`);
+      setTotalActiveTitle(`Total Active ${searchItem[0]?.headerLabelName}`);
+      setTotalInActiveTitle(`Total InActive ${searchItem[0]?.headerLabelName}`);
+
+      if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
+        grandTotal = itemInfoData?.length;
+        totalActive = itemActiveStatus?.length;
+        totalInActive = itemInActiveStatus?.length;
+      } else if (searchItem[0]?.menuId == MenuIdCollection.userSeting) {
+        grandTotal = user?.length;
+        totalActive = activeUser?.length;
+        totalInActive = inActiveUser?.length;
+      }
+      
+      setGrandTotal(grandTotal);
+      setTotalActive(totalActive);
+      setTotalInActive(totalInActive);
     }
-    if(pathname=='/main-view/user-setting'){
-      setTotalTitle('Total User')
-      setTotalActiveTitle('Total Active User')
-      setTotalInActiveTitle('Total InActive User')
-      setGrandTotal(user?.length)
-      setTotalActive(activeUser?.length)
-      setTotalInActive(inActiveUser?.length)
-    }
-    if(pathname=='/main-view/menu-list'){
-      setMenuList(true)
-      setTotalTitle('Total Menu')
-      setTotalActiveTitle('Total Active Menu')
-      setTotalInActiveTitle('Total InActive Menu')
-    }
-  },[pathname,itemInfoData,itemActiveStatus,itemInActiveStatus,user,activeUser,inActiveUser])
+  }, [
+    mainData,
+    pathname,
+    itemInfoData,
+    itemActiveStatus,
+    itemInActiveStatus,
+    user,
+    activeUser,
+    inActiveUser,
+  ]);
+
   return (
     <div>
-    <div class="row">
-      <div class="col-sm-3">
-        <div
-          class="cardbox shadow-lg"
-          style={{ borderLeft: "12px solid #2DDC1B", borderRadius: "10px" }}
-        >
+      <div class="row">
+        <div class="col-sm-3">
           <div
-            class="card-body"
-            data-toggle="modal"
-            data-target="#exampleModal"
+            class="cardbox shadow-lg"
+            style={{ borderLeft: "12px solid #2DDC1B", borderRadius: "10px" }}
           >
-            <p
-              class="card-title"
-              style={{
-                color: "#8091a5",
-                fontSize: "13px",
-                fontWeight: "600",
-              }}
+            <div
+              class="card-body"
+              data-toggle="modal"
+              data-target="#exampleModal"
             >
-              {totalTitle}
-            </p>
-            <h5
-              class="card-text"
-              style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
-            >
-              {grandTotal}
-            </h5>
+              <p
+                class="card-title"
+                style={{
+                  color: "#8091a5",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                }}
+              >
+                {totalTitle}
+              </p>
+              <h5
+                class="card-text"
+                style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
+              >
+                {grandTotal}
+              </h5>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-sm-3 mt-4 mt-sm-0">
-        <div
-          class="cardbox shadow-lg"
-          style={{
-            borderLeft: "12px solid  #B8FEB3",
-            borderRadius: "10px",
-          }}
-        >
+        <div class="col-sm-3 mt-4 mt-sm-0">
           <div
-            class="card-body"
-            data-toggle="modal"
-            data-target="#exampleModalCenter"
-            onClick={() => {
-              
+            class="cardbox shadow-lg"
+            style={{
+              borderLeft: "12px solid  #B8FEB3",
+              borderRadius: "10px",
+            }}
+          >
+            <div
+              class="card-body"
+              data-toggle="modal"
+              data-target="#exampleModalCenter"
+              onClick={() => {
                 setActiveUserModal(true);
-            
-            
-            }}
-          >
-            <p
-              class="card-title"
-              style={{
-                color: "#8091a5",
-                fontSize: "13px",
-                fontWeight: "600",
               }}
             >
-             {totalActiveTitle}
-            </p>
-            <h5
-              class="card-text"
-              style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
-            >
-              {totalActive}
-            </h5>
+              <p
+                class="card-title"
+                style={{
+                  color: "#8091a5",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                }}
+              >
+                {totalActiveTitle}
+              </p>
+              <h5
+                class="card-text"
+                style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
+              >
+                {totalActive}
+              </h5>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-sm-3 mt-4 mt-sm-0">
-        <div
-          class="cardbox shadow-lg"
-          style={{ borderLeft: "12px solid red", borderRadius: "10px" }}
-        >
+        <div class="col-sm-3 mt-4 mt-sm-0">
           <div
-            class="card-body"
-            data-toggle="modal"
-            data-target="#exampleModalCenter"
-            onClick={() => {
-              setInActiveUserModal(true);
-            }}
+            class="cardbox shadow-lg"
+            style={{ borderLeft: "12px solid red", borderRadius: "10px" }}
           >
-            <p
-              class="card-title"
-              style={{
-                color: "#8091a5",
-                fontSize: "13px",
-                fontWeight: "600",
+            <div
+              class="card-body"
+              data-toggle="modal"
+              data-target="#exampleModalCenter"
+              onClick={() => {
+                setInActiveUserModal(true);
               }}
             >
-             {totalInActiveTitle}
-            </p>
-            <h5
-              class="card-text"
-              style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
-            >
-              {totalInActive}
-            </h5>
+              <p
+                class="card-title"
+                style={{
+                  color: "#8091a5",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                }}
+              >
+                {totalInActiveTitle}
+              </p>
+              <h5
+                class="card-text"
+                style={{ color: "#000", fontSize: "30px", fontWeight: "700" }}
+              >
+                {totalInActive}
+              </h5>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  )
-}
+  );
+};
 
-export default ListHeading
+export default ListHeading;

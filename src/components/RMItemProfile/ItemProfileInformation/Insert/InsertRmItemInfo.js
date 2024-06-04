@@ -34,7 +34,7 @@ const InsertRmItemInfo = () => {
     options?.forEach((option) => {
       result.push({
         value: option._id,
-        label: option.sizeInfo,
+        label: option.categoryInfo,
       });
     });
     return result;
@@ -58,10 +58,11 @@ const InsertRmItemInfo = () => {
   const initialValues = {
     detailsData: [
       {
+        categoryId: "",
         itemName: "",
-        sizeId: "",
         unitId: "",
         openingStock: "",
+        description: "",
         itemStatus: false,
         openingDate: startDate,
         ladgerApproveStatus: false,
@@ -148,62 +149,7 @@ const InsertRmItemInfo = () => {
             </div>
           </div>
           <div>
-            <div className="mt-4">
-              <label htmlFor="">Opening Stock Date</label>
-              <DatePicker
-                dateFormat="y-MM-dd"
-                className="text-center custom-datepicker ms-2"
-                //   value={isEdit ? updateOpeningStore?.OpeningDate : startDate}
-                calendarClassName="custom-calendar"
-                selected={startDate}
-                required
-                onChange={(startDate) => {
-                  if (startDate > new Date()) {
-                    swal({
-                      title: "Select Valid Date",
-                      text: "Date should be equal or earlier than today",
-                      icon: "warning",
-                      button: "OK",
-                    });
-                  } else {
-                    setStartDate(startDate.toLocaleDateString("en-CA"));
-                  }
-                }}
-              />
-            </div>
-            <div className="text-right">
-              <button
-                className="border-0 "
-                style={{
-                  // backgroundColor: "#00B987",
-                  backgroundColor: "#2DDC1B",
-                  color: "black",
-                  padding: "5px 10px",
-                  fontSize: "14px",
-                  borderRadius: "5px",
-                  marginLeft: "5px",
-                }}
-                onClick={() => {
-                  console.log("ArrayHelperRef ");
-                  ArrayHelperRef.current.push({
-                    itemName: "",
-                    sizeId: "",
-                    unitId: "",
-                    openingStock: "",
-                    openingDate: startDate,
-                    itemStatus: false,
-                    ladgerApproveStatus: false,
-                    ladgerApproveDate: null,
-                    makeBy: makebyUser,
-                    updateBy: null,
-                    makeDate: new Date().toLocaleDateString("en-CA"),
-                    updateDate: null,
-                  });
-                }}
-              >
-                <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> Add Row
-              </button>
-            </div>
+            <div className="text-right"></div>
           </div>
 
           <div className="mt-3">
@@ -212,10 +158,11 @@ const InsertRmItemInfo = () => {
               validationSchema={Yup.object({
                 detailsData: Yup.array().of(
                   Yup.object().shape({
+                    categoryId: Yup.string().required("Required"),
                     itemName: Yup.string().required("Required"),
-                    sizeId: Yup.string().required("Required"),
                     unitId: Yup.string().required("Required"),
                     openingStock: Yup.string().required("Required"),
+                    description: Yup.string().required("Required"),
                   })
                 ),
               })}
@@ -240,24 +187,84 @@ const InsertRmItemInfo = () => {
                     handleSubmit(e, values, resetForm);
                   }}
                 >
-                  <div className="d-flex justify-content-between align-items-center mt-4 mb-4">
-                    <button
-                      type="submit"
-                      form="itemcreation-form"
-                      className="border-0 "
-                      style={{
-                        backgroundColor: isValid && dirty ? "#2DDC1B" : "gray",
-                        color: "white",
-                        padding: "5px 10px",
-                        fontSize: "14px",
-                        borderRadius: "5px",
-                        width: "100px",
-                      }}
-                      disabled={!(isValid && dirty)}
-                    >
-                      Save
-                    </button>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="">
+                      <label htmlFor="">Opening Stock Date</label>
+                      <DatePicker
+                        dateFormat="y-MM-dd"
+                        className="text-center custom-datepicker ms-2"
+                        //   value={isEdit ? updateOpeningStore?.OpeningDate : startDate}
+                        calendarClassName="custom-calendar"
+                        selected={startDate}
+                        required
+                        onChange={(startDate) => {
+                          if (startDate > new Date()) {
+                            swal({
+                              title: "Select Valid Date",
+                              text: "Date should be equal or earlier than today",
+                              icon: "warning",
+                              button: "OK",
+                            });
+                          } else {
+                            setStartDate(startDate.toLocaleDateString("en-CA"));
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="d-flex mt-4 mb-4">
+                      <button
+                        type="submit"
+                        form="itemcreation-form"
+                        className="border-0 "
+                        style={{
+                          backgroundColor:
+                            isValid && dirty ? "#2DDC1B" : "gray",
+                          color: "white",
+                          padding: "5px 10px",
+                          fontSize: "14px",
+                          borderRadius: "5px",
+                          width: "100px",
+                        }}
+                        disabled={!(isValid && dirty)}
+                      >
+                        Save
+                      </button>
+                      <div
+                        className="border-0 "
+                        style={{
+                          // backgroundColor: "#00B987",
+                          backgroundColor: "#2DDC1B",
+                          color: "black",
+                          padding: "5px 10px",
+                          fontSize: "14px",
+                          borderRadius: "5px",
+                          marginLeft: "5px",
+                        }}
+                        onClick={() => {
+                          console.log("ArrayHelperRef ");
+                          ArrayHelperRef.current.push({
+                            categoryId: "",
+                            itemName: "",
+                            unitId: "",
+                            openingStock: "",
+                            description: "",
+                            itemStatus: false,
+                            openingDate: startDate,
+                            ladgerApproveStatus: false,
+                            ladgerApproveDate: null,
+                            makeBy: makebyUser,
+                            updateBy: null,
+                            makeDate: new Date().toLocaleDateString("en-CA"),
+                            updateDate: null,
+                          });
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> Add
+                        Row
+                      </div>
+                    </div>
                   </div>
+
                   <FieldArray
                     name="detailsData"
                     render={(arrayHelpers) => {
@@ -266,7 +273,7 @@ const InsertRmItemInfo = () => {
                       return (
                         <div
                           className=" flex-1 items-center d-flex-nowrap"
-                          style={{ height: "200px", overflowY: "auto" }}
+                          style={{ height: "300px", overflowY: "auto" }}
                         >
                           <table className="table w-full table-bordered">
                             <thead className="w-100">
@@ -276,13 +283,13 @@ const InsertRmItemInfo = () => {
                                 </th>
 
                                 <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
-                                  Item Name
+                                  Category Info
                                   <span className="text-danger fw-bold fs-2">
                                     *
                                   </span>
                                 </th>
                                 <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
-                                  Size Info
+                                  Item Name
                                   <span className="text-danger fw-bold fs-2">
                                     *
                                   </span>
@@ -295,6 +302,12 @@ const InsertRmItemInfo = () => {
                                 </th>
                                 <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
                                   Opening Stock
+                                  <span className="text-danger fw-bold fs-2">
+                                    *
+                                  </span>
+                                </th>
+                                <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
+                                  Item Description
                                   <span className="text-danger fw-bold fs-2">
                                     *
                                   </span>
@@ -319,40 +332,6 @@ const InsertRmItemInfo = () => {
                                         <td className="text-center align-middle">
                                           {index + 1}
                                         </td>
-
-                                        <td className="text-center align-middle">
-                                          <Field
-                                            type="text"
-                                            name={`detailsData.${index}.itemName`}
-                                            placeholder="item name"
-                                            value={detail?.itemName}
-                                            style={{
-                                              border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "75%",
-                                              borderRadius: "5px",
-                                            }}
-                                            onClick={(e) => {
-                                              setFieldValue(
-                                                `detailsData.${index}.itemName`,
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                          <br />
-                                          {touched.detailsData?.[index]
-                                            ?.itemName &&
-                                            errors.detailsData?.[index]
-                                              ?.itemName && (
-                                              <div className="text-danger">
-                                                {
-                                                  errors.detailsData[index]
-                                                    .itemName
-                                                }
-                                              </div>
-                                            )}
-                                        </td>
-
                                         <td>
                                           <div className="w-100 d-flex justify-content-between mt-2">
                                             <div className="w-100">
@@ -360,13 +339,13 @@ const InsertRmItemInfo = () => {
                                                 class="form-select"
                                                 className=" mb-3"
                                                 aria-label="Default select example"
-                                                name="sizeinfo"
+                                                name="categoryInfo"
                                                 options={
                                                   itemSizeConvertedOptions
                                                 }
                                                 value={itemSizeConvertedOptions.find(
                                                   (x) =>
-                                                    x.value == detail.sizeId
+                                                    x.value == detail.categoryId
                                                 )}
                                                 styles={{
                                                   control: (
@@ -390,20 +369,20 @@ const InsertRmItemInfo = () => {
                                                 })}
                                                 onChange={(e) => {
                                                   setFieldValue(
-                                                    `detailsData.${index}.sizeId`,
+                                                    `detailsData.${index}.categoryId`,
                                                     e.value
                                                   );
                                                 }}
                                               ></Select>
 
                                               {touched.detailsData?.[index]
-                                                ?.sizeId &&
+                                                ?.categoryId &&
                                                 errors.detailsData?.[index]
-                                                  ?.sizeId && (
+                                                  ?.categoryId && (
                                                   <div className="text-danger">
                                                     {
                                                       errors.detailsData[index]
-                                                        .sizeId
+                                                        .categoryId
                                                     }
                                                   </div>
                                                 )}
@@ -421,7 +400,38 @@ const InsertRmItemInfo = () => {
                                             </div>
                                           </div>
                                         </td>
-
+                                        <td className="text-center align-middle">
+                                          <Field
+                                            type="text"
+                                            name={`detailsData.${index}.itemName`}
+                                            placeholder="item name"
+                                            value={detail?.itemName}
+                                            style={{
+                                              border: "1px solid #2DDC1B",
+                                              padding: "5px",
+                                              width: "100%",
+                                              borderRadius: "5px",
+                                            }}
+                                            onClick={(e) => {
+                                              setFieldValue(
+                                                `detailsData.${index}.itemName`,
+                                                e.target.value
+                                              );
+                                            }}
+                                          />
+                                          <br />
+                                          {touched.detailsData?.[index]
+                                            ?.itemName &&
+                                            errors.detailsData?.[index]
+                                              ?.itemName && (
+                                              <div className="text-danger">
+                                                {
+                                                  errors.detailsData[index]
+                                                    .itemName
+                                                }
+                                              </div>
+                                            )}
+                                        </td>
                                         <td>
                                           <div className="w-100 d-flex justify-content-between mt-2">
                                             <div className="w-100">
@@ -487,8 +497,9 @@ const InsertRmItemInfo = () => {
                                             style={{
                                               border: "1px solid #2DDC1B",
                                               padding: "5px",
-                                              width: "75%",
+                                              width: "100%",
                                               borderRadius: "5px",
+                                              textAlign: "center",
                                             }}
                                             onClick={(e) => {
                                               setFieldValue(
@@ -503,6 +514,38 @@ const InsertRmItemInfo = () => {
                                               name={`detailsData.${index}.menu_name`}
                                             />
                                           </span>
+                                        </td>
+                                        <td className="text-center align-middle">
+                                          <Field
+                                            type="textarea"
+                                            name={`detailsData.${index}.description`}
+                                            placeholder="description"
+                                            value={detail?.description}
+                                            style={{
+                                              border: "1px solid #2DDC1B",
+                                              padding: "5px",
+                                              width: "100%",
+                                              borderRadius: "5px",
+                                              textAlign: "center",
+                                            }}
+                                            onClick={(e) => {
+                                              setFieldValue(
+                                                `detailsData.${index}.description`,
+                                                e.target.value
+                                              );
+                                            }}
+                                          />
+                                          {touched.detailsData?.[index]
+                                            ?.description &&
+                                            errors.detailsData?.[index]
+                                              ?.description && (
+                                              <div className="text-danger">
+                                                {
+                                                  errors.detailsData[index]
+                                                    .description
+                                                }
+                                              </div>
+                                            )}
                                         </td>
                                         <td className="text-center align-middle">
                                           <div class="form-check">

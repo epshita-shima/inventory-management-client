@@ -10,7 +10,7 @@ import { useGetAllUserQuery } from '../../../../redux/features/user/userApi';
 const FGItemInfoTableData = () => {
     const clickhandler = (name) => console.log("delete", name);
     const { data: user, isUserloading } = useGetAllUserQuery(undefined);
-    const { data: itemInfoData} = useGetAllItemInformationQuery(undefined);
+    const { data: itemInfoData,isFGItemloading} = useGetAllItemInformationQuery(undefined);
     const [permission, setPermission] = useState();
     const navigate = useNavigate();
 
@@ -61,7 +61,7 @@ const FGItemInfoTableData = () => {
       }
     }, [user, navigate]);
 
-    if (isUserloading) {
+    if (isFGItemloading) {
       return (
         <div className="d-flex justify-content-center align-items-center">
           <button

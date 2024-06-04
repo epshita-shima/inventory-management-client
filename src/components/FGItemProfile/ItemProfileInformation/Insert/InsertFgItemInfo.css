@@ -1,8 +1,7 @@
 .custom-datepicker {
     border: 1px solid #2DDC1B;
-    padding: 8px;
+    padding: 5px;
     border-radius: 5px;
-   
     outline: #2DDC1B;
   }
   .custom-datepicker-update{

@@ -13,6 +13,7 @@ import ListHeading from "../../../../Common/ListHeading/ListHeading";
 import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
 import { downloadPDF } from "../../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../../ReportProperties/HandelExcelDownload";
+import { unstable_HistoryRouter, useLocation } from "react-router-dom";
 
 const IteminfoList = ({ permission, itemInfoData }) => {
   const { data: itemSizeInfo } = useGetAllItemSizeQuery(undefined);
@@ -26,8 +27,7 @@ const IteminfoList = ({ permission, itemInfoData }) => {
   const[itemActiveStatus,setItemActiveStaus]=useState([])
   const[itemInActiveStatus,setItemInActiveStatus]=useState([])
   var reportTitle = "All Active Item List";
-console.log(itemInfoData)
-  console.log(extractedDataForReport)
+
   useEffect(() => {
     const itemActiveStatus = itemInfoData?.filter((item) => item.itemStatus==true);
     const itemInActiveStatus = itemInfoData?.filter((item) => item.itemStatus == false);
