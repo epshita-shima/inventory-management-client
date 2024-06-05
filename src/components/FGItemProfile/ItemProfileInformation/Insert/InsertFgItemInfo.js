@@ -23,6 +23,8 @@ const InsertFgItemInfo = () => {
   const [startDate, setStartDate] = useState(
     new Date().toLocaleDateString("en-CA")
   );
+  // const [selectedSizeValue, setSelectedSizeValue] = useState(null);
+  // const [selectedUnitValue, setSelectedUnitValue] = useState(null);
   const { data: itemSize } = useGetAllItemSizeQuery(undefined);
   const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
   const [insertIteminfo] = useInsertItemInformationMutation();
@@ -76,25 +78,52 @@ const InsertFgItemInfo = () => {
     ],
   };
 
+  const handleChange = (setFieldValue, index, newValue) => {
+    setFieldValue(`detailsData.${index}.sizeId`, newValue);
+  };
   const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
-    try {
-      const response = await insertIteminfo(values.detailsData);
-      console.log(response.data.status);
-      if (response.data.status === 200) {
-        swal("Done", "Data Save Successfully", "success");
-        resetForm();
-      } else {
-        swal(
-          "Not Possible!",
-          "An problem occurred while creating the data",
-          "error"
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      swal("Relax!", "An problem occurred while creating the data", "error");
-    }
+    console.log(values.detailsData);
+    resetForm({
+      values: {
+        detailsData: [
+          {
+            itemName: "",
+            sizeId: "",
+            unitId: "",
+            openingStock: "",
+          },
+        ],
+      },
+    });
+    // try {
+    //   const response = await insertIteminfo(values.detailsData);
+    //   console.log(response.data.status);
+    //   if (response.data.status === 200) {
+    //     swal("Done", "Data Save Successfully", "success");
+    //     resetForm({
+    //       values: {
+    //         detailsData: [
+    //           {
+    //             itemName: "",
+    //             sizeId: "",
+    //             unitId: "",
+    //             openingStock: "",
+    //           },
+    //         ],
+    //       },
+    //     });
+    //   } else {
+    //     swal(
+    //       "Not Possible!",
+    //       "An problem occurred while creating the data",
+    //       "error"
+    //     );
+    //   }
+    // } catch (err) {
+    //   console.error(err);
+    //   swal("Relax!", "An problem occurred while creating the data", "error");
+    // }
   };
   return (
     <div
@@ -316,6 +345,7 @@ const InsertFgItemInfo = () => {
                             <tbody>
                               {details && details.length > 0
                                 ? details.map((detail, index) => {
+                                    console.log(detail.sizeId);
                                     return (
                                       <tr key={index}>
                                         <td className="text-center align-middle">
@@ -330,9 +360,11 @@ const InsertFgItemInfo = () => {
                                             value={detail?.itemName}
                                             style={{
                                               border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "75%",
+                                              padding: "4px",
+                                              width: "95%",
+                                              height:'38px',
                                               borderRadius: "5px",
+                                              textAlign:'center'
                                             }}
                                             onClick={(e) => {
                                               setFieldValue(
@@ -360,26 +392,40 @@ const InsertFgItemInfo = () => {
                                             <div className="w-100">
                                               <Select
                                                 class="form-select"
-                                                className=" mb-3"
+                                                className="w-100 mb-3"
                                                 aria-label="Default select example"
                                                 name="sizeinfo"
                                                 options={
                                                   itemSizeConvertedOptions
                                                 }
-                                                value={itemSizeConvertedOptions.find(
-                                                  (x) =>
-                                                    x.value == detail.sizeId
-                                                )}
+                                                defaultValue={{
+                                                  label: "Select Size",
+                                                  value: 0,
+                                                }}
+                                                // value={itemSizeConvertedOptions.find(
+                                                //   (x) =>
+                                                //     x.value == values.detailsData[index].sizeId
+                                                // )}
+                                                value={itemSizeConvertedOptions.filter(function(option) {
+                                                  return option.value === values.detailsData[index].sizeId;
+                                                })}
                                                 styles={{
                                                   control: (
                                                     baseStyles,
                                                     state
                                                   ) => ({
                                                     ...baseStyles,
+                                                    width: "100%",
                                                     borderColor: state.isFocused
                                                       ? "#fff"
                                                       : "#fff",
                                                     border: "1px solid #2DDC1B",
+                                                  }),
+                                                  menu: (provided) => ({
+                                                    ...provided,
+                                                    zIndex: 9999,
+                                                    height:'200px',
+                                                     overflowY:'scroll'
                                                   }),
                                                 }}
                                                 theme={(theme) => ({
@@ -391,13 +437,12 @@ const InsertFgItemInfo = () => {
                                                   },
                                                 })}
                                                 onChange={(e) => {
-                                                  setFieldValue(
-                                                    `detailsData.${index}.sizeId`,
-                                                    e.value
-                                                  );
+                                                  handleChange( setFieldValue,
+                                                    index,
+                                                    e.value)
                                                 }}
-                                              ></Select>
-
+                                              ></Select> 
+                                             
                                               {touched.detailsData?.[index]
                                                 ?.sizeId &&
                                                 errors.detailsData?.[index]
@@ -410,9 +455,9 @@ const InsertFgItemInfo = () => {
                                                   </div>
                                                 )}
                                             </div>
-                                            <div className="ms-2">
+                                            <div className="ms-2 mt-2">
                                               <FontAwesomeIcon
-                                                className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
+                                                className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
                                                 style={{
                                                   background: "#2DDC1B",
                                                 }}
@@ -435,9 +480,15 @@ const InsertFgItemInfo = () => {
                                                 options={
                                                   itemUnitConvertedOptions
                                                 }
-                                                value={itemUnitConvertedOptions.find(
+                                                defaultValue={{
+                                                  label: "Select Unit",
+                                                  value: 0,
+                                                }}
+                                                value={itemUnitConvertedOptions.filter(
                                                   (x) =>
-                                                    x.value == detail.unitId
+                                                    x.value ==
+                                                    values.detailsData[index]
+                                                      .unitId
                                                 )}
                                                 styles={{
                                                   control: (
@@ -449,6 +500,12 @@ const InsertFgItemInfo = () => {
                                                       ? "#fff"
                                                       : "#fff",
                                                     border: "1px solid #2DDC1B",
+                                                  }),
+                                                  menu: (provided) => ({
+                                                    ...provided,
+                                                    zIndex: 9999,
+                                                    height:'200px',
+                                                     overflowY:'scroll'
                                                   }),
                                                 }}
                                                 theme={(theme) => ({
@@ -467,7 +524,7 @@ const InsertFgItemInfo = () => {
                                                 }}
                                               ></Select>
                                             </div>
-                                            <div className="ms-2">
+                                            <div className="ms-2 mt-2">
                                               <FontAwesomeIcon
                                                 className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
                                                 style={{
@@ -488,9 +545,11 @@ const InsertFgItemInfo = () => {
                                             value={detail?.openingStock}
                                             style={{
                                               border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "75%",
+                                              padding: "4px",
+                                              width: "95%",
+                                              height:'38px',
                                               borderRadius: "5px",
+                                              textAlign:'center'
                                             }}
                                             onClick={(e) => {
                                               setFieldValue(

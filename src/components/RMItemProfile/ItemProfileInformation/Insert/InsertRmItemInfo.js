@@ -127,7 +127,7 @@ const InsertRmItemInfo = () => {
                   letterSpacing: ".5px",
                 }}
               >
-                Create Item Info
+                Create (RM) Item Info
               </span>
             </div>
             <div>
@@ -140,7 +140,7 @@ const InsertRmItemInfo = () => {
                   height: "25px",
                 }}
                 onClick={() => {
-                  navigate("/main-view/item-list");
+                  navigate("/main-view/item-list-(rm)");
                 }}
               >
                 <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>{" "}
@@ -275,7 +275,7 @@ const InsertRmItemInfo = () => {
                           className=" flex-1 items-center d-flex-nowrap"
                           style={{ height: "300px", overflowY: "auto" }}
                         >
-                          <table className="table w-full table-bordered">
+                          <table className="table w-full table-bordered shadow-lg" >
                             <thead className="w-100">
                               <tr>
                                 <th className="bg-white text-center align-middle text-[#581C87] ">
@@ -343,7 +343,7 @@ const InsertRmItemInfo = () => {
                                                 options={
                                                   itemSizeConvertedOptions
                                                 }
-                                                value={itemSizeConvertedOptions.find(
+                                                value={itemSizeConvertedOptions.filter(
                                                   (x) =>
                                                     x.value == detail.categoryId
                                                 )}
@@ -357,6 +357,10 @@ const InsertRmItemInfo = () => {
                                                       ? "#fff"
                                                       : "#fff",
                                                     border: "1px solid #2DDC1B",
+                                                  }),
+                                                  menu: (provided) => ({
+                                                    ...provided,
+                                                    zIndex: 9999,
                                                   }),
                                                 }}
                                                 theme={(theme) => ({
@@ -443,7 +447,7 @@ const InsertRmItemInfo = () => {
                                                 options={
                                                   itemUnitConvertedOptions
                                                 }
-                                                value={itemUnitConvertedOptions.find(
+                                                value={itemUnitConvertedOptions.filter(
                                                   (x) =>
                                                     x.value == detail.unitId
                                                 )}
@@ -457,6 +461,10 @@ const InsertRmItemInfo = () => {
                                                       ? "#fff"
                                                       : "#fff",
                                                     border: "1px solid #2DDC1B",
+                                                  }),
+                                                  menu: (provided) => ({
+                                                    ...provided,
+                                                    zIndex: 9999,
                                                   }),
                                                 }}
                                                 theme={(theme) => ({

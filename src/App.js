@@ -101,8 +101,8 @@ function App() {
                 path="user-update/:id"
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>
-              {/* <Route  path="/main-view/create-item-(rm)" element={<InsertRmItemInfo></InsertRmItemInfo>}></Route> */}
-              <Route path="/main-view/create-item-(rm)" element={<UpdateRmItemInfo></UpdateRmItemInfo>}></Route>
+              <Route  path="/main-view/create-item-(rm)" element={<InsertRmItemInfo></InsertRmItemInfo>}></Route>
+              {/* <Route path="/main-view/create-item-(rm)" element={<UpdateRmItemInfo></UpdateRmItemInfo>}></Route> */}
               <Route
                 path="/main-view/item-list-(fg)"
                 element={<FGItemInfoTableData></FGItemInfoTableData>}

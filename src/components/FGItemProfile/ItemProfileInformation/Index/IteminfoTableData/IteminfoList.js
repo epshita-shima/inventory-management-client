@@ -15,7 +15,7 @@ import { downloadPDF } from "../../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../../ReportProperties/HandelExcelDownload";
 import { unstable_HistoryRouter, useLocation } from "react-router-dom";
 
-const IteminfoList = ({ permission, itemInfoData }) => {
+const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
   const { data: itemSizeInfo } = useGetAllItemSizeQuery(undefined);
   const { data: itemUnitInfo } = useGetAllItemUnitQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
@@ -230,7 +230,7 @@ const IteminfoList = ({ permission, itemInfoData }) => {
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon d-flex ">
             <div>
-              <FontAwesomeIcon icon={faRefresh}></FontAwesomeIcon> &nbsp;
+              <FontAwesomeIcon icon={faRefresh} onClick={()=>refetch()}></FontAwesomeIcon> &nbsp;
             </div>
             <div class="dropdown">
               <button
@@ -287,6 +287,7 @@ const IteminfoList = ({ permission, itemInfoData }) => {
     companyinfo,
     extractedDataForReport,
     reportTitle,
+    refetch
   ]);
 
   return (

@@ -123,7 +123,7 @@ const UpdateFgItemInfo = () => {
                     height: "25px",
                   }}
                   onClick={() => {
-                    // navigate('/main-view/menu-list')
+                    navigate('/main-view/item-list-(fg)')
                   }}
                 >
                   <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>{" "}
@@ -197,6 +197,12 @@ const UpdateFgItemInfo = () => {
                             borderColor: state.isFocused ? "#fff" : "#fff",
                             border: "1px solid #2DDC1B",
                           }),
+                          menu: (provided) => ({
+                            ...provided,
+                            zIndex: 9999,
+                            height:'200px',
+                             overflowY:'scroll'
+                          }),
                         }}
                         theme={(theme) => ({
                           ...theme,
@@ -251,6 +257,11 @@ const UpdateFgItemInfo = () => {
                             ...baseStyles,
                             borderColor: state.isFocused ? "#fff" : "#fff",
                             border: "1px solid #2DDC1B",
+                            
+                          }),
+                          menu: (provided) => ({
+                            ...provided,
+                            zIndex: 9999, // Increase the z-index value here
                           }),
                         }}
                         theme={(theme) => ({
@@ -260,6 +271,7 @@ const UpdateFgItemInfo = () => {
                             primary25: "#B8FEB3",
                             primary: "#2DDC1B",
                           },
+                          
                         })}
                         onChange={(e) => {
                           setSingleItemInfoData((prevData)=> ({
@@ -293,12 +305,12 @@ const UpdateFgItemInfo = () => {
                  <DatePicker
                   dateFormat="y-MM-dd"
                   className="text-center custom-datepicker-update"
-                  //   value={isEdit ? updateOpeningStore?.OpeningDate : startDate}
                   calendarClassName="custom-calendar"
-                  selected={startDate}
+                  selected={singleItemInfoData?.openingDate}
                   value={singleItemInfoData?.openingDate}
                   required
                   onChange={(startDate) => {
+                    console.log(startDate)
                     if (startDate > new Date()) {
                       swal({
                         title: "Select Valid Date",
@@ -310,7 +322,7 @@ const UpdateFgItemInfo = () => {
                       setStartDate(startDate.toLocaleDateString("en-CA"));
                       setSingleItemInfoData((prevData)=> ({
                           ...prevData,
-                          openingDate: startDate,
+                          openingDate: startDate.toLocaleDateString("en-CA"),
                           updateBy: updatebyUser,
                           updateDate: new Date().toLocaleDateString("en-CA"),
                       }));
