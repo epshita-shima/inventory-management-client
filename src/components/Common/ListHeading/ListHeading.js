@@ -11,9 +11,10 @@ const ListHeading = ({
   itemInfoData,
   itemActiveStatus,
   itemInActiveStatus,
+  rmItemInfoData,
+  rmItemActiveStatus,
+  rmItemInActiveStatus
 }) => {
-  const [FGItemList, setFGItemList] = useState(false);
-  // const [menuList, setMenuList] = useState(false);
   const [totalTitle, setTotalTitle] = useState("");
   const [totalActiveTitle, setTotalActiveTitle] = useState("");
   const [totalInActiveTitle, setTotalInActiveTitle] = useState("");
@@ -26,7 +27,9 @@ const ListHeading = ({
   const getUserFromLocal = localStorage.getItem("user");
   const getUserFromLocalConvert = JSON.parse(getUserFromLocal);
   const getMenuListFromLOcalUser = getUserFromLocalConvert[0]?.menulist;
-
+console.log(  rmItemInfoData,
+  rmItemActiveStatus,
+  rmItemInActiveStatus)
   const traverse = (items) => {
     const urls = [];
     items.forEach((item) => {
@@ -52,20 +55,28 @@ const ListHeading = ({
     const wordsURL = pathname.split("/");
     const repStr = wordsURL[2].replaceAll("-", " ");
     let grandTotal, totalActive, totalInActive;
-
+console.log(searchItem)
     if (searchItem) {
       setTotalTitle(`Total ${searchItem[0]?.headerLabelName}`);
       setTotalActiveTitle(`Total Active ${searchItem[0]?.headerLabelName}`);
       setTotalInActiveTitle(`Total InActive ${searchItem[0]?.headerLabelName}`);
-
+console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
       if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
+        console.log('fg')
         grandTotal = itemInfoData?.length;
         totalActive = itemActiveStatus?.length;
         totalInActive = itemInActiveStatus?.length;
       } else if (searchItem[0]?.menuId == MenuIdCollection.userSeting) {
+        console.log('fg')
         grandTotal = user?.length;
         totalActive = activeUser?.length;
         totalInActive = inActiveUser?.length;
+      }
+       else if (searchItem[0]?.menuId == MenuIdCollection.rmItemList) {
+        console.log('rm')
+        grandTotal = rmItemInfoData?.length;
+        totalActive = rmItemActiveStatus?.length;
+        totalInActive = rmItemInActiveStatus?.length;
       }
       
       setGrandTotal(grandTotal);
@@ -81,6 +92,9 @@ const ListHeading = ({
     user,
     activeUser,
     inActiveUser,
+    rmItemInfoData,
+    rmItemActiveStatus,
+    rmItemInActiveStatus
   ]);
 
   return (

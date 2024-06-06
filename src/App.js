@@ -29,6 +29,7 @@ import InsertFgItemInfo from "./components/FGItemProfile/ItemProfileInformation/
 import UpdateFgItemInfo from "./components/FGItemProfile/ItemProfileInformation/Update/UpdateFgItemInfo";
 import InsertRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Insert/InsertRmItemInfo";
 import UpdateRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Update/UpdateRmItemInfo";
+import RMItemInfoTableData from "./components/RMItemProfile/ItemProfileInformation/Index/RMItemInfoTableData";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -102,6 +103,8 @@ function App() {
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>
               <Route  path="/main-view/create-item-(rm)" element={<InsertRmItemInfo></InsertRmItemInfo>}></Route>
+              <Route  path="/main-view/item-list-(rm)" element={<RMItemInfoTableData></RMItemInfoTableData>}></Route>
+              <Route  path="update-items-rm/:id" element={<UpdateRmItemInfo></UpdateRmItemInfo>}></Route>
               {/* <Route path="/main-view/create-item-(rm)" element={<UpdateRmItemInfo></UpdateRmItemInfo>}></Route> */}
               <Route
                 path="/main-view/item-list-(fg)"

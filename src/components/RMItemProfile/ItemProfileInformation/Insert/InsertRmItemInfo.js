@@ -12,24 +12,24 @@ import * as Yup from "yup";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import "./InserRmItemInfo.css";
-import InsertItemSizeInfoModal from "../../../SizeInformation/Insert/InsertItemSizeInfoModal";
-import { useGetAllItemSizeQuery } from "../../../../redux/features/itemsizeinfo/itemSizeInfoApi";
 import InsertUnitInfoModal from "./../../../UnitInformation/Insert/InsertUnitInfoModal";
 import { useGetAllItemUnitQuery } from "../../../../redux/features/itemUnitInfo/itemUnitInfoApi";
-import { useInsertItemInformationMutation } from "../../../../redux/features/iteminformation/iteminfoApi";
 import { useNavigate } from "react-router-dom";
+import InsertCategoryInformationModal from "../../../CategoryInformation/Insert/InsertCategoryInformationModal";
+import { useGetAllCategoryInfoQuery } from "../../../../redux/features/categoryInfo/categoryInfoApi";
+import { useInsertRMItemInformationMutation } from "../../../../redux/features/iteminformation/rmItemInfoApi";
 const InsertRmItemInfo = () => {
   const ArrayHelperRef = useRef();
-  const [startDate, setStartDate] = useState(new Date());
-  const { data: itemSize } = useGetAllItemSizeQuery(undefined);
+  const [startDate, setStartDate] = useState(new Date().toLocaleDateString("en-CA"));
+  const { data: categoryInfoData } = useGetAllCategoryInfoQuery(undefined)
   const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
-  const [insertIteminfo] = useInsertItemInformationMutation();
+  const [insertRMIteminfoData] = useInsertRMItemInformationMutation();
   const navigate = useNavigate();
   const getUser = localStorage.getItem("user");
   const getUserParse = JSON.parse(getUser);
   const makebyUser = getUserParse[0].username;
 
-  const itemSizeConvertSelectOption = (options) => {
+  const categoryInfoConvertSelectOption = (options) => {
     let result = [];
     options?.forEach((option) => {
       result.push({
@@ -40,8 +40,8 @@ const InsertRmItemInfo = () => {
     return result;
   };
 
-  const itemSizeConvertedOptions = itemSizeConvertSelectOption(itemSize);
-
+  const categoryInfoConvertedOptions = categoryInfoConvertSelectOption(categoryInfoData);
+console.log(categoryInfoConvertedOptions)
   const itemUnitConvertSelectOption = (options) => {
     let result = [];
     options?.forEach((option) => {
@@ -69,7 +69,7 @@ const InsertRmItemInfo = () => {
         ladgerApproveDate: null,
         makeBy: makebyUser,
         updateBy: null,
-        makeDate: new Date().toLocaleDateString("en-CA"),
+        makeDate: new Date(),
         updateDate: null,
       },
     ],
@@ -79,7 +79,7 @@ const InsertRmItemInfo = () => {
     e.preventDefault();
 
     try {
-      const response = await insertIteminfo(values.detailsData);
+      const response = await insertRMIteminfoData(values.detailsData);
       console.log(response.data.status);
       if (response.data.status === 200) {
         swal("Done", "Data Save Successfully", "success");
@@ -127,7 +127,7 @@ const InsertRmItemInfo = () => {
                   letterSpacing: ".5px",
                 }}
               >
-                Create (RM) Item Info
+                Create (Raw Material) Item Info
               </span>
             </div>
             <div>
@@ -254,7 +254,7 @@ const InsertRmItemInfo = () => {
                             ladgerApproveDate: null,
                             makeBy: makebyUser,
                             updateBy: null,
-                            makeDate: new Date().toLocaleDateString("en-CA"),
+                            makeDate: new Date(),
                             updateDate: null,
                           });
                         }}
@@ -332,7 +332,7 @@ const InsertRmItemInfo = () => {
                                         <td className="text-center align-middle">
                                           {index + 1}
                                         </td>
-                                        <td>
+                                        <td style={{width:'20%'}}>
                                           <div className="w-100 d-flex justify-content-between mt-2">
                                             <div className="w-100">
                                               <Select
@@ -341,9 +341,9 @@ const InsertRmItemInfo = () => {
                                                 aria-label="Default select example"
                                                 name="categoryInfo"
                                                 options={
-                                                  itemSizeConvertedOptions
+                                                  categoryInfoConvertedOptions
                                                 }
-                                                value={itemSizeConvertedOptions.filter(
+                                                value={categoryInfoConvertedOptions.filter(
                                                   (x) =>
                                                     x.value == detail.categoryId
                                                 )}
@@ -391,7 +391,7 @@ const InsertRmItemInfo = () => {
                                                   </div>
                                                 )}
                                             </div>
-                                            <div className="ms-2">
+                                            <div className="ms-2 mt-2">
                                               <FontAwesomeIcon
                                                 className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
                                                 style={{
@@ -399,7 +399,7 @@ const InsertRmItemInfo = () => {
                                                 }}
                                                 icon={faPlus}
                                                 data-toggle="modal"
-                                                data-target="#exampleModal1"
+                                                data-target="#categoryInfoModal"
                                               />
                                             </div>
                                           </div>
@@ -415,6 +415,8 @@ const InsertRmItemInfo = () => {
                                               padding: "5px",
                                               width: "100%",
                                               borderRadius: "5px",
+                                              textAlign:'center',
+                                              height:'38px'
                                             }}
                                             onClick={(e) => {
                                               setFieldValue(
@@ -436,7 +438,7 @@ const InsertRmItemInfo = () => {
                                               </div>
                                             )}
                                         </td>
-                                        <td>
+                                        <td style={{width:'17%'}}>
                                           <div className="w-100 d-flex justify-content-between mt-2">
                                             <div className="w-100">
                                               <Select
@@ -483,7 +485,7 @@ const InsertRmItemInfo = () => {
                                                 }}
                                               ></Select>
                                             </div>
-                                            <div className="ms-2">
+                                            <div className="ms-2 mt-2">
                                               <FontAwesomeIcon
                                                 className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
                                                 style={{
@@ -508,6 +510,7 @@ const InsertRmItemInfo = () => {
                                               width: "100%",
                                               borderRadius: "5px",
                                               textAlign: "center",
+                                              height:'38px'
                                             }}
                                             onClick={(e) => {
                                               setFieldValue(
@@ -535,6 +538,7 @@ const InsertRmItemInfo = () => {
                                               width: "100%",
                                               borderRadius: "5px",
                                               textAlign: "center",
+                                              height:'38px'
                                             }}
                                             onClick={(e) => {
                                               setFieldValue(
@@ -560,6 +564,7 @@ const InsertRmItemInfo = () => {
                                             <input
                                               type="checkbox"
                                               id="flexCheckDefault"
+                                              checked={detail.itemStatus}
                                               onClick={(e) => {
                                                 setFieldValue(
                                                   `detailsData.${index}.itemStatus`,
@@ -599,7 +604,7 @@ const InsertRmItemInfo = () => {
           </div>
         </div>
       </div>
-      <InsertItemSizeInfoModal></InsertItemSizeInfoModal>
+    <InsertCategoryInformationModal></InsertCategoryInformationModal>
       <InsertUnitInfoModal></InsertUnitInfoModal>
     </div>
   );

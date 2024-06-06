@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useGetSingleItemQuery, useUpdateItemInfoMutation } from "../../../../redux/features/iteminformation/iteminfoApi";
+import {
+  useGetSingleItemQuery,
+  useUpdateItemInfoMutation,
+} from "../../../../redux/features/iteminformation/iteminfoApi";
 import { useNavigate, useParams } from "react-router-dom";
 import InsertItemSizeInfoModal from "../../../SizeInformation/Insert/InsertItemSizeInfoModal";
 import InsertUnitInfoModal from "../../../UnitInformation/Insert/InsertUnitInfoModal";
@@ -18,135 +21,134 @@ import { useGetAllItemUnitQuery } from "../../../../redux/features/itemUnitInfo/
 import { InputGroup, Form } from "react-bootstrap";
 
 const UpdateFgItemInfo = () => {
-    const [startDate, setStartDate] = useState(new Date());
-    const { id } = useParams();
-    const [singleItemInfoData, setSingleItemInfoData] = useState();
-    const { data: singleItemData } = useGetSingleItemQuery(id);
-    const { data: itemSize } = useGetAllItemSizeQuery(undefined);
-    const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
-    const [updateItemInfo]=useUpdateItemInfoMutation()
-    const navigate=useNavigate()
-    const getUser = localStorage.getItem("user");
-    const getUserParse = JSON.parse(getUser);
-    const updatebyUser = getUserParse[0].username;
-    console.log(id);
-    console.log(singleItemInfoData);
-    useEffect(() => {
-      setSingleItemInfoData(singleItemData);
-    }, [singleItemData]);
-  
-    const itemSizeConvertSelectOption = (options) => {
-      let result = [];
-      options?.forEach((option) => {
-        result.push({
-          value: option._id,
-          label: option.sizeInfo,
-        });
+  const [startDate, setStartDate] = useState(new Date());
+  const { id } = useParams();
+  const [singleItemInfoData, setSingleItemInfoData] = useState();
+  const { data: singleItemData } = useGetSingleItemQuery(id);
+  const { data: itemSize } = useGetAllItemSizeQuery(undefined);
+  const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
+  const [updateItemInfo] = useUpdateItemInfoMutation();
+  const navigate = useNavigate();
+  const getUser = localStorage.getItem("user");
+  const getUserParse = JSON.parse(getUser);
+  const updatebyUser = getUserParse[0].username;
+  console.log(id);
+  console.log(singleItemInfoData);
+  useEffect(() => {
+    setSingleItemInfoData(singleItemData);
+  }, [singleItemData]);
+
+  const itemSizeConvertSelectOption = (options) => {
+    let result = [];
+    options?.forEach((option) => {
+      result.push({
+        value: option._id,
+        label: option.sizeInfo,
       });
-      return result;
-    };
-  
-    const itemSizeConvertedOptions = itemSizeConvertSelectOption(itemSize);
-  
-    const itemUnitConvertSelectOption = (options) => {
-      let result = [];
-      options?.forEach((option) => {
-        result.push({
-          value: option._id,
-          label: option.unitInfo,
-        });
+    });
+    return result;
+  };
+
+  const itemSizeConvertedOptions = itemSizeConvertSelectOption(itemSize);
+
+  const itemUnitConvertSelectOption = (options) => {
+    let result = [];
+    options?.forEach((option) => {
+      result.push({
+        value: option._id,
+        label: option.unitInfo,
       });
-      return result;
-    };
-  
-    const itemUnitConvertedOptions = itemUnitConvertSelectOption(itemUnitData);
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-  
-      try {
-        const response = await updateItemInfo(singleItemInfoData);
-        console.log(response.data.status);
-        if (response.data.status === 200) {
-          swal("Done", "Data Update Successfully", "success");
-          navigate('/main-view/item-list-(fg)')
-        } else {
-          swal("Not Possible!", "An problem occurred while updating the data", "error");
-        }
-      } catch (err) {
-        console.error(err);
-        swal("Relax!", "An problem occurred while updating the data", "error");
+    });
+    return result;
+  };
+
+  const itemUnitConvertedOptions = itemUnitConvertSelectOption(itemUnitData);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await updateItemInfo(singleItemInfoData);
+      console.log(response.data.status);
+      if (response.data.status === 200) {
+        swal("Done", "Data Update Successfully", "success");
+        navigate("/main-view/item-list-(fg)");
+      } else {
+        swal(
+          "Not Possible!",
+          "An problem occurred while updating the data",
+          "error"
+        );
       }
-    };
-  
-    return (
-      <div
-        className=" row px-4 mx-4"
-        style={{
-          overflowY: "scroll",
-          height: "500px",
-        }}
-      >
-        <div class="overflow-hidden">
-          <div className="shadow-lg mt-2 mt-sm-5 mt-md-5 mt-lg-5 p-5 rounded-4">
-            <div className="d-flex justify-content-between align-items-center ">
-              <div className="d-flex align-items-center">
-                <FontAwesomeIcon
-                  style={{
-                    fontSize: "14px",
-                    color: "#000",
-                    // backgroundColor: "#00B987",
-                    backgroundColor: "#2DDC1B",
-                    borderRadius: "50px",
-                    padding: "3px",
-                  }}
-                  icon={faPlus}
-                />
-                &nbsp;
-                <span
-                  style={{
-                    color: "#000",
-                    fontWeight: "700",
-                    letterSpacing: ".5px",
-                  }}
-                >
-                  Update Item Info
-                </span>
-              </div>
-              <div>
-                <button
-                  style={{
-                    backgroundColor: "#E55566",
-                    outline: "none",
-                    border: "none",
-                    color: "white",
-                    height: "25px",
-                  }}
-                  onClick={() => {
-                    navigate('/main-view/item-list-(fg)')
-                  }}
-                >
-                  <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>{" "}
-                  Back to ItemList
-                </button>
-              </div>
-            </div>
-            <div>
-          
-            </div>
-  
-            <div className="mt-3">
-              <Form
-                id="itemcreation-form"
-                onSubmit={(e) => {
-                  handleSubmit(e);
+    } catch (err) {
+      console.error(err);
+      swal("Relax!", "An problem occurred while updating the data", "error");
+    }
+  };
+
+  return (
+    <div
+      className=" row px-4 mx-4"
+      style={{
+        overflowY: "scroll",
+        height: "500px",
+      }}
+    >
+      <div class="overflow-hidden">
+        <div className="shadow-lg mt-2 mt-sm-5 mt-md-5 mt-lg-5 p-5 rounded-4">
+          <div className="d-flex justify-content-between align-items-center ">
+            <div className="d-flex align-items-center">
+              <FontAwesomeIcon
+                style={{
+                  fontSize: "14px",
+                  color: "#000",
+                  // backgroundColor: "#00B987",
+                  backgroundColor: "#2DDC1B",
+                  borderRadius: "50px",
+                  padding: "3px",
+                }}
+                icon={faPlus}
+              />
+              &nbsp;
+              <span
+                style={{
+                  color: "#000",
+                  fontWeight: "700",
+                  letterSpacing: ".5px",
                 }}
               >
-              
-  
-               <div className="d-flex justify-content-center align-items-center w-100 ">
-               <div className="card shadow-lg w-50 p-5">
-                 
+                Update Item Info
+              </span>
+            </div>
+            <div>
+              <button
+                style={{
+                  backgroundColor: "#E55566",
+                  outline: "none",
+                  border: "none",
+                  color: "white",
+                  height: "25px",
+                }}
+                onClick={() => {
+                  navigate("/main-view/item-list-(fg)");
+                }}
+              >
+                <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>{" "}
+                Back to ItemList
+              </button>
+            </div>
+          </div>
+          <div></div>
+
+          <div className="mt-3">
+            <Form
+              id="itemcreation-form"
+              onSubmit={(e) => {
+                handleSubmit(e);
+              }}
+            >
+              <div className="d-flex justify-content-center align-items-center w-100 ">
+                <div className="card shadow-lg w-50 p-5">
                   <Form.Label
                     htmlFor="inputPassword5"
                     style={{ color: "#032339", letterSpacing: "1px" }}
@@ -163,17 +165,20 @@ const UpdateFgItemInfo = () => {
                       value={singleItemInfoData?.itemName}
                       autoComplete="off"
                       onChange={(e) => {
-                        setSingleItemInfoData((prevData)=> ({
+                        setSingleItemInfoData((prevData) => ({
                           ...prevData,
-                          itemName:e.target.value,
+                          itemName: e.target.value,
                           updateBy: updatebyUser,
                           updateDate: new Date().toLocaleDateString("en-CA"),
-                      }))
+                        }));
                       }}
-                      style={{ border: "1px solid #B8FEB3", background: "white" }}
+                      style={{
+                        border: "1px solid #B8FEB3",
+                        background: "white",
+                      }}
                     />
                   </InputGroup>
-  
+
                   <div className="w-100 d-flex justify-content-between mt-2">
                     <div className="w-100">
                       <Form.Label
@@ -200,8 +205,8 @@ const UpdateFgItemInfo = () => {
                           menu: (provided) => ({
                             ...provided,
                             zIndex: 9999,
-                            height:'200px',
-                             overflowY:'scroll'
+                            height: "200px",
+                            overflowY: "scroll",
                           }),
                         }}
                         theme={(theme) => ({
@@ -213,12 +218,12 @@ const UpdateFgItemInfo = () => {
                           },
                         })}
                         onChange={(e) => {
-                          setSingleItemInfoData((prevData)=> ({
+                          setSingleItemInfoData((prevData) => ({
                             ...prevData,
-                            sizeId:e.value,
+                            sizeId: e.value,
                             updateBy: updatebyUser,
                             updateDate: new Date().toLocaleDateString("en-CA"),
-                        }))
+                          }));
                         }}
                       ></Select>
                     </div>
@@ -234,7 +239,7 @@ const UpdateFgItemInfo = () => {
                       />
                     </div>
                   </div>
-  
+
                   <div className="w-100 d-flex justify-content-between mt-2">
                     <div className="w-100">
                       <Form.Label
@@ -257,7 +262,6 @@ const UpdateFgItemInfo = () => {
                             ...baseStyles,
                             borderColor: state.isFocused ? "#fff" : "#fff",
                             border: "1px solid #2DDC1B",
-                            
                           }),
                           menu: (provided) => ({
                             ...provided,
@@ -271,15 +275,14 @@ const UpdateFgItemInfo = () => {
                             primary25: "#B8FEB3",
                             primary: "#2DDC1B",
                           },
-                          
                         })}
                         onChange={(e) => {
-                          setSingleItemInfoData((prevData)=> ({
+                          setSingleItemInfoData((prevData) => ({
                             ...prevData,
-                            unitId:e.value,
+                            unitId: e.value,
                             updateBy: updatebyUser,
                             updateDate: new Date().toLocaleDateString("en-CA"),
-                        }))
+                          }));
                         }}
                       ></Select>
                     </div>
@@ -301,35 +304,35 @@ const UpdateFgItemInfo = () => {
                   >
                     Opening Stock Date
                   </Form.Label>
-                 <div className="mb-2">
-                 <DatePicker
-                  dateFormat="y-MM-dd"
-                  className="text-center custom-datepicker-update"
-                  calendarClassName="custom-calendar"
-                  selected={singleItemInfoData?.openingDate}
-                  value={singleItemInfoData?.openingDate}
-                  required
-                  onChange={(startDate) => {
-                    console.log(startDate)
-                    if (startDate > new Date()) {
-                      swal({
-                        title: "Select Valid Date",
-                        text: "Date should be equal or earlier than today",
-                        icon: "warning",
-                        button: "OK",
-                      });
-                    } else {
-                      setStartDate(startDate.toLocaleDateString("en-CA"));
-                      setSingleItemInfoData((prevData)=> ({
-                          ...prevData,
-                          openingDate: startDate.toLocaleDateString("en-CA"),
-                          updateBy: updatebyUser,
-                          updateDate: new Date().toLocaleDateString("en-CA"),
-                      }));
-                    }
-                  }}
-                />
-                 </div>
+                  <div className="mb-2">
+                    <DatePicker
+                      dateFormat="y-MM-dd"
+                      className="text-center custom-datepicker-update"
+                      calendarClassName="custom-calendar"
+                      selected={singleItemInfoData?.openingDate}
+                      value={singleItemInfoData?.openingDate}
+                      required
+                      onChange={(startDate) => {
+                        console.log(startDate);
+                        if (startDate > new Date()) {
+                          swal({
+                            title: "Select Valid Date",
+                            text: "Date should be equal or earlier than today",
+                            icon: "warning",
+                            button: "OK",
+                          });
+                        } else {
+                          setStartDate(startDate.toLocaleDateString("en-CA"));
+                          setSingleItemInfoData((prevData) => ({
+                            ...prevData,
+                            openingDate: startDate.toLocaleDateString("en-CA"),
+                            updateBy: updatebyUser,
+                            updateDate: new Date().toLocaleDateString("en-CA"),
+                          }));
+                        }
+                      }}
+                    />
+                  </div>
                   <Form.Label
                     htmlFor="inputPassword5"
                     style={{ color: "#032339", letterSpacing: "1px" }}
@@ -345,14 +348,17 @@ const UpdateFgItemInfo = () => {
                       value={singleItemInfoData?.openingStock}
                       autoComplete="off"
                       onChange={(e) => {
-                        setSingleItemInfoData((prevData)=> ({
+                        setSingleItemInfoData((prevData) => ({
                           ...prevData,
-                          openingStock:e.target.value,
+                          openingStock: e.target.value,
                           updateBy: updatebyUser,
                           updateDate: new Date().toLocaleDateString("en-CA"),
-                      }))
+                        }));
                       }}
-                      style={{ border: "1px solid #B8FEB3", background: "white" }}
+                      style={{
+                        border: "1px solid #B8FEB3",
+                        background: "white",
+                      }}
                     />
                   </InputGroup>
                   <Form.Label
@@ -367,42 +373,42 @@ const UpdateFgItemInfo = () => {
                       checked={singleItemInfoData?.itemStatus}
                       id="flexCheckDefault"
                       onClick={(e) => {
-                        setSingleItemInfoData((prevData)=> ({
+                        setSingleItemInfoData((prevData) => ({
                           ...prevData,
-                          itemStatus:e.target.checked,
+                          itemStatus: e.target.checked,
                           updateBy: updatebyUser,
                           updateDate: new Date().toLocaleDateString("en-CA"),
-                      }))
+                        }));
                       }}
                     />
                   </div>
                 </div>
-               </div>
-                <div className="d-flex justify-content-center align-items-center mt-4 w-100">
-                  <button
-                    type="submit"
-                    form="itemcreation-form"
-                    className="border-0 "
-                    style={{
-                      backgroundColor: "#2DDC1B",
-                      color: "white",
-                      padding: "5px 10px",
-                      fontSize: "14px",
-                      borderRadius: "5px",
-                      width: "20%",
-                    }}
-                  >
-                    Save
-                  </button>
-                </div>
-              </Form>
-            </div>
+              </div>
+              <div className="d-flex justify-content-center align-items-center mt-4 w-100">
+                <button
+                  type="submit"
+                  form="itemcreation-form"
+                  className="border-0 "
+                  style={{
+                    backgroundColor: "#2DDC1B",
+                    color: "white",
+                    padding: "5px 10px",
+                    fontSize: "14px",
+                    borderRadius: "5px",
+                    width: "20%",
+                  }}
+                >
+                  Save
+                </button>
+              </div>
+            </Form>
           </div>
         </div>
-        <InsertItemSizeInfoModal></InsertItemSizeInfoModal>
-        <InsertUnitInfoModal></InsertUnitInfoModal>
       </div>
-    );
-}
+      <InsertItemSizeInfoModal></InsertItemSizeInfoModal>
+      <InsertUnitInfoModal></InsertUnitInfoModal>
+    </div>
+  );
+};
 
-export default UpdateFgItemInfo
+export default UpdateFgItemInfo;

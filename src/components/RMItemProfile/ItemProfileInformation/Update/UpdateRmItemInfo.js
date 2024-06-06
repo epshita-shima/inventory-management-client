@@ -19,37 +19,42 @@ import swal from "sweetalert";
 import { useGetAllItemSizeQuery } from "../../../../redux/features/itemsizeinfo/itemSizeInfoApi";
 import { useGetAllItemUnitQuery } from "../../../../redux/features/itemUnitInfo/itemUnitInfoApi";
 import { InputGroup, Form, FloatingLabel } from "react-bootstrap";
+import { useGetSingleRMItemQuery, useUpdateRMItemInfoMutation } from "../../../../redux/features/iteminformation/rmItemInfoApi";
+import { useGetAllCategoryInfoQuery } from "../../../../redux/features/categoryInfo/categoryInfoApi";
+import InsertCategoryInformationModal from "../../../CategoryInformation/Insert/InsertCategoryInformationModal";
 
 const UpdateRmItemInfo = () => {
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date().toLocaleDateString("en-CA"));
   const { id } = useParams();
   const [singleItemInfoData, setSingleItemInfoData] = useState();
-  const { data: singleItemData } = useGetSingleItemQuery(id);
-  const { data: itemSize } = useGetAllItemSizeQuery(undefined);
+  const { data: singleRMItemData } = useGetSingleRMItemQuery(id);
+  const { data: categoryInfoData } = useGetAllCategoryInfoQuery(undefined)
   const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
-  const [updateItemInfo] = useUpdateItemInfoMutation();
+  const [updateRMItemInfoData] = useUpdateRMItemInfoMutation();
   const navigate = useNavigate();
   const getUser = localStorage.getItem("user");
   const getUserParse = JSON.parse(getUser);
   const updatebyUser = getUserParse[0].username;
   console.log(id);
   console.log(singleItemInfoData);
-  useEffect(() => {
-    setSingleItemInfoData(singleItemData);
-  }, [singleItemData]);
 
-  const itemSizeConvertSelectOption = (options) => {
+  useEffect(() => {
+    setSingleItemInfoData(singleRMItemData);
+  }, [singleRMItemData]);
+
+  const categoryInfoConvertSelectOption = (options) => {
     let result = [];
     options?.forEach((option) => {
       result.push({
         value: option._id,
-        label: option.sizeInfo,
+        label: option.categoryInfo,
       });
     });
     return result;
   };
 
-  const itemSizeConvertedOptions = itemSizeConvertSelectOption(itemSize);
+  const categoryInfoConvertedOptions = categoryInfoConvertSelectOption(categoryInfoData);
+console.log(categoryInfoConvertedOptions)
 
   const itemUnitConvertSelectOption = (options) => {
     let result = [];
@@ -68,11 +73,11 @@ const UpdateRmItemInfo = () => {
     e.preventDefault();
 
     try {
-      const response = await updateItemInfo(singleItemInfoData);
+      const response = await updateRMItemInfoData(singleItemInfoData);
       console.log(response.data.status);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", "success");
-        navigate("/main-view/item-list");
+        navigate("/main-view/item-list-(rm)");
       } else {
         swal(
           "Not Possible!",
@@ -117,7 +122,7 @@ const UpdateRmItemInfo = () => {
                   letterSpacing: ".5px",
                 }}
               >
-                Update (RM) Item Info
+                Update (Raw Material) Item Info
               </span>
             </div>
             <div>
@@ -149,54 +154,6 @@ const UpdateRmItemInfo = () => {
             >
               <div className="d-flex justify-content-center align-items-center w-100 ">
                 <div className="card shadow-lg w-50 p-5">
-                  <div className="w-100 d-flex justify-content-between mt-2">
-                    <div className="w-100">
-                      <Form.Label
-                        htmlFor="inputPassword5"
-                        style={{ color: "#032339", letterSpacing: "1px" }}
-                      >
-                        Category Info
-                      </Form.Label>
-                      <Select
-                        class="form-select"
-                        className=" mb-3"
-                        aria-label="Default select example"
-                        name="categoryInfo"
-                        options={itemSizeConvertedOptions}
-                        // value={itemSizeConvertedOptions.find(
-                        //   (x) =>
-                        //     x.value == detail.categoryId
-                        // )}
-                        styles={{
-                          control: (baseStyles, state) => ({
-                            ...baseStyles,
-                            borderColor: state.isFocused ? "#fff" : "#fff",
-                            border: "1px solid #2DDC1B",
-                          }),
-                        }}
-                        theme={(theme) => ({
-                          ...theme,
-                          colors: {
-                            ...theme.colors,
-                            primary25: "#B8FEB3",
-                            primary: "#2DDC1B",
-                          },
-                        })}
-                        onChange={(e) => {}}
-                      ></Select>
-                    </div>
-                    <div className="ms-2 mt-5">
-                      <FontAwesomeIcon
-                        className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
-                        style={{
-                          background: "#2DDC1B",
-                        }}
-                        icon={faPlus}
-                        data-toggle="modal"
-                        data-target="#exampleModal1"
-                      />
-                    </div>
-                  </div>
                   <Form.Label
                     htmlFor="inputPassword5"
                     style={{ color: "#032339", letterSpacing: "1px" }}
@@ -217,7 +174,7 @@ const UpdateRmItemInfo = () => {
                           ...prevData,
                           itemName: e.target.value,
                           updateBy: updatebyUser,
-                          updateDate: new Date().toLocaleDateString("en-CA"),
+                          updateDate: new Date(),
                         }));
                       }}
                       style={{
@@ -226,6 +183,67 @@ const UpdateRmItemInfo = () => {
                       }}
                     />
                   </InputGroup>
+
+                  <div className="w-100 d-flex justify-content-between mt-2">
+                    <div className="w-100">
+                      <Form.Label
+                        htmlFor="inputPassword5"
+                        style={{ color: "#032339", letterSpacing: "1px" }}
+                      >
+                        Size Info
+                      </Form.Label>
+                      <Select
+                        class="form-select"
+                        className=" mb-3"
+                        aria-label="Default select example"
+                        name="categoryinfo"
+                        options={categoryInfoConvertedOptions}
+                        value={categoryInfoConvertedOptions.find(
+                          (x) => x.value == singleItemInfoData?.categoryId
+                        )}
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            borderColor: state.isFocused ? "#fff" : "#fff",
+                            border: "1px solid #2DDC1B",
+                          }),
+                          menu: (provided) => ({
+                            ...provided,
+                            zIndex: 9999,
+                            height: "200px",
+                            overflowY: "scroll",
+                          }),
+                        }}
+                        theme={(theme) => ({
+                          ...theme,
+                          colors: {
+                            ...theme.colors,
+                            primary25: "#B8FEB3",
+                            primary: "#2DDC1B",
+                          },
+                        })}
+                        onChange={(e) => {
+                          setSingleItemInfoData((prevData) => ({
+                            ...prevData,
+                            categoryId: e.value,
+                            updateBy: updatebyUser,
+                            updateDate: new Date(),
+                          }));
+                        }}
+                      ></Select>
+                    </div>
+                    <div className="ms-2 mt-5">
+                      <FontAwesomeIcon
+                        className="border align-middle text-center p-2 fs-3 rounded-5 text-light"
+                        style={{
+                          background: "#2DDC1B",
+                        }}
+                        icon={faPlus}
+                        data-toggle="modal"
+                        data-target="#exampleModal1"
+                      />
+                    </div>
+                  </div>
 
                   <div className="w-100 d-flex justify-content-between mt-2">
                     <div className="w-100">
@@ -250,6 +268,10 @@ const UpdateRmItemInfo = () => {
                             borderColor: state.isFocused ? "#fff" : "#fff",
                             border: "1px solid #2DDC1B",
                           }),
+                          menu: (provided) => ({
+                            ...provided,
+                            zIndex: 9999, // Increase the z-index value here
+                          }),
                         }}
                         theme={(theme) => ({
                           ...theme,
@@ -264,7 +286,7 @@ const UpdateRmItemInfo = () => {
                             ...prevData,
                             unitId: e.value,
                             updateBy: updatebyUser,
-                            updateDate: new Date().toLocaleDateString("en-CA"),
+                            updateDate: new Date(),
                           }));
                         }}
                       ></Select>
@@ -291,12 +313,12 @@ const UpdateRmItemInfo = () => {
                     <DatePicker
                       dateFormat="y-MM-dd"
                       className="text-center custom-datepicker-update"
-                      //   value={isEdit ? updateOpeningStore?.OpeningDate : startDate}
                       calendarClassName="custom-calendar"
-                      selected={startDate}
+                      selected={singleItemInfoData?.openingDate}
                       value={singleItemInfoData?.openingDate}
                       required
                       onChange={(startDate) => {
+                        console.log(startDate);
                         if (startDate > new Date()) {
                           swal({
                             title: "Select Valid Date",
@@ -308,9 +330,9 @@ const UpdateRmItemInfo = () => {
                           setStartDate(startDate.toLocaleDateString("en-CA"));
                           setSingleItemInfoData((prevData) => ({
                             ...prevData,
-                            openingDate: startDate,
+                            openingDate: startDate.toLocaleDateString("en-CA"),
                             updateBy: updatebyUser,
-                            updateDate: new Date().toLocaleDateString("en-CA"),
+                            updateDate: new Date(),
                           }));
                         }
                       }}
@@ -335,7 +357,7 @@ const UpdateRmItemInfo = () => {
                           ...prevData,
                           openingStock: e.target.value,
                           updateBy: updatebyUser,
-                          updateDate: new Date().toLocaleDateString("en-CA"),
+                          updateDate: new Date(),
                         }));
                       }}
                       style={{
@@ -344,21 +366,6 @@ const UpdateRmItemInfo = () => {
                       }}
                     />
                   </InputGroup>
-
-                  <Form.Label
-                    htmlFor="inputPassword5"
-                    style={{ color: "#032339", letterSpacing: "1px" }}
-                  >
-                    Description
-                  </Form.Label>
-                  <FloatingLabel
-                    controlId="floatingInput"
-                    // label="description"
-                    value={singleItemInfoData?.description}
-                    className="mb-3"
-                  >
-                    <Form.Control type="email" placeholder="name@example.com" />
-                  </FloatingLabel>
                   <Form.Label
                     htmlFor="inputPassword5"
                     style={{ color: "#032339", letterSpacing: "1px" }}
@@ -375,7 +382,7 @@ const UpdateRmItemInfo = () => {
                           ...prevData,
                           itemStatus: e.target.checked,
                           updateBy: updatebyUser,
-                          updateDate: new Date().toLocaleDateString("en-CA"),
+                          updateDate: new Date(),
                         }));
                       }}
                     />
@@ -403,7 +410,7 @@ const UpdateRmItemInfo = () => {
           </div>
         </div>
       </div>
-      <InsertItemSizeInfoModal></InsertItemSizeInfoModal>
+      <InsertCategoryInformationModal></InsertCategoryInformationModal>
       <InsertUnitInfoModal></InsertUnitInfoModal>
     </div>
   );

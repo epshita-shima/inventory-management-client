@@ -114,6 +114,7 @@ const UserDataList = ({
                 height: "40px",
                 width: "40px",
                 borderRadius: "50px",
+                border:'1px solid #fff'
               }}
             >
               <FontAwesomeIcon
