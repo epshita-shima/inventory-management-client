@@ -4,7 +4,7 @@ const iteminfoApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAllItemInformation: builder.query({
       query: () => "/iteminfo",
-      providesTags: ["insertiteminfo", "updateiteminfo","deleteiteminfo"],
+      providesTags: ["insertiteminfo", "updateiteminfo","changesitemtatus","deleteiteminfo"],
       refetchOnReconnect: true,
       refetchOnFocus: true,
     }),
@@ -44,6 +44,20 @@ const iteminfoApi = api.injectEndpoints({
         status: meta.response.status,
       }),
     }),
+
+    updateFinishGoodStatus: builder.mutation({
+      query: (dataToUpdate) => ({
+        url: "/iteminfo",
+        method: "PUT",
+        body: dataToUpdate,
+      }),
+      invalidatesTags: ["changesitemtatus"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
+      }),
+    }),
+    
     deleteItemInfo: builder.mutation({
       query: (id) => ({
         url: `/iteminfo/${id}`,
@@ -64,5 +78,6 @@ export const {
   useInsertItemInformationMutation,
   useGetSingleItemQuery,
   useUpdateItemInfoMutation,
+  useUpdateFinishGoodStatusMutation,
   useDeleteItemInfoMutation
 } = iteminfoApi;

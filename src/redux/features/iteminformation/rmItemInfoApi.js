@@ -4,7 +4,7 @@ const rmItemInfoApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAllRMItemInformation: builder.query({
       query: () => "/rmiteminfo",
-      providesTags: ["insertiteminfo", "updateiteminfo","deleteiteminfo"],
+      providesTags: ["insertiteminfo", "updateiteminfo","deleteiteminfo","changesitemtatus"],
       refetchOnReconnect: true,
       refetchOnFocus: true,
     }),
@@ -44,6 +44,18 @@ const rmItemInfoApi = api.injectEndpoints({
         status: meta.response.status,
       }),
     }),
+    updateRawMaterialStatus: builder.mutation({
+      query: (dataToUpdate) => ({
+        url: "/rmiteminfo",
+        method: "PUT",
+        body: dataToUpdate,
+      }),
+      invalidatesTags: ["changesitemtatus"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
+      }),
+    }),
     deleteRMItemInfo: builder.mutation({
       query: (id) => ({
         url: `/rmiteminfo/${id}`,
@@ -64,5 +76,6 @@ useGetAllRMItemInformationQuery,
 useInsertRMItemInformationMutation,
 useGetSingleRMItemQuery,
 useUpdateRMItemInfoMutation,
+useUpdateRawMaterialStatusMutation,
 useDeleteRMItemInfoMutation
 } = rmItemInfoApi;

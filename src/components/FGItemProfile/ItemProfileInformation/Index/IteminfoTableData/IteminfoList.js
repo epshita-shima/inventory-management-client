@@ -14,8 +14,10 @@ import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinf
 import { downloadPDF } from "../../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../../ReportProperties/HandelExcelDownload";
 import { unstable_HistoryRouter, useLocation } from "react-router-dom";
+import handleCheckboxClick from "../../../../Common/ListHeadingModal/Function/handleCheckboxClick";
+import ActiveListDataModal from "../../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
 
-const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
+const IteminfoList = ({ permission, finishGoodInItemInfoData ,refetch}) => {
   const { data: itemSizeInfo } = useGetAllItemSizeQuery(undefined);
   const { data: itemUnitInfo } = useGetAllItemUnitQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
@@ -23,16 +25,21 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
   const [extractedDataForReport, setExtractedDataForReport] = useState([]);
   const [extractedInActiveDataForReport, setExtractedInActiveDataForReport] = useState([]);
   const [resetPaginationToggle, setResetPaginationToggle] =React.useState(false);
+  const [activeFinishGoodItemModal, setActiveFinishGoodItemModal] =
+  useState(false);
+const [inActiveFinishGoodItemModal, setInActiveFinishGoodItemModal] =
+  useState(false);
+const [selectedData, setSelectedData] = useState([]);
   const [deleteItemInfo] = useDeleteItemInfoMutation();
-  const[itemActiveStatus,setItemActiveStaus]=useState([])
-  const[itemInActiveStatus,setItemInActiveStatus]=useState([])
-  var reportTitle = "All Active Item List";
+  const[finishGoodActiveStatus,setFinishGoodActiveStaus]=useState([])
+  const[finishGoodInActiveStatus,setFinishGoodInActiveStatus]=useState([])
+  var reportTitle = "All Active Finish Good Item List";
 
   useEffect(() => {
-    const itemActiveStatus = itemInfoData?.filter((item) => item.itemStatus==true);
-    const itemInActiveStatus = itemInfoData?.filter((item) => item.itemStatus == false);
+    const finishGoodActiveStatus = finishGoodInItemInfoData?.filter((item) => item.itemStatus==true);
+    const finishGoodInActiveStatus = finishGoodInItemInfoData?.filter((item) => item.itemStatus == false);
     
-    const extractedFields = itemActiveStatus?.map((item) => {
+    const extractedFields = finishGoodActiveStatus?.map((item) => {
       const size = itemSizeInfo?.find((x) => x._id === item.sizeId);
       const unit = itemUnitInfo?.find((x) => x._id === item?.unitId);
       return{
@@ -44,9 +51,9 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
       }
     });
 
-    const extractedInactiveFields = itemInActiveStatus?.map((item) => {
+    const extractedInactiveFields = finishGoodInActiveStatus?.map((item) => {
       const size = itemSizeInfo?.find((x) => x._id === item.sizeId);
-      const unit = itemUnitInfo?.find((x) => x._id === itemInfoData?.unitId);
+      const unit = itemUnitInfo?.find((x) => x._id === finishGoodInItemInfoData?.unitId);
       return{
         openingDate:item.openingDate,
         itemName: item.itemName,
@@ -55,31 +62,72 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
         openingStock:item.OpeningStock
       }
     });
-    setItemActiveStaus(itemActiveStatus)
-    setItemInActiveStatus(itemInActiveStatus)
+    setFinishGoodActiveStaus(finishGoodActiveStatus)
+    setFinishGoodInActiveStatus(finishGoodInActiveStatus)
     setExtractedDataForReport(extractedFields);
     setExtractedInActiveDataForReport(extractedInactiveFields);
-  }, [itemUnitInfo,itemInfoData?.unitId,itemSizeInfo,itemInfoData]);
+  }, [itemUnitInfo,finishGoodInItemInfoData?.unitId,itemSizeInfo,finishGoodInItemInfoData]);
 
+  const generateColumns = (data, fields) => {
+    if (data?.length === 0) return [];
 
+    return fields.map((field) => {
+       if (field === "itemStatus") {
+        return {
+          name: "Status",
+          button: true,
+          width: "200px",
+          grow: 2,
+          cell: (row) => (
+            <div className="d-flex justify-content-between align-content-center">
+              <a
+                target="_blank"
+                className="action-icon"
+                style={{
+                  textDecoration: "none",
+                  color: "#000",
+                  fontSize: "14px",
+                  textAlign: "center",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  aria-label={`Checkbox for data item ${row.id}`}
+                  checked={row.status} // Assuming status is a boolean field
+                  onChange={(e) => handleCheckboxClick(row, setSelectedData)} // Assuming handleCheckboxClick is defined elsewhere
+                />
+              </a>
+            </div>
+          ),
+        };
+      } else {
+        return {
+          name: field.charAt(0).toUpperCase() + field.slice(1), // Capitalize the first letter
+          selector: (row) => row[field],
+          sortable: true, // Optional: make columns sortable
+          center: true,
+        };
+      }
+    });
+  };
   const columns = [
     {
       name: "Sl.",
-      selector: (itemInfoData, index) => index + 1,
+      selector: (finishGoodInItemInfoData, index) => index + 1,
       center: true,
       width: "60px",
     },
     {
       name: "Item Name",
-      selector: (itemInfoData) => itemInfoData?.itemName,
+      selector: (finishGoodInItemInfoData) => finishGoodInItemInfoData?.itemName,
       sortable: true,
       center: true,
       filterable: true,
     },
     {
       name: "Item Size",
-      selector: (itemInfoData) => {
-        const size = itemSizeInfo?.find((x) => x._id === itemInfoData?.sizeId);
+      selector: (finishGoodInItemInfoData) => {
+        const size = itemSizeInfo?.find((x) => x._id === finishGoodInItemInfoData?.sizeId);
         return size ? size.sizeInfo : "N/A"; // Assuming 'sizeName' is the field that contains the size name
       },
       sortable: true,
@@ -88,21 +136,43 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
     },
     {
       name: "Item Unit",
-      selector: (itemInfoData) => {
-        const unit = itemUnitInfo?.find((x) => x._id === itemInfoData?.unitId);
+      selector: (finishGoodInItemInfoData) => {
+        const unit = itemUnitInfo?.find((x) => x._id === finishGoodInItemInfoData?.unitId);
         return unit ? unit.unitInfo : "N/A"; // Assuming 'sizeName' is the field that contains the size name
       },
       sortable: true,
       center: true,
       filterable: true,
     },
-
+    {
+      name: "Status",
+      button: true,
+      width: "200px",
+      grow: 2,
+      cell: (finishGoodInItemInfoData) => (
+        <div className="d-flex justify-content-between align-content-center">
+          <a
+            target="_blank"
+            className="action-icon"
+            style={{
+              textDecoration: "none",
+              color: "#000",
+              fontSize: "14px",
+              textAlign: "center",
+            }}
+            // href={`UpdateGroupName/${data?.GroupId}`}
+          >
+            {finishGoodInItemInfoData?.itemStatus == true ? <p>Active</p> : <p>InActive</p>}
+          </a>
+        </div>
+      ),
+    },
     {
       name: "Action",
       button: true,
       width: "200px",
       grow: 2,
-      cell: (itemInfoData) => (
+      cell: (finishGoodInItemInfoData) => (
         <div className="d-flex justify-content-between align-content-center">
           {permission?.isUpdated ? (
             <a
@@ -113,10 +183,10 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
               title="Update item"
               style={{
                 color: `${
-                  itemInfoData?.items?.length == 0 ? "gray" : "#2DDC1B"
+                  finishGoodInItemInfoData?.items?.length == 0 ? "gray" : "#2DDC1B"
                 } `,
                 border: `${
-                  itemInfoData?.items?.length == 0
+                  finishGoodInItemInfoData?.items?.length == 0
                     ? "2px solid gray"
                     : "2px solid #2DDC1B"
                 }`,
@@ -125,7 +195,7 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
                 marginLeft: "10px",
               }}
               onClick={() => {
-                window.open(`update-items/${itemInfoData?._id}`);
+                window.open(`update-items/${finishGoodInItemInfoData?._id}`);
               }}
             >
               <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
@@ -158,7 +228,7 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
                 }).then(async (willDelete) => {
                   if (willDelete) {
                     const response = await deleteItemInfo(
-                      itemInfoData?._id
+                      finishGoodInItemInfoData?._id
                     ).unwrap();
                     console.log(response);
                     if (response.status === 200) {
@@ -210,7 +280,7 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
     },
   };
 
-  const filteredItems = itemInfoData?.filter(
+  const filteredItems = finishGoodInItemInfoData?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==
       -1
@@ -293,9 +363,11 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
   return (
     <div className="row px-5 mx-4">
       <ListHeading 
-      itemInfoData={itemInfoData}
-      itemActiveStatus={itemActiveStatus}
-      itemInActiveStatus={itemInActiveStatus}
+      finishGoodInItemInfoData={finishGoodInItemInfoData}
+      finishGoodActiveStatus={finishGoodActiveStatus}
+      finishGoodInActiveStatus={finishGoodInActiveStatus}
+      setActiveDataModal={setActiveFinishGoodItemModal}
+        setInActiveDataModal={setInActiveFinishGoodItemModal}
       ></ListHeading>
       <div
         className="col userlist-table mt-4"
@@ -341,6 +413,34 @@ const IteminfoList = ({ permission, itemInfoData ,refetch}) => {
           ))}
         </tbody>
       </table>
+      {activeFinishGoodItemModal ? (
+        <ActiveListDataModal
+          listData={finishGoodActiveStatus}
+          activeDataModal={activeFinishGoodItemModal}
+          setActiveDataModal={setActiveFinishGoodItemModal}
+          extractedData={extractedDataForReport}
+          companyinfo={companyinfo}
+          generateColumns={generateColumns}
+          selectedData={selectedData}
+          setSelectedData={setSelectedData}
+        ></ActiveListDataModal>
+      ) : (
+        ""
+      )}
+      {inActiveFinishGoodItemModal ? (
+        <ActiveListDataModal
+          listData={finishGoodInActiveStatus}
+          inActiveDataModal={inActiveFinishGoodItemModal}
+          setInActiveDataModal={setInActiveFinishGoodItemModal}
+          companyinfo={companyinfo}
+          extractedInActiveData={extractedInActiveDataForReport}
+          generateColumns={generateColumns}
+          selectedData={selectedData}
+          setSelectedData={setSelectedData}
+        ></ActiveListDataModal>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

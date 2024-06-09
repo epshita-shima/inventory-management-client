@@ -28,6 +28,7 @@
   .custom-calendar {
     background-color: #B8FEB3;
     width: 280px;
+    z-index: 9999,
   }
   .custom-calendar .react-datepicker__month-container {
     width: 100%; /* Ensure the month container takes the full width */

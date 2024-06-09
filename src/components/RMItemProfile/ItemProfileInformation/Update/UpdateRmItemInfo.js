@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  useGetSingleItemQuery,
-  useUpdateItemInfoMutation,
-} from "../../../../redux/features/iteminformation/iteminfoApi";
 import { useNavigate, useParams } from "react-router-dom";
-import InsertItemSizeInfoModal from "../../../SizeInformation/Insert/InsertItemSizeInfoModal";
 import InsertUnitInfoModal from "../../../UnitInformation/Insert/InsertUnitInfoModal";
-import { Field, FieldArray, Formik } from "formik";
 import {
   faArrowAltCircleLeft,
   faPlus,
@@ -16,19 +10,24 @@ import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import swal from "sweetalert";
-import { useGetAllItemSizeQuery } from "../../../../redux/features/itemsizeinfo/itemSizeInfoApi";
+
 import { useGetAllItemUnitQuery } from "../../../../redux/features/itemUnitInfo/itemUnitInfoApi";
-import { InputGroup, Form, FloatingLabel } from "react-bootstrap";
-import { useGetSingleRMItemQuery, useUpdateRMItemInfoMutation } from "../../../../redux/features/iteminformation/rmItemInfoApi";
+import { InputGroup, Form } from "react-bootstrap";
+import {
+  useGetSingleRMItemQuery,
+  useUpdateRMItemInfoMutation,
+} from "../../../../redux/features/iteminformation/rmItemInfoApi";
 import { useGetAllCategoryInfoQuery } from "../../../../redux/features/categoryInfo/categoryInfoApi";
 import InsertCategoryInformationModal from "../../../CategoryInformation/Insert/InsertCategoryInformationModal";
 
 const UpdateRmItemInfo = () => {
-  const [startDate, setStartDate] = useState(new Date().toLocaleDateString("en-CA"));
+  const [startDate, setStartDate] = useState(
+    new Date().toLocaleDateString("en-CA")
+  );
   const { id } = useParams();
   const [singleItemInfoData, setSingleItemInfoData] = useState();
   const { data: singleRMItemData } = useGetSingleRMItemQuery(id);
-  const { data: categoryInfoData } = useGetAllCategoryInfoQuery(undefined)
+  const { data: categoryInfoData } = useGetAllCategoryInfoQuery(undefined);
   const { data: itemUnitData } = useGetAllItemUnitQuery(undefined);
   const [updateRMItemInfoData] = useUpdateRMItemInfoMutation();
   const navigate = useNavigate();
@@ -53,8 +52,9 @@ const UpdateRmItemInfo = () => {
     return result;
   };
 
-  const categoryInfoConvertedOptions = categoryInfoConvertSelectOption(categoryInfoData);
-console.log(categoryInfoConvertedOptions)
+  const categoryInfoConvertedOptions =
+    categoryInfoConvertSelectOption(categoryInfoData);
+  console.log(categoryInfoConvertedOptions);
 
   const itemUnitConvertSelectOption = (options) => {
     let result = [];
@@ -240,7 +240,7 @@ console.log(categoryInfoConvertedOptions)
                         }}
                         icon={faPlus}
                         data-toggle="modal"
-                        data-target="#exampleModal1"
+                        data-target="#categoryInfoModal"
                       />
                     </div>
                   </div>

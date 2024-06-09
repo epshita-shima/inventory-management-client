@@ -29,18 +29,20 @@ import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../ReportProperties/HandelExcelDownload";
 import { Button } from "react-bootstrap";
 import ListHeading from "../../../Common/ListHeading/ListHeading";
+import ActiveListDataModal from "../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
+import handleCheckboxClick from './../../../Common/ListHeadingModal/Function/handleCheckboxClick';
 
 const UserListInfo = ({
   setChangePassword,
   setResetPassword,
   resetPassword,
   changePassword,
-  permission
+  permission,
 }) => {
   const [userId, setUserId] = useState(null);
   const { data: user } = useGetAllUserQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
-  const [activeUserModal, setActiveUserModal] = useState(false);
+  const [activeUserModal, setActiveDataModal] = useState(false);
   const [inActiveUserModal, setInActiveUserModal] = useState(false);
   const [deleteUser, { isLoading, isSuccess, isError }] =
     useDeleteUserMutation();
@@ -51,9 +53,9 @@ const UserListInfo = ({
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
   const [demoData, setDemoData] = useState(null);
   const [filterText, setFilterText] = React.useState("");
-  const [resetPaginationToggle, setResetPaginationToggle] =
-    React.useState(false);
-    var reportTitle = "All Active User";
+  const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
+  const [selectedData, setSelectedData] = useState([]);
+  var reportTitle = "All Active User";
 
   // useEffect(() => {
   //   if (localStorage.length > 0) {
@@ -106,7 +108,21 @@ const UserListInfo = ({
 
   // // Output the user list for the current user
   // console.log(permission);
-
+ 
+  // const handleCheckboxClick = (dataItem) => {
+  //   console.log(dataItem);
+  //   setSelectedData((prevSelectedData) => {
+  //     if (prevSelectedData?.includes(dataItem)) {
+  //       // Deselect the data item if it's already selected
+  //       return prevSelectedData.filter((item) => item !== dataItem);
+  //     } else {
+  //       // Select the data item if it's not already selected
+  //       return [...prevSelectedData, dataItem];
+  //     }
+  //   });
+  // };
+ 
+ 
   useEffect(() => {
     const activeUsers = user?.filter((user) => user.isactive == true);
     const inActiveUser = user?.filter((user) => user.isactive == false);
@@ -146,6 +162,49 @@ const UserListInfo = ({
 
   const handleActiveStatus = (id) => {
     setUserId(id);
+  };
+
+  const generateColumns = (data, fields) => {
+    if (data?.length === 0) return [];
+
+    return fields.map((field) => {
+      if (field === "isactive") {
+        return {
+          name: "Status",
+          button: true,
+          width: "200px",
+          grow: 2,
+          cell: (row) => (
+            <div className="d-flex justify-content-between align-content-center">
+              <a
+                target="_blank"
+                className="action-icon"
+                style={{
+                  textDecoration: "none",
+                  color: "#000",
+                  fontSize: "14px",
+                  textAlign: "center",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  aria-label={`Checkbox for data item ${row.id}`}
+                  checked={row.status} // Assuming status is a boolean field
+                  onChange={(e) => handleCheckboxClick(row,setSelectedData)} // Assuming handleCheckboxClick is defined elsewhere
+                />
+              </a>
+            </div>
+          ),
+        };
+      } else {
+        return {
+          name: field.charAt(0).toUpperCase() + field.slice(1), // Capitalize the first letter
+          selector: (row) => row[field],
+          sortable: true, // Optional: make columns sortable
+          center: true,
+        };
+      }
+    });
   };
 
   const columns = [
@@ -296,6 +355,7 @@ const UserListInfo = ({
       ),
     },
   ];
+
   const customStyles = {
     rows: {
       style: {
@@ -318,7 +378,6 @@ const UserListInfo = ({
     },
   };
 
-
   const filteredItems = activeUser?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==
@@ -335,7 +394,6 @@ const UserListInfo = ({
 
     return (
       <div className="d-block d-sm-flex justify-content-center align-items-center ">
-      
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon d-flex ">
             <div>
@@ -400,13 +458,13 @@ const UserListInfo = ({
 
   return (
     <div className="row px-4 mx-4">
-     <ListHeading 
-     user={user}
-     setActiveUserModal={setActiveUserModal}
-     activeUser={activeUser}
-     setInActiveUserModal={setInActiveUserModal}
-     inActiveUser={inActiveUser}
-     ></ListHeading>
+      <ListHeading
+        user={user}
+        setActiveDataModal={setActiveDataModal}
+        activeUser={activeUser}
+        setInActiveUserModal={setInActiveUserModal}
+        inActiveUser={inActiveUser}
+      ></ListHeading>
       <div class=" mt-5">
         <div class="row">
           <div
@@ -454,24 +512,47 @@ const UserListInfo = ({
       <UserListModal user={user}></UserListModal>
       <UserActivationModal userId={userId}></UserActivationModal>
       {activeUserModal ? (
-        <UserActiveListModal
-          user={activeUser}
-          activeUserModal={activeUserModal}
-          setActiveUserModal={setActiveUserModal}
+        // <UserActiveListModal
+        //   user={activeUser}
+        //   activeUserModal={activeUserModal}
+        //   setActiveDataModal={setActiveDataModal}
+        //   extractedData={extractedData}
+        //   companyinfo={companyinfo}
+        // ></UserActiveListModal>
+        <ActiveListDataModal
+          listData={activeUser}
+          activeDataModal={activeUserModal}
+          // inActiveDataModal={inActiveUserModal}
+          // setInActiveDataModal={setInActiveUserModal}
+          setActiveDataModal={setActiveDataModal}
           extractedData={extractedData}
           companyinfo={companyinfo}
-        ></UserActiveListModal>
+          // extractedInActiveData={extractedInActiveData}
+          generateColumns={generateColumns}
+          selectedData={selectedData}
+          setSelectedData={setSelectedData}
+        ></ActiveListDataModal>
       ) : (
         ""
       )}
       {inActiveUserModal ? (
-        <UserActiveListModal
-          user={inActiveUser}
-          inActiveUserModal={inActiveUserModal}
-          setInActiveUserModal={setInActiveUserModal}
-          extractedInActiveData={extractedInActiveData}
-          companyinfo={companyinfo}
-        ></UserActiveListModal>
+<ActiveListDataModal
+   listData={inActiveUser}
+   inActiveDataModal={inActiveUserModal}
+   setInActiveDataModal={setInActiveUserModal}
+   extractedInActiveData={extractedInActiveData}
+   generateColumns={generateColumns}
+     companyinfo={companyinfo}
+     selectedData={selectedData}
+     setSelectedData={setSelectedData}
+></ActiveListDataModal>
+        // <UserActiveListModal
+        //   user={inActiveUser}
+        //   inActiveUserModal={inActiveUserModal}
+        //   setInActiveUserModal={setInActiveUserModal}
+        //   extractedInActiveData={extractedInActiveData}
+        //   companyinfo={companyinfo}
+        // ></UserActiveListModal>
       ) : (
         ""
       )}

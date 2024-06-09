@@ -13,16 +13,13 @@ import LoginWithMongodb from "./pages/Login/LoginWithMongodb";
 import UserCreation from "./components/UserListInformation/Insert/UserCreation";
 import SingleUserDisplay from "./components/UserListInformation/Update/SingleUserDisplay";
 import LoginWithUsername from "./pages/Login/LoginWithUsername";
-import Footer from "./pages/Footer/Footer";
 import MainView from "./components/MainView/MainView";
 import ChangePasswordModal from "./pages/Login/ChangePasswordModal";
-import RequireAuth from "./pages/RequireAuth/RequireAuth";
 import NotFound from "./pages/NotFound/NotFound";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import CreateMenu from "./components/MenuInformation/Insert/CreateMenu";
 import MenuDataList from "./components/MenuInformation/Index/MenuDataList";
 import UpdateMenu from "./components/MenuInformation/Update/UpdateMenu";
-import UserListInfo from "./components/UserListInformation/Index/UserDataTable/UserListInfo";
 import UserDataList from "./components/UserListInformation/Index/UserDataList";
 import FGItemInfoTableData from "./components/FGItemProfile/ItemProfileInformation/Index/FGItemInfoTableData";
 import InsertFgItemInfo from "./components/FGItemProfile/ItemProfileInformation/Insert/InsertFgItemInfo";
@@ -30,6 +27,9 @@ import UpdateFgItemInfo from "./components/FGItemProfile/ItemProfileInformation/
 import InsertRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Insert/InsertRmItemInfo";
 import UpdateRmItemInfo from "./components/RMItemProfile/ItemProfileInformation/Update/UpdateRmItemInfo";
 import RMItemInfoTableData from "./components/RMItemProfile/ItemProfileInformation/Index/RMItemInfoTableData";
+import InsertCFTInfo from "./components/CFTInformations/Insert/InsertCFTInfo";
+import CFTInfosTableData from "./components/CFTInformations/Index/CFTInfosTableData";
+import UpdateCFTInfo from "./components/CFTInformations/Update/UpdateCFTInfo";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -114,6 +114,9 @@ function App() {
                 path="/main-view/create-item-(fg)"
                 element={<InsertFgItemInfo></InsertFgItemInfo>}
               ></Route>
+              <Route path="/main-view/craete-cft-infos" element={<InsertCFTInfo></InsertCFTInfo>}></Route>
+              <Route path="/main-view/cft-info-list" element={<CFTInfosTableData></CFTInfosTableData>}></Route>
+              <Route path="update-cft-info/:id" element={<UpdateCFTInfo></UpdateCFTInfo>}></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={

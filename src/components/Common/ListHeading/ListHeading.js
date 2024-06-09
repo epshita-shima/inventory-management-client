@@ -4,16 +4,20 @@ import MenuIdCollection from "../MenuIdCollection/MenuIdCollection";
 
 const ListHeading = ({
   user,
-  setActiveUserModal,
+  setActiveDataModal,
   activeUser,
-  setInActiveUserModal,
+  setInActiveDataModal,
   inActiveUser,
-  itemInfoData,
-  itemActiveStatus,
-  itemInActiveStatus,
+  finishGoodInItemInfoData,
+  finishGoodActiveStatus,
+  finishGoodInActiveStatus,
   rmItemInfoData,
   rmItemActiveStatus,
-  rmItemInActiveStatus
+  rmItemInActiveStatus,
+  setActiveRawMeterialItemModal,
+  cftInfosData,
+  cftInfoActiveStatus,
+  cftInfoInActiveStatus,
 }) => {
   const [totalTitle, setTotalTitle] = useState("");
   const [totalActiveTitle, setTotalActiveTitle] = useState("");
@@ -27,9 +31,7 @@ const ListHeading = ({
   const getUserFromLocal = localStorage.getItem("user");
   const getUserFromLocalConvert = JSON.parse(getUserFromLocal);
   const getMenuListFromLOcalUser = getUserFromLocalConvert[0]?.menulist;
-console.log(  rmItemInfoData,
-  rmItemActiveStatus,
-  rmItemInActiveStatus)
+
   const traverse = (items) => {
     const urls = [];
     items.forEach((item) => {
@@ -55,7 +57,7 @@ console.log(  rmItemInfoData,
     const wordsURL = pathname.split("/");
     const repStr = wordsURL[2].replaceAll("-", " ");
     let grandTotal, totalActive, totalInActive;
-console.log(searchItem)
+
     if (searchItem) {
       setTotalTitle(`Total ${searchItem[0]?.headerLabelName}`);
       setTotalActiveTitle(`Total Active ${searchItem[0]?.headerLabelName}`);
@@ -63,9 +65,9 @@ console.log(searchItem)
 console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
       if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
         console.log('fg')
-        grandTotal = itemInfoData?.length;
-        totalActive = itemActiveStatus?.length;
-        totalInActive = itemInActiveStatus?.length;
+        grandTotal = finishGoodInItemInfoData?.length;
+        totalActive = finishGoodActiveStatus?.length;
+        totalInActive = finishGoodInActiveStatus?.length;
       } else if (searchItem[0]?.menuId == MenuIdCollection.userSeting) {
         console.log('fg')
         grandTotal = user?.length;
@@ -79,6 +81,13 @@ console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
         totalInActive = rmItemInActiveStatus?.length;
       }
       
+       else if (searchItem[0]?.menuId == MenuIdCollection.cftinfolist) {
+        console.log('rm')
+        grandTotal = cftInfosData?.length;
+        totalActive = cftInfoActiveStatus?.length;
+        totalInActive = cftInfoInActiveStatus?.length;
+      }
+      
       setGrandTotal(grandTotal);
       setTotalActive(totalActive);
       setTotalInActive(totalInActive);
@@ -86,15 +95,18 @@ console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
   }, [
     mainData,
     pathname,
-    itemInfoData,
-    itemActiveStatus,
-    itemInActiveStatus,
+    finishGoodInItemInfoData,
+    finishGoodActiveStatus,
+    finishGoodInActiveStatus,
     user,
     activeUser,
     inActiveUser,
     rmItemInfoData,
     rmItemActiveStatus,
-    rmItemInActiveStatus
+    rmItemInActiveStatus,
+    cftInfosData,
+    cftInfoActiveStatus,
+    cftInfoInActiveStatus
   ]);
 
   return (
@@ -142,7 +154,7 @@ console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
               data-toggle="modal"
               data-target="#exampleModalCenter"
               onClick={() => {
-                setActiveUserModal(true);
+                setActiveDataModal(true);
               }}
             >
               <p
@@ -174,7 +186,7 @@ console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
               data-toggle="modal"
               data-target="#exampleModalCenter"
               onClick={() => {
-                setInActiveUserModal(true);
+                setInActiveDataModal(true);
               }}
             >
               <p

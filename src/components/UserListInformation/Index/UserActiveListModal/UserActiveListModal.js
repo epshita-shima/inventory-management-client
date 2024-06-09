@@ -116,7 +116,7 @@ console.log(user)
   const customStyles = {
     table: {
       style: {
-        height: "350px",
+        height: "250px",
         overflow: "auto",
       },
     },
@@ -279,7 +279,8 @@ console.log(user)
     role="dialog"
     aria-labelledby="exampleModalCenterTitle"
     aria-hidden="true"
-    style={{height:'550px'}}
+    style={{overflow:'hidden'}}
+
     >
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -304,7 +305,7 @@ console.log(user)
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
+          <div className="modal-body">
             <DataTable
               columns={columns}
               data={filteredItems}

@@ -10,7 +10,7 @@ import { useGetAllUserQuery } from '../../../../redux/features/user/userApi';
 const FGItemInfoTableData = () => {
     const clickhandler = (name) => console.log("delete", name);
     const { data: user, isUserloading } = useGetAllUserQuery(undefined);
-    const { data: itemInfoData,isFGItemloading,refetch} = useGetAllItemInformationQuery(undefined);
+    const { data: finishGoodInItemInfoData,isFGItemloading,refetch} = useGetAllItemInformationQuery(undefined);
     const [permission, setPermission] = useState();
     const navigate = useNavigate();
 
@@ -85,7 +85,7 @@ const FGItemInfoTableData = () => {
       <div>
         <IteminfoList
           permission={permission}
-          itemInfoData={itemInfoData}
+          finishGoodInItemInfoData={finishGoodInItemInfoData}
           click={clickhandler}
           refetch={refetch}
         />
