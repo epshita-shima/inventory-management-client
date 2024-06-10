@@ -31,8 +31,9 @@ const downloadPDF = (companyinfo,reportTitle) => {
   doc.save(`${fileName}.pdf`);
 };
 const downloadAllPDF = (companyinfo,reportTitle) => {
+  const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
   const doc = new jsPDF();
-  console.log(companyinfo)
+ 
   doc.autoTable({
     html: "#my-table2",
     startY: 50,
@@ -58,9 +59,10 @@ const downloadAllPDF = (companyinfo,reportTitle) => {
   addFooter(doc, companyinfo,reportTitle);
 
   // Save the PDF
-  doc.save("userlist.pdf");
+  doc.save(`${fileName}.pdf`);
 };
 const downloadInactivePDF = (companyinfo,reportTitle) => {
+  const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
   const doc = new jsPDF();
   console.log(companyinfo)
   doc.autoTable({
@@ -88,7 +90,7 @@ const downloadInactivePDF = (companyinfo,reportTitle) => {
   addFooter(doc, companyinfo,reportTitle);
 
   // Save the PDF
-  doc.save("userlist.pdf");
+  doc.save(`${fileName}.pdf`);
 };
 
 const addFooter = (doc, companyinfo,reportTitle) => {

@@ -18,6 +18,9 @@ const ListHeading = ({
   cftInfosData,
   cftInfoActiveStatus,
   cftInfoInActiveStatus,
+  supplierInfoData,
+  supplierInfoActiveStatus,
+  supplierInfoInActiveStatus
 }) => {
   const [totalTitle, setTotalTitle] = useState("");
   const [totalActiveTitle, setTotalActiveTitle] = useState("");
@@ -62,7 +65,7 @@ const ListHeading = ({
       setTotalTitle(`Total ${searchItem[0]?.headerLabelName}`);
       setTotalActiveTitle(`Total Active ${searchItem[0]?.headerLabelName}`);
       setTotalInActiveTitle(`Total InActive ${searchItem[0]?.headerLabelName}`);
-console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
+      console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
       if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
         console.log('fg')
         grandTotal = finishGoodInItemInfoData?.length;
@@ -88,6 +91,12 @@ console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
         totalInActive = cftInfoInActiveStatus?.length;
       }
       
+       else if (searchItem[0]?.menuId == MenuIdCollection.supplierinfolist) {
+        grandTotal = supplierInfoData?.length;
+        totalActive = supplierInfoActiveStatus?.length;
+        totalInActive = supplierInfoInActiveStatus?.length;
+      }
+      
       setGrandTotal(grandTotal);
       setTotalActive(totalActive);
       setTotalInActive(totalInActive);
@@ -106,7 +115,10 @@ console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
     rmItemInActiveStatus,
     cftInfosData,
     cftInfoActiveStatus,
-    cftInfoInActiveStatus
+    cftInfoInActiveStatus,
+    supplierInfoData,
+    supplierInfoActiveStatus,
+    supplierInfoInActiveStatus
   ]);
 
   return (

@@ -1,0 +1,66 @@
+.vertical-scrollable>.row {
+    position: absolute;
+    top: 120px;
+    bottom: 100px;
+    left: 180px;
+    width: 50%;
+    overflow-y: scroll;
+}
+.col-sm-8 {
+    color: white;
+    font-size: 24px;
+    padding-bottom: 20px;
+    padding-top: 18px;
+}
+.col-sm-8:nth-child(2n+1) {
+    background: green;
+}
+.col-sm-8:nth-child(2n+2) {
+    background: black;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #dddddd;
+}
+
+/* For the resizable columns */
+.resizable {
+    overflow: hidden;
+    position: relative;
+}
+
+.resizable .resize-handle {
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    top: 0;
+    right: 0;
+    cursor: col-resize;
+}
+
+.resizable td:last-child .resize-handle {
+    display: none; /* Hides the resize handle for the last column */
+}

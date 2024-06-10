@@ -462,7 +462,7 @@ const UserListInfo = ({
         user={user}
         setActiveDataModal={setActiveDataModal}
         activeUser={activeUser}
-        setInActiveUserModal={setInActiveUserModal}
+        setInActiveDataModal={setInActiveUserModal}
         inActiveUser={inActiveUser}
       ></ListHeading>
       <div class=" mt-5">
@@ -500,6 +500,26 @@ const UserListInfo = ({
         </thead>
         <tbody>
           {extractedData?.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.firstname}</td>
+              <td>{item.username}</td>
+              <td>{item.mobileNo}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <table id="my-tableInactive" className="d-none">
+        <thead>
+          <tr>
+            <th>Sl.</th>
+            <th>First name</th>
+            <th>User Name</th>
+            <th>Mobile No</th>
+          </tr>
+        </thead>
+        <tbody>
+          {extractedInActiveData?.map((item, index) => (
             <tr key={index}>
               <td>{index + 1}</td>
               <td>{item.firstname}</td>

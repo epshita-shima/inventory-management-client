@@ -12,7 +12,7 @@ import handleDownload from "../../../ReportProperties/HandelExcelDownload";
 import FilterComponent from "../../../UserListInformation/Index/UserDataTable/FilterComponent";
 import { useUpdateMultipleUserStatusMutation } from "../../../../redux/features/user/userApi";
 import MenuIdCollection from "../../MenuIdCollection/MenuIdCollection";
-import { useUpdateRMItemInfoMutation, useUpdateRawMaterialStatusMutation } from "../../../../redux/features/iteminformation/rmItemInfoApi";
+import { useUpdateRawMaterialStatusMutation } from "../../../../redux/features/iteminformation/rmItemInfoApi";
 import { useUpdateCFTInfoStatusMutation } from "../../../../redux/features/cftinformation/cftInfosApi";
 import { useUpdateFinishGoodStatusMutation } from "../../../../redux/features/iteminformation/iteminfoApi";
 
@@ -31,9 +31,9 @@ const ActiveListDataModal = ({
 }) => {
   const [updateStatusForUserData, { isLoading, isError }] =
     useUpdateMultipleUserStatusMutation();
-    const [updateStatusForRawMeterial]=useUpdateRawMaterialStatusMutation()
-    const [updateStatusForFinishGood]=useUpdateFinishGoodStatusMutation()
-    const [updateCFTInfoStatus]=useUpdateCFTInfoStatusMutation()
+  const [updateStatusForRawMeterial] = useUpdateRawMaterialStatusMutation();
+  const [updateStatusForFinishGood] = useUpdateFinishGoodStatusMutation();
+  const [updateCFTInfoStatus] = useUpdateCFTInfoStatusMutation();
   const activeReportTitle = "All Active listData";
   const inActiveReportTitle = "All Inactive listData";
 
@@ -42,7 +42,7 @@ const ActiveListDataModal = ({
   const getMenuListFromLOcalUser = getUserFromLocalConvert[0]?.menulist;
   // const [columns,setColumns]=useState([])
 
-  console.log(extractedInActiveData)
+  console.log(extractedInActiveData);
   const currentUrl = window.location.href;
   const pathname = new URL(currentUrl).pathname;
 
@@ -72,123 +72,34 @@ const ActiveListDataModal = ({
   if (searchItem[0]?.menuId == MenuIdCollection.userSeting) {
     const fieldsToDisplay = ["firstname", "mobileNo", "isactive"];
     columns = generateColumns(listData, fieldsToDisplay);
-  } 
-  else if (searchItem[0]?.menuId == MenuIdCollection.rmItemList) {
+  } else if (searchItem[0]?.menuId == MenuIdCollection.rmItemList) {
     const fieldsToDisplay = ["itemName", "categoryId", "itemStatus"];
     columns = generateColumns(listData, fieldsToDisplay);
-  } 
-  else if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
-    const fieldsToDisplay = ["itemName", "itemStatus"];
+  } else if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
+    const fieldsToDisplay = ["itemName", "sizeId", "itemStatus"];
     columns = generateColumns(listData, fieldsToDisplay);
-  } 
-  else if (searchItem[0]?.menuId == MenuIdCollection.cftinfolist) {
+  } else if (searchItem[0]?.menuId == MenuIdCollection.cftinfolist) {
     const fieldsToDisplay = ["openingDate", "kgPerUnit", "isActive"];
+    columns = generateColumns(listData, fieldsToDisplay);
+  } else if (searchItem[0]?.menuId == MenuIdCollection.supplierinfolist) {
+    const fieldsToDisplay = ["supplierName", "mobileNo", "isActive"];
     columns = generateColumns(listData, fieldsToDisplay);
   }
 
   const handleUpdate = async () => {
     try {
       // Update the isactive field to true for all selected data items
-  
-      if (activeDataModal && (searchItem[0]?.menuId == MenuIdCollection.userSeting)) {
+
+      if (
+        activeDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.userSeting
+      ) {
         const updatedData = selectedData.map((item) => ({
           ...item,
           isactive: false,
         }));
-      
+
         const response = await updateStatusForUserData(updatedData);
-      console.log(response.data.status);
-      if (response.data.status === 200) {
-        swal("Done", "Data Update status Successfully", "success");
-        setSelectedData([]);
-      } else {
-        swal(
-          "Not Possible!",
-          "An problem occurred while updating the data",
-          "error"
-        );
-      }
-    
-      }
-      else if(activeDataModal && (searchItem[0]?.menuId == MenuIdCollection.rmItemList)){
-        const updateRawMeterial=selectedData.map((item) => ({
-            ...item,
-            itemStatus: false,
-          }));
-          const response = await updateStatusForRawMeterial(updateRawMeterial);;
-          console.log(response.data.status);
-          if (response.data.status === 200) {
-            swal("Done", "Data Update status Successfully", "success");
-            setSelectedData([]);
-          } else {
-            swal(
-              "Not Possible!",
-              "An problem occurred while updating the data",
-              "error"
-            );
-          }
-      }
-      else if(activeDataModal && (searchItem[0]?.menuId == MenuIdCollection.fgItemList)){
-        const updateFinishGood=selectedData.map((item) => ({
-            ...item,
-            itemStatus: false,
-          }));
-          const response = await updateStatusForFinishGood(updateFinishGood);;
-          console.log(response.data.status);
-          if (response.data.status === 200) {
-            swal("Done", "Data Update status Successfully", "success");
-            setSelectedData([]);
-          } else {
-            swal(
-              "Not Possible!",
-              "An problem occurred while updating the data",
-              "error"
-            );
-          }
-      }
-      else if(activeDataModal && (searchItem[0]?.menuId == MenuIdCollection.cftinfolist)){
-        const updateCftInfo=selectedData.map((item) => ({
-            ...item,
-            isActive: false,
-          }));
-          const response = await updateCFTInfoStatus(updateCftInfo);
-          console.log(response.data.status);
-          if (response.data.status === 200) {
-            swal("Done", "Data Update status Successfully", "success");
-            setSelectedData([]);
-          } else {
-            swal(
-              "Not Possible!",
-              "An problem occurred while updating the data",
-              "error"
-            );
-          }
-      }
-      if (inActiveDataModal && (searchItem[0]?.menuId == MenuIdCollection.userSeting)) {
-        const updatedData = selectedData.map((item) => ({
-          ...item,
-          isactive: true,
-        }));
-        const response = await updateStatusForUserData(updatedData);;
-          console.log(response.data.status);
-          if (response.data.status === 200) {
-            swal("Done", "Data Update status Successfully", "success");
-            setSelectedData([]);
-          } else {
-            swal(
-              "Not Possible!",
-              "An problem occurred while updating the data",
-              "error"
-            );
-          }
-      }
-      else if(inActiveDataModal && (searchItem[0]?.menuId == MenuIdCollection.rmItemList)){
-        const updateRawMeterial=selectedData.map((item) => ({
-          ...item,
-          itemStatus: true,
-        }));
-        console.log(updateRawMeterial)
-        const response = await updateStatusForRawMeterial(updateRawMeterial);;
         console.log(response);
         if (response.data.status === 200) {
           swal("Done", "Data Update status Successfully", "success");
@@ -200,9 +111,113 @@ const ActiveListDataModal = ({
             "error"
           );
         }
+      } else if (
+        activeDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.rmItemList
+      ) {
+        const updateRawMeterial = selectedData.map((item) => ({
+          ...item,
+          itemStatus: false,
+        }));
+        const response = await updateStatusForRawMeterial(updateRawMeterial);
+        console.log(response.data.status);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      } else if (
+        activeDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.fgItemList
+      ) {
+        const updateFinishGood = selectedData.map((item) => ({
+          ...item,
+          itemStatus: false,
+        }));
+        const response = await updateStatusForFinishGood(updateFinishGood);
+        console.log(response.data.status);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      } else if (
+        activeDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.cftinfolist
+      ) {
+        const updateCftInfo = selectedData.map((item) => ({
+          ...item,
+          isActive: false,
+        }));
+        const response = await updateCFTInfoStatus(updateCftInfo);
+        console.log(response.data.status);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
       }
-      else if(inActiveDataModal && (searchItem[0]?.menuId == MenuIdCollection.fgItemList)){
-        const updateFinishGood=selectedData.map((item) => ({
+      if (
+        inActiveDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.userSeting
+      ) {
+        const updatedData = selectedData.map((item) => ({
+          ...item,
+          isactive: true,
+        }));
+        const response = await updateStatusForUserData(updatedData);
+        console.log(response);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      } else if (
+        inActiveDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.rmItemList
+      ) {
+        const updateRawMeterial = selectedData.map((item) => ({
+          ...item,
+          itemStatus: true,
+        }));
+        console.log(updateRawMeterial);
+        const response = await updateStatusForRawMeterial(updateRawMeterial);
+        console.log(response);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      } else if (
+        inActiveDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.fgItemList
+      ) {
+        const updateFinishGood = selectedData.map((item) => ({
           ...item,
           itemStatus: true,
         }));
@@ -217,14 +232,16 @@ const ActiveListDataModal = ({
             "error"
           );
         }
-      }
-      else if(inActiveDataModal && (searchItem[0]?.menuId == MenuIdCollection.cftinfolist)){
-        const updateCFTInfo=selectedData.map((item) => ({
+      } else if (
+        inActiveDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.cftinfolist
+      ) {
+        const updateCFTInfo = selectedData.map((item) => ({
           ...item,
           isActive: true,
         }));
-        console.log(updateCFTInfo)
-        const response = await updateCFTInfoStatus(updateCFTInfo);;
+        console.log(updateCFTInfo);
+        const response = await updateCFTInfoStatus(updateCFTInfo);
         console.log(response);
         if (response.data.status === 200) {
           swal("Done", "Data Update status Successfully", "success");
@@ -237,7 +254,6 @@ const ActiveListDataModal = ({
           );
         }
       }
-
     } catch (error) {
       console.error("Error updating data:", error);
     }
@@ -519,26 +535,6 @@ const ActiveListDataModal = ({
               subHeader
               subHeaderComponent={subHeaderComponent}
             />
-            <table id="my-tableInactive" className="d-none">
-              <thead>
-                <tr>
-                  <th>Sl.</th>
-                  <th>First name</th>
-                  <th>listData Name</th>
-                  <th>Mobile No</th>
-                </tr>
-              </thead>
-              <tbody>
-                {extractedInActiveData?.map((item, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{item.firstname}</td>
-                    <td>{item.username}</td>
-                    <td>{item.mobileNo}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
           <div class="modal-footer">
             <button

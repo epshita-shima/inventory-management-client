@@ -1,15 +1,5 @@
-import { Route, Router, Routes } from "react-router-dom";
-import DynamicDropdown from "./components/DynamicDropdown";
-import SignUp from "./pages/SignUp/SignUp";
-import Login from "./pages/Login/Login";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useDispatch } from "react-redux";
-import { setLoading, setUser } from "./redux/features/user/userSlice";
-import { useEffect, useState } from "react";
-import { auth } from "./lib/firebase";
-import Home from "./pages/Home/Home";
-import SignUpMongodb from "./pages/SignUp/SignUpMongodb";
-import LoginWithMongodb from "./pages/Login/LoginWithMongodb";
+import { Route,  Routes } from "react-router-dom";
+import { useState } from "react";
 import UserCreation from "./components/UserListInformation/Insert/UserCreation";
 import SingleUserDisplay from "./components/UserListInformation/Update/SingleUserDisplay";
 import LoginWithUsername from "./pages/Login/LoginWithUsername";
@@ -30,6 +20,8 @@ import RMItemInfoTableData from "./components/RMItemProfile/ItemProfileInformati
 import InsertCFTInfo from "./components/CFTInformations/Insert/InsertCFTInfo";
 import CFTInfosTableData from "./components/CFTInformations/Index/CFTInfosTableData";
 import UpdateCFTInfo from "./components/CFTInformations/Update/UpdateCFTInfo";
+import InsertSupplierInformation from "./components/SupplierProfile/Insert/InsertSupplierInformation";
+import SupplierInfoTableData from "./components/SupplierProfile/Index/SupplierInfoTableData/SupplierInfoTableData";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -114,9 +106,12 @@ function App() {
                 path="/main-view/create-item-(fg)"
                 element={<InsertFgItemInfo></InsertFgItemInfo>}
               ></Route>
-              <Route path="/main-view/craete-cft-infos" element={<InsertCFTInfo></InsertCFTInfo>}></Route>
+              <Route path="/main-view/create-cft-infos" element={<InsertCFTInfo></InsertCFTInfo>}></Route>
               <Route path="/main-view/cft-info-list" element={<CFTInfosTableData></CFTInfosTableData>}></Route>
               <Route path="update-cft-info/:id" element={<UpdateCFTInfo></UpdateCFTInfo>}></Route>
+              <Route path="/main-view/create-supplier" element={<InsertSupplierInformation></InsertSupplierInformation>}></Route>
+              <Route path="/main-view/supplier-name-list" element={<SupplierInfoTableData></SupplierInfoTableData>}></Route>
+              <Route path="update-supplier-info/:id" element={<InsertSupplierInformation></InsertSupplierInformation>}></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={

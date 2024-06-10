@@ -52,6 +52,10 @@ const userApi = api.injectEndpoints({
         body: dataToUpdate,
       }),
       invalidatesTags: ["changesmanytatus"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
+      }),
     }),
     updateMultipleUserField: builder.mutation({
       query: (dataToUpdate) => ({

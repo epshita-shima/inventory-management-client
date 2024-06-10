@@ -36,26 +36,15 @@ const CFTInfosTableData = () => {
           currentUser?.menulist?.forEach((menu) => {
             menu?.items?.forEach((subMenu) => {
               // Check if the subMenu is the "User Profile" menu
-              console.log("no sub label", subMenu);
-              if (subMenu.items.length <= 0) {
-               
-              if(subMenu.label=='Craete CFT Infos'){
-                userList=subMenu
-              }
-              } else {
-                if (subMenu?.label === subMenu?.label) {
-                  // Find the "User List" sub-item
-                  if (subMenu?.items.length > 0) {
-                  } else {
-                    const userListSubMenu = subMenu?.items?.find(
-                      (subItem) => subItem?.label === "CFT Info List"
-                    );
-                    console.log(userListSubMenu);
-                    if (userListSubMenu) {
-                      // Set the user list property
-                      userList = userListSubMenu;
-                    }
-                  }
+              if (subMenu?.label === subMenu?.label) {
+                // Find the "User List" sub-item
+                const userListSubMenu = subMenu?.items?.find(
+                  (subItem) => subItem?.label === "CFT Info List"
+                );
+                console.log(userListSubMenu)
+                if (userListSubMenu) {
+                  // Set the user list property
+                  userList = userListSubMenu;
                 }
               }
             });

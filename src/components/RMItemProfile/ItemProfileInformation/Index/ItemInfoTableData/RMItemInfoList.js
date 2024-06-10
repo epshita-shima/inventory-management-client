@@ -80,7 +80,7 @@ const RMItemInfoList = ({ permission }) => {
         itemName: item.itemName,
         categoryId: category ? category.categoryInfo : "N/A",
         unitId: unit ? unit.unitInfo : "N/A",
-        openingStock: item.OpeningStock,
+        openingStock: item.openingStock,
       };
     });
     setItemActiveStaus(rmItemActiveStatus);
@@ -450,13 +450,14 @@ const RMItemInfoList = ({ permission }) => {
           />
         </div>
       </div>
+
       <table id="my-table" className="d-none">
         <thead>
           <tr>
             <th>Sl.</th>
             <th>Opening Date</th>
             <th>Item Name</th>
-            <th>Size Info</th>
+            <th>Category Name</th>
             <th>Unit Info</th>
             <th>Opening Stock</th>
           </tr>
@@ -467,13 +468,39 @@ const RMItemInfoList = ({ permission }) => {
               <td>{index + 1}</td>
               <td>{item.openingDate}</td>
               <td>{item.itemName}</td>
-              <td>{item.sizeId}</td>
+              <td>{item.categoryId}</td>
               <td>{item.unitId}</td>
               <td>{item.openingStock}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <table id="my-tableInactive" className="d-none">
+        <thead>
+        <tr>
+            <th>Sl.</th>
+            <th>Opening Date</th>
+            <th>Item Name</th>
+            <th>Category Name</th>
+            <th>Unit Info</th>
+            <th>Opening Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          {extractedInActiveDataForReport?.map((item, index) => (
+           <tr key={index}>
+           <td>{index + 1}</td>
+           <td>{item.openingDate}</td>
+           <td>{item.itemName}</td>
+           <td>{item.categoryId}</td>
+           <td>{item.unitId}</td>
+           <td>{item.openingStock}</td>
+         </tr>
+          ))}
+        </tbody>
+      </table>
+
       {activeRawMeterialItemModal ? (
         <ActiveListDataModal
           listData={rmItemActiveStatus}

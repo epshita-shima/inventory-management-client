@@ -21,6 +21,7 @@ const cftInfosApi= api.injectEndpoints({
         status: meta.response.status,
       }),
     }),
+
     getSingleCFTInfo: builder.query({
         query: (id) => {
           if (id) {
@@ -30,6 +31,7 @@ const cftInfosApi= api.injectEndpoints({
           }
         },
       }),
+
       updateCFTInfo: builder.mutation({
         query: (payload) => ({
           url: `/cftinfo/${payload._id}`,
@@ -42,6 +44,7 @@ const cftInfosApi= api.injectEndpoints({
           status: meta.response.status,
         }),
       }),
+
       updateCFTInfoStatus: builder.mutation({
         query: (dataToUpdate) => ({
           url: "/cftinfo",
@@ -54,6 +57,7 @@ const cftInfosApi= api.injectEndpoints({
           status: meta.response.status,
         }),
       }),
+      
       deleteCFTInfo: builder.mutation({
         query: (id) => ({
           url: `/cftinfo/${id}`,

@@ -62,10 +62,13 @@ console.log(currentUser)
       // Loop through the menus of the current user
       currentUser?.menulist?.forEach((menu) => {
         menu?.items?.forEach((subMenu) => {
-          // Check if the subMenu is the "User Profile" menu
+          
+          if(subMenu.items.length <= 0){
+            if(subMenu.label=='User Setting'){
+              userList=subMenu
+            }
+          }
           if (subMenu?.label === subMenu?.label) {
-            // Find the "User List" sub-item
-            console.log(subMenu?.label , subMenu?.label)
             const userListSubMenu = subMenu?.items.find(
               (subItem) => subItem?.label === 'User Setting'
             );
