@@ -21,11 +21,10 @@ console.log(menus)
   const getMenulistData = localStorage?.getItem("user");
 
   const menuListData = JSON.parse(getMenulistData);
-  console.log(menuListData);
   if (menuListData !== null) {
     var menuListSingleData = menuListData[0]?.menulist;
   }
-  const [showComponent, setShowComponent] = useState(false);
+
   const [setAllMenuData]=useUpdateMultipleUserFieldMutation()
   const navigate = useNavigate();
 
@@ -86,17 +85,15 @@ console.log(menus)
 
   const handleRefreshData = async () => {
     await refetch().then(({ data }) => {
-      console.log(data)
       const userData = data?.filter(
         (item) =>
           item?.username === menuListData[0]?.username &&
           item.password === menuListData[0]?.password
       );
-      console.log(userData[0]?.roleId)
+  
       if (userData[0]?.roleId === "65d48768a106fcb4f5c28071") {
         const updateProperties = (item) => {
           // Create a new object with the existing properties and set them to true
-          console.log(item)
           const newItem = {
             ...item,
             isChecked: true,
@@ -120,11 +117,10 @@ console.log(menus)
           );
           return { ...item, menulist: updatedMenuList };
         });
-        console.log(updatedUserData)
         setAllMenuData(updatedUserData)
         localStorage.setItem("user", JSON.stringify(updatedUserData));
       } else {
-        // localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem("user", JSON.stringify(userData));
       }
     });
   };

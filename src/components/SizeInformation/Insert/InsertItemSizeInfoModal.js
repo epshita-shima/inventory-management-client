@@ -22,7 +22,7 @@ const InsertItemSizeInfoModal = () => {
         sizeInfo: "",
         makeBy: makebyUser,
         updateBy: null,
-        makeDate: new Date().toLocaleDateString("en-CA"),
+        makeDate: new Date(),
         updateDate: null,
       },
     ],
@@ -91,7 +91,7 @@ const InsertItemSizeInfoModal = () => {
                     sizeInfo: "",
                     makeBy: makebyUser,
                     updateBy: null,
-                    makeDate: new Date().toLocaleDateString("en-CA"),
+                    makeDate: new Date(),
                     updateDate: null,
                   });
                 }}

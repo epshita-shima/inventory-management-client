@@ -5,7 +5,6 @@ import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faPenToSquare, faRefresh, faTrash } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
-import FilterComponent from "./FilterComponent";
 import { useGetAllItemSizeQuery } from "../../../../../redux/features/itemsizeinfo/itemSizeInfoApi";
 import { useGetAllItemUnitQuery } from "../../../../../redux/features/itemUnitInfo/itemUnitInfoApi";
 import { useDeleteItemInfoMutation } from "../../../../../redux/features/iteminformation/iteminfoApi";
@@ -13,15 +12,16 @@ import ListHeading from "../../../../Common/ListHeading/ListHeading";
 import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
 import { downloadPDF } from "../../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../../ReportProperties/HandelExcelDownload";
-import { unstable_HistoryRouter, useLocation } from "react-router-dom";
 import handleCheckboxClick from "../../../../Common/ListHeadingModal/Function/handleCheckboxClick";
 import ActiveListDataModal from "../../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
+import FilterComponent from "../../../../Common/ListDataSearchBoxDesign/FilterComponent";
 
 const IteminfoList = ({ permission, finishGoodInItemInfoData ,refetch}) => {
   const { data: itemSizeInfo } = useGetAllItemSizeQuery(undefined);
   const { data: itemUnitInfo } = useGetAllItemUnitQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
   const [filterText, setFilterText] = React.useState("");
+  const [extractedAllDataReport, setExtractedAllDataReport] = useState([]);
   const [extractedDataForReport, setExtractedDataForReport] = useState([]);
   const [extractedInActiveDataForReport, setExtractedInActiveDataForReport] = useState([]);
   const [resetPaginationToggle, setResetPaginationToggle] =React.useState(false);
@@ -33,12 +33,24 @@ const [selectedData, setSelectedData] = useState([]);
   const [deleteItemInfo] = useDeleteItemInfoMutation();
   const[finishGoodActiveStatus,setFinishGoodActiveStaus]=useState([])
   const[finishGoodInActiveStatus,setFinishGoodInActiveStatus]=useState([])
-  var reportTitle = "All Active Finish Good Item List";
+  var reportTitle = "All Finish Good Item List";
 
   useEffect(() => {
     const finishGoodActiveStatus = finishGoodInItemInfoData?.filter((item) => item.itemStatus==true);
     const finishGoodInActiveStatus = finishGoodInItemInfoData?.filter((item) => item.itemStatus == false);
     
+    const extractedFieldsForAllData = finishGoodInItemInfoData?.map((item) => {
+      const size = itemSizeInfo?.find((x) => x._id === item.sizeId);
+      const unit = itemUnitInfo?.find((x) => x._id === item?.unitId);
+      return{
+        openingDate:item.openingDate,
+        itemName: item.itemName,
+        sizeId: size ? size.sizeInfo : "N/A",
+        unitId: unit ? unit.unitInfo : "N/A",
+        openingStock:item.openingStock,
+        itemStatus:item.itemStatus ? 'Active' : 'InActive'
+      }
+    });
     const extractedFields = finishGoodActiveStatus?.map((item) => {
       const size = itemSizeInfo?.find((x) => x._id === item.sizeId);
       const unit = itemUnitInfo?.find((x) => x._id === item?.unitId);
@@ -47,7 +59,8 @@ const [selectedData, setSelectedData] = useState([]);
         itemName: item.itemName,
         sizeId: size ? size.sizeInfo : "N/A",
         unitId: unit ? unit.unitInfo : "N/A",
-        openingStock:item.openingStock
+        openingStock:item.openingStock,
+        itemStatus:item.itemStatus ? 'Active' : 'InActive'
       }
     });
 
@@ -59,9 +72,11 @@ const [selectedData, setSelectedData] = useState([]);
         itemName: item.itemName,
         sizeId: size ? size.sizeInfo : "N/A",
         unitId: unit ? unit.unitInfo : "N/A",
-        openingStock:item.openingStock
+        openingStock:item.openingStock,
+        itemStatus:item.itemStatus ? 'Active' : 'InActive'
       }
     });
+    setExtractedAllDataReport(extractedFieldsForAllData)
     setFinishGoodActiveStaus(finishGoodActiveStatus)
     setFinishGoodInActiveStatus(finishGoodInActiveStatus)
     setExtractedDataForReport(extractedFields);
@@ -176,7 +191,7 @@ const [selectedData, setSelectedData] = useState([]);
             }}
             // href={`UpdateGroupName/${data?.GroupId}`}
           >
-            {finishGoodInItemInfoData?.itemStatus == true ? <p>Active</p> : <p>InActive</p>}
+            {finishGoodInItemInfoData?.itemStatus == true ? <p className="text-success fw-bold">Active</p> : <p className="text-danger fw-bold">InActive</p>}
           </a>
         </div>
       ),
@@ -209,7 +224,7 @@ const [selectedData, setSelectedData] = useState([]);
                 marginLeft: "10px",
               }}
               onClick={() => {
-                window.open(`update-items/${finishGoodInItemInfoData?._id}`);
+                window.open(`update-finish-goods-items/${finishGoodInItemInfoData?._id}`);
               }}
             >
               <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
@@ -345,7 +360,7 @@ const [selectedData, setSelectedData] = useState([]);
                     class="dropdown-item"
                     href="#"
                     onClick={() => {
-                      handleDownload(extractedDataForReport, companyinfo, reportTitle);
+                      handleDownload(extractedAllDataReport, companyinfo, reportTitle);
                     }}
                   >
                     Excel
@@ -369,7 +384,7 @@ const [selectedData, setSelectedData] = useState([]);
     filterText,
     resetPaginationToggle,
     companyinfo,
-    extractedDataForReport,
+    extractedAllDataReport,
     reportTitle,
     refetch
   ]);
@@ -412,6 +427,33 @@ const [selectedData, setSelectedData] = useState([]);
             <th>Size Info</th>
             <th>Unit Info</th>
             <th>Opening Stock</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {extractedAllDataReport?.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.openingDate}</td>
+              <td>{item.itemName}</td>
+              <td>{item.sizeId}</td>
+              <td>{item.unitId}</td>
+              <td>{item.openingStock}</td>
+              <td>{item.itemStatus}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <table id="my-table2" className="d-none">
+        <thead>
+          <tr>
+            <th>Sl.</th>
+            <th>Opening Date</th>
+            <th>Item Name</th>
+            <th>Size Info</th>
+            <th>Unit Info</th>
+            <th>Opening Stock</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -423,10 +465,12 @@ const [selectedData, setSelectedData] = useState([]);
               <td>{item.sizeId}</td>
               <td>{item.unitId}</td>
               <td>{item.openingStock}</td>
+              <td>{item.itemStatus}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
       <table id="my-tableInactive" className="d-none">
         <thead>
           <tr>
@@ -436,6 +480,8 @@ const [selectedData, setSelectedData] = useState([]);
             <th>Size Info</th>
             <th>Unit Info</th>
             <th>Opening Stock</th>
+            <th>Status</th>
+
           </tr>
         </thead>
         <tbody>
@@ -447,6 +493,7 @@ const [selectedData, setSelectedData] = useState([]);
               <td>{item.sizeId}</td>
               <td>{item.unitId}</td>
               <td>{item.openingStock}</td>
+              <td>{item.itemStatus}</td>
             </tr>
           ))}
         </tbody>

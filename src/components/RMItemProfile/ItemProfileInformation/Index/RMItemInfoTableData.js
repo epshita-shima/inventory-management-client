@@ -38,7 +38,7 @@ const RMItemInfoTableData = () => {
                 if (subMenu?.label === subMenu?.label) {
                   // Find the "User List" sub-item
                   const userListSubMenu = subMenu?.items?.find(
-                    (subItem) => subItem?.label === "Item List (RM)"
+                    (subItem) => subItem?.label === "Raw Material Item List"
                   );
                   console.log(userListSubMenu)
                   if (userListSubMenu) {
@@ -95,7 +95,7 @@ const RMItemInfoTableData = () => {
           >
             <div className="">
               <a
-                href="/main-view/create-item-(rm)"
+                href="/main-view/create-raw-material-item"
                 target="_blank"
                 className="text-white text-center d-flex justify-content-center align-items-center"
                 style={{

@@ -1,130 +1,96 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable no-undef */
-import React, { useState, useEffect, useMemo } from "react";
-import { useGetAllCategoryInfoQuery } from "../../../../../redux/features/categoryInfo/categoryInfoApi";
-import { useGetAllItemUnitQuery } from "../../../../../redux/features/itemUnitInfo/itemUnitInfoApi";
-import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
-import ListHeading from "../../../../Common/ListHeading/ListHeading";
-import DataTable from "react-data-table-component";
+import React, { useEffect, useMemo, useState } from "react";
+import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
+import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
+import {
+  useDeleteClientInfoMutation,
+  useGetAllClientInformationQuery,
+} from "../../../../redux/features/clientinformation/clientInfoApi";
+import handleCheckboxClick from "../../../Common/ListHeadingModal/Function/handleCheckboxClick";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import DataTable from "react-data-table-component";
 import {
   faDownload,
   faPenToSquare,
   faRefresh,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  useDeleteRMItemInfoMutation,
-  useGetAllRMItemInformationQuery,
-} from "../../../../../redux/features/iteminformation/rmItemInfoApi";
-import { downloadPDF } from "../../../../ReportProperties/HeaderFooter";
-import handleDownload from "../../../../ReportProperties/HandelExcelDownload";
-import ActiveListDataModal from "../../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
-import handleCheckboxClick from "../../../../Common/ListHeadingModal/Function/handleCheckboxClick";
-import FilterComponent from "../../../../Common/ListDataSearchBoxDesign/FilterComponent";
+import swal from "sweetalert";
+import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
+import handleDownload from "../../../ReportProperties/HandelExcelDownload";
+import ListHeading from "../../../Common/ListHeading/ListHeading";
+import ActiveListDataModal from "../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
 
-const RMItemInfoList = ({ permission }) => {
-  const { data: categoryInfoData } = useGetAllCategoryInfoQuery(undefined);
-  const { data: itemUnitInfo } = useGetAllItemUnitQuery(undefined);
+const ClientInfoList = ({ permission }) => {
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
-  const {
-    data: rmItemInfoData,
-    isRmItemLoading,
-    refetch,
-  } = useGetAllRMItemInformationQuery(undefined);
+  const { data: clientInfoData, refetch } =
+    useGetAllClientInformationQuery(undefined);
   const [filterText, setFilterText] = useState("");
+  const [extractedAllDataReport, setExtractedAllDataReport] = useState([]);
   const [extractedDataForReport, setExtractedDataForReport] = useState([]);
-  const [extractedAllData, setExtractedAllData] = useState([]);
   const [extractedInActiveDataForReport, setExtractedInActiveDataForReport] =
     useState([]);
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
-  const [activeRawMeterialItemModal, setActiveRawMeterialItemModal] =
-    useState(false);
-  const [inActiveRawMeterialItemModal, setInActiveRawMeterialItemModal] =
-    useState(false);
+  const [activeClientInfoModal, setActiveClientInfoModal] = useState(false);
+  const [inActiveClientInfoModal, setInActiveClientInfoModal] = useState(false);
   const [selectedData, setSelectedData] = useState([]);
-  const [deleteRMItemInfo] = useDeleteRMItemInfoMutation();
-  const [rmItemActiveStatus, setItemActiveStaus] = useState([]);
-  const [rmItemInActiveStatus, setItemInActiveStatus] = useState([]);
-  var reportTitle = "All Raw Material Item List";
-
-  console.log(categoryInfoData);
-
+  const [deleteClientInfo] = useDeleteClientInfoMutation();
+  const [clientInfoActiveStatus, setClientInfoActiveStatus] = useState([]);
+  const [clientInfoInActiveStatus, setClientInfoInActiveStatus] = useState([]);
+  var reportTitle = "All Client List";
+  console.log(selectedData);
+  
   useEffect(() => {
-    const rmItemActiveStatus = rmItemInfoData?.filter(
-      (item) => item.itemStatus == true
+    const clientInfoActiveStatus = clientInfoData?.filter(
+      (item) => item.isActive == true
     );
-    const rmItemInActiveStatus = rmItemInfoData?.filter(
-      (item) => item.itemStatus == false
+    const clientInfoInActiveStatus = clientInfoData?.filter(
+      (item) => item.isActive == false
     );
-    console.log(rmItemActiveStatus);
-    console.log(rmItemInActiveStatus);
-    const extractedFields = rmItemActiveStatus?.map((item) => {
-      const category = categoryInfoData?.find((x) => x._id === item.categoryId);
-      const unit = itemUnitInfo?.find((x) => x._id === item?.unitId);
-      console.log(category);
+ 
+    const extractedForAddDataFields = clientInfoData?.map((item) => {
       return {
-        openingDate: item.openingDate,
-        itemName: item.itemName,
-        categoryId: category ? category.categoryInfo : "N/A",
-        unitId: unit ? unit.unitInfo : "N/A",
-        openingStock: item.openingStock,
-        itemStatus:item.itemStatus
+        clientName: item.clientName,
+        email: item.email,
+        mobileNo: item.mobileNo,
+        contactPerson: item.contactPerson,
+        address: item.address,
+        isActive:item.isActive ? 'Active' : 'InActive'
       };
     });
-    const extractedFieldsForAllData = rmItemInfoData?.map((item) => {
-      const category = categoryInfoData?.find((x) => x._id === item.categoryId);
-      const unit = itemUnitInfo?.find((x) => x._id === item?.unitId);
-      console.log(category);
+    const extractedFields = clientInfoActiveStatus?.map((item) => {
       return {
-        openingDate: item.openingDate,
-        itemName: item.itemName,
-        categoryId: category ? category.categoryInfo : "N/A",
-        unitId: unit ? unit.unitInfo : "N/A",
-        openingStock: item.openingStock,
-        itemStatus:item.itemStatus
+        clientName: item.clientName,
+        email: item.email,
+        mobileNo: item.mobileNo,
+        contactPerson: item.contactPerson,
+        address: item.address,
+        isActive:item.isActive ? 'Active' : 'InActive'
       };
     });
 
-    const extractedInactiveFields = rmItemInActiveStatus?.map((item) => {
-      const category = categoryInfoData?.find((x) => x._id === item.categoryId);
-      const unit = itemUnitInfo?.find((x) => x._id === rmItemInfoData?.unitId);
-
+    const extractedInactiveFields = clientInfoInActiveStatus?.map((item) => {
       return {
-        openingDate: item.openingDate,
-        itemName: item.itemName,
-        categoryId: category ? category.categoryInfo : "N/A",
-        unitId: unit ? unit.unitInfo : "N/A",
-        openingStock: item.openingStock,
-        itemStatus:item.itemStatus
+        clientName: item.clientName,
+        email: item.email,
+        mobileNo: item.mobileNo,
+        contactPerson: item.contactPerson,
+        address: item.address,
+        isActive:item.isActive ? 'Active' : 'InActive'
       };
     });
-    setExtractedAllData(extractedFieldsForAllData)
-    setItemActiveStaus(rmItemActiveStatus);
-    setItemInActiveStatus(rmItemInActiveStatus);
+    setExtractedAllDataReport(extractedForAddDataFields)
+    setClientInfoActiveStatus(clientInfoActiveStatus);
+    setClientInfoInActiveStatus(clientInfoInActiveStatus);
     setExtractedDataForReport(extractedFields);
     setExtractedInActiveDataForReport(extractedInactiveFields);
-  }, [itemUnitInfo, rmItemInfoData?.unitId, categoryInfoData, rmItemInfoData]);
+  }, [clientInfoData?.unitId, clientInfoData]);
 
   const generateColumns = (data, fields) => {
     if (data?.length === 0) return [];
 
     return fields.map((field) => {
-      if (field === "categoryId") {
-        return {
-          name: "Category Name",
-          selector: (rmItemInfoData) => {
-            const category = categoryInfoData?.find(
-              (x) => x._id === rmItemInfoData?.categoryId
-            );
-            return category ? category.categoryInfo : "N/A"; // Assuming 'categoryInfo' is the field that contains the category name
-          },
-          sortable: true,
-          center: true,
-          filterable: true,
-        };
-      } else if (field === "itemStatus") {
+      if (field === "isActive") {
         return {
           name: "Status",
           button: true,
@@ -146,7 +112,9 @@ const RMItemInfoList = ({ permission }) => {
                   type="checkbox"
                   aria-label={`Checkbox for data item ${row.id}`}
                   checked={row.status} // Assuming status is a boolean field
-                  onChange={(e) => handleCheckboxClick(row, setSelectedData)} // Assuming handleCheckboxClick is defined elsewhere
+                  onChange={(e) => {
+                    handleCheckboxClick(row, setSelectedData);
+                  }}
                 />
               </a>
             </div>
@@ -166,62 +134,56 @@ const RMItemInfoList = ({ permission }) => {
   const columns = [
     {
       name: "Sl.",
-      selector: (rmItemInfoData, index) => index + 1,
+      selector: (clientInfoData, index) => index + 1,
       center: true,
       width: "60px",
     },
     {
-      name: "Opening Date",
-      selector: (rmItemInfoData) => rmItemInfoData?.openingDate,
+      name: "Client Name",
+      selector: (clientInfoData) => clientInfoData?.clientName,
       sortable: true,
       center: true,
       filterable: true,
+      width: "200px",
     },
     {
-      name: "Item Name",
-      selector: (rmItemInfoData) => rmItemInfoData?.itemName,
+      name: "Email",
+      selector: (clientInfoData) => clientInfoData?.email,
       sortable: true,
       center: true,
       filterable: true,
+      width: "200px",
     },
     {
-      name: "Category Name",
-      selector: (rmItemInfoData) => {
-        const category = categoryInfoData?.find(
-          (x) => x._id === rmItemInfoData?.categoryId
-        );
-        console.log(category);
-        return category ? category.categoryInfo : "N/A"; // Assuming 'sizeName' is the field that contains the size name
-      },
+      name: "Mobile Number",
+      selector: (clientInfoData) => clientInfoData?.mobileNo,
       sortable: true,
       center: true,
       filterable: true,
+      width: "200px",
     },
     {
-      name: "Unit Name",
-      selector: (rmItemInfoData) => {
-        const unit = itemUnitInfo?.find(
-          (x) => x._id === rmItemInfoData?.unitId
-        );
-        return unit ? unit.unitInfo : "N/A"; // Assuming 'sizeName' is the field that contains the size name
-      },
+      name: "Contact Person",
+      selector: (clientInfoData) => clientInfoData?.contactPerson,
       sortable: true,
       center: true,
       filterable: true,
+      width: "200px",
     },
     {
-      name: "Opening Stock",
-      selector: (rmItemInfoData) => rmItemInfoData?.openingStock,
+      name: "Address",
+      selector: (clientInfoData) => clientInfoData?.address,
       sortable: true,
       center: true,
       filterable: true,
+      width: "auto",
     },
     {
       name: "Status",
       button: true,
-      width: "200px",
+      width: "100px",
       grow: 2,
-      cell: (rmItemInfoData) => (
+      cell: (clientInfoData) => (
         <div className="d-flex justify-content-between align-content-center">
           <a
             target="_blank"
@@ -234,7 +196,7 @@ const RMItemInfoList = ({ permission }) => {
             }}
             // href={`UpdateGroupName/${data?.GroupId}`}
           >
-            {rmItemInfoData?.itemStatus == true ? <p className="text-success fw-bold">Active</p> : <p className="text-danger fw-bold">InActive</p>}
+            {clientInfoData?.isActive == true ? <p className="text-success fw-bold">Active</p> : <p className="text-danger fw-bold">InActive</p>}
           </a>
         </div>
       ),
@@ -242,9 +204,9 @@ const RMItemInfoList = ({ permission }) => {
     {
       name: "Action",
       button: true,
-      width: "200px",
+      width: "130px",
       grow: 2,
-      cell: (rmItemInfoData) => (
+      cell: (clientInfoData) => (
         <div className="d-flex justify-content-between align-content-center">
           {permission?.isUpdated ? (
             <a
@@ -255,10 +217,10 @@ const RMItemInfoList = ({ permission }) => {
               title="Update item"
               style={{
                 color: `${
-                  rmItemInfoData?.items?.length == 0 ? "gray" : "#2DDC1B"
+                  clientInfoData?.items?.length == 0 ? "gray" : "#2DDC1B"
                 } `,
                 border: `${
-                  rmItemInfoData?.items?.length == 0
+                  clientInfoData?.items?.length == 0
                     ? "2px solid gray"
                     : "2px solid #2DDC1B"
                 }`,
@@ -267,7 +229,7 @@ const RMItemInfoList = ({ permission }) => {
                 marginLeft: "10px",
               }}
               onClick={() => {
-                window.open(`update-items-raw-material/${rmItemInfoData?._id}`);
+                window.open(`update-client-info/${clientInfoData?._id}`);
               }}
             >
               <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
@@ -299,8 +261,8 @@ const RMItemInfoList = ({ permission }) => {
                   dangerMode: true,
                 }).then(async (willDelete) => {
                   if (willDelete) {
-                    const response = await deleteRMItemInfo(
-                      rmItemInfoData?._id
+                    const response = await deleteClientInfo(
+                      clientInfoData?._id
                     ).unwrap();
                     console.log(response);
                     if (response.status === 200) {
@@ -352,7 +314,7 @@ const RMItemInfoList = ({ permission }) => {
     },
   };
 
-  const filteredItems = rmItemInfoData?.filter(
+  const filteredItems = clientInfoData?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==
       -1
@@ -407,7 +369,7 @@ const RMItemInfoList = ({ permission }) => {
                     href="#"
                     onClick={() => {
                       handleDownload(
-                        extractedAllData,
+                        extractedAllDataReport,
                         companyinfo,
                         reportTitle
                       );
@@ -434,19 +396,18 @@ const RMItemInfoList = ({ permission }) => {
     filterText,
     resetPaginationToggle,
     companyinfo,
-    extractedAllData,
+    extractedAllDataReport,
     reportTitle,
     refetch,
   ]);
-
   return (
     <div className="row px-5 mx-4">
       <ListHeading
-        rmItemInfoData={rmItemInfoData}
-        rmItemActiveStatus={rmItemActiveStatus}
-        rmItemInActiveStatus={rmItemInActiveStatus}
-        setActiveDataModal={setActiveRawMeterialItemModal}
-        setInActiveDataModal={setInActiveRawMeterialItemModal}
+        clientInfoData={clientInfoData}
+        clientInfoActiveStatus={clientInfoActiveStatus}
+        clientInfoInActiveStatus={clientInfoInActiveStatus}
+        setActiveDataModal={setActiveClientInfoModal}
+        setInActiveDataModal={setInActiveClientInfoModal}
       ></ListHeading>
       <div
         className="col userlist-table mt-4"
@@ -473,25 +434,24 @@ const RMItemInfoList = ({ permission }) => {
         <thead>
           <tr>
             <th>Sl.</th>
-            <th>Opening Date</th>
-            <th>RM Item Name</th>
-            <th>Category Name</th>
-            <th>Unit Info</th>
-            <th>Opening Stock</th>
+            <th>Client Name</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>Contact Person</th>
+            <th>Address</th>
             <th>Status</th>
-
           </tr>
         </thead>
         <tbody>
-          {extractedAllData?.map((item, index) => (
+          {extractedAllDataReport?.map((item, index) => (
             <tr key={index}>
               <td>{index + 1}</td>
-              <td>{item.openingDate}</td>
-              <td>{item.itemName}</td>
-              <td>{item.categoryId}</td>
-              <td>{item.unitId}</td>
-              <td>{item.openingStock == 0 ? '-' :  item.openingStock}</td>
-              <td>{item.itemStatus ? 'Active' : 'InActive'}</td>
+              <td>{item.clientName}</td>
+              <td>{item.email}</td>
+              <td>{item.mobileNo}</td>
+              <td>{item.contactPerson}</td>
+              <td>{item.address}</td>
+              <td>{item.isActive}</td>
             </tr>
           ))}
         </tbody>
@@ -500,25 +460,24 @@ const RMItemInfoList = ({ permission }) => {
         <thead>
           <tr>
             <th>Sl.</th>
-            <th>Opening Date</th>
-            <th>RM Item Name</th>
-            <th>Category Name</th>
-            <th>Unit Info</th>
-            <th>Opening Stock</th>
+            <th>Client Name</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>Contact Person</th>
+            <th>Address</th>
             <th>Status</th>
-
           </tr>
         </thead>
         <tbody>
           {extractedDataForReport?.map((item, index) => (
             <tr key={index}>
               <td>{index + 1}</td>
-              <td>{item.openingDate}</td>
-              <td>{item.itemName}</td>
-              <td>{item.categoryId}</td>
-              <td>{item.unitId}</td>
-              <td>{item.openingStock == 0 ? '-' :  item.openingStock}</td>
-              <td>{item.itemStatus ? 'Active' : 'InActive'}</td>
+              <td>{item.clientName}</td>
+              <td>{item.email}</td>
+              <td>{item.mobileNo}</td>
+              <td>{item.contactPerson}</td>
+              <td>{item.address}</td>
+              <td>{item.isActive}</td>
             </tr>
           ))}
         </tbody>
@@ -526,34 +485,36 @@ const RMItemInfoList = ({ permission }) => {
 
       <table id="my-tableInactive" className="d-none">
         <thead>
-        <tr>
+          <tr>
             <th>Sl.</th>
-            <th>Opening Date</th>
-            <th>RM Item Name</th>
-            <th>Category Name</th>
-            <th>Unit Info</th>
-            <th>Opening Stock</th>
+            <th>Client Name</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>Contact Person</th>
+            <th>Address</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           {extractedInActiveDataForReport?.map((item, index) => (
-           <tr key={index}>
-           <td>{index + 1}</td>
-           <td>{item.openingDate}</td>
-           <td>{item.itemName}</td>
-           <td>{item.categoryId}</td>
-           <td>{item.unitId}</td>
-           <td>{item.openingStock == 0 ? '-' :  item.openingStock}</td>
-         </tr>
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.clientName}</td>
+              <td>{item.email}</td>
+              <td>{item.mobileNo}</td>
+              <td>{item.contactPerson}</td>
+              <td>{item.address}</td>
+              <td>{item.isActive}</td>
+            </tr>
           ))}
         </tbody>
       </table>
 
-      {activeRawMeterialItemModal ? (
+      {activeClientInfoModal ? (
         <ActiveListDataModal
-          listData={rmItemActiveStatus}
-          activeDataModal={activeRawMeterialItemModal}
-          setActiveDataModal={setActiveRawMeterialItemModal}
+          listData={clientInfoActiveStatus}
+          activeDataModal={activeClientInfoModal}
+          setActiveDataModal={setActiveClientInfoModal}
           extractedData={extractedDataForReport}
           companyinfo={companyinfo}
           generateColumns={generateColumns}
@@ -563,11 +524,11 @@ const RMItemInfoList = ({ permission }) => {
       ) : (
         ""
       )}
-      {inActiveRawMeterialItemModal ? (
+      {inActiveClientInfoModal ? (
         <ActiveListDataModal
-          listData={rmItemInActiveStatus}
-          inActiveDataModal={inActiveRawMeterialItemModal}
-          setInActiveDataModal={setInActiveRawMeterialItemModal}
+          listData={clientInfoInActiveStatus}
+          inActiveDataModal={inActiveClientInfoModal}
+          setInActiveDataModal={setInActiveClientInfoModal}
           companyinfo={companyinfo}
           extractedInActiveData={extractedInActiveDataForReport}
           generateColumns={generateColumns}
@@ -581,4 +542,4 @@ const RMItemInfoList = ({ permission }) => {
   );
 };
 
-export default RMItemInfoList;
+export default ClientInfoList;

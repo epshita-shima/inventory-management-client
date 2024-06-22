@@ -44,6 +44,7 @@ const supplierInfoApi = api.injectEndpoints({
         status: meta.response.status,
       }),
     }),
+    
     updateSupplierInfoStatus: builder.mutation({
       query: (dataToUpdate) => ({
         url: "/supplierinfo",
@@ -56,6 +57,7 @@ const supplierInfoApi = api.injectEndpoints({
         status: meta.response.status,
       }),
     }),
+
     deleteSupplierInfo: builder.mutation({
       query: (id) => ({
         url: `/supplierinfo/${id}`,

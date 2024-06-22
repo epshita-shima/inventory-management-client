@@ -7,7 +7,7 @@ const menuApi = api.injectEndpoints({
       providesTags: ["getallmenu", "getallchildmenu", "deletemenu","updatenestedmenudata","updatesinglemenudata,updatesingleportionmenu"],
       refetchOnReconnect: true,
       refetchOnFocus: true,
-      // refetchOnTags: ["getallmenu", "getallchildmenu"],
+      refetchOnTags: ["getallmenu", "getallchildmenu", "deletemenu","updatenestedmenudata","updatesinglemenudata,updatesingleportionmenu"],
     }),
     createMenu: builder.mutation({
       query: (payload) => ({

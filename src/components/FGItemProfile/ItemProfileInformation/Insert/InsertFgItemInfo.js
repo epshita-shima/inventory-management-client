@@ -156,7 +156,7 @@ const InsertFgItemInfo = () => {
                   letterSpacing: ".5px",
                 }}
               >
-                Create Item Info
+                Create Finish Goods Item Info
               </span>
             </div>
             <div>
@@ -169,7 +169,7 @@ const InsertFgItemInfo = () => {
                   height: "25px",
                 }}
                 onClick={() => {
-                  navigate("/main-view/item-list-(fg)");
+                  navigate("/main-view/finish-goods-item-list");
                 }}
               >
                 <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>{" "}

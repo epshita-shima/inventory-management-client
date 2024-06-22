@@ -1,18 +1,17 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react'
-import IteminfoList from './IteminfoTableData/IteminfoList';
+import ClientInfoList from './ClientInfoTableData/ClientInfoList';
+import { useGetAllUserQuery } from '../../../redux/features/user/userApi';
 import { useNavigate } from 'react-router-dom';
-import { useGetAllItemInformationQuery } from '../../../../redux/features/iteminformation/iteminfoApi';
-import { useGetAllUserQuery } from '../../../../redux/features/user/userApi';
 
-
-const FGItemInfoTableData = () => {
+const ClientInfoTableData = () => {
     const clickhandler = (name) => console.log("delete", name);
     const { data: user, isUserloading } = useGetAllUserQuery(undefined);
-    const { data: finishGoodInItemInfoData,isFGItemloading,refetch} = useGetAllItemInformationQuery(undefined);
+   
     const [permission, setPermission] = useState();
     const navigate = useNavigate();
+
 
     useEffect(() => {
       if (localStorage.length > 0) {
@@ -36,7 +35,7 @@ const FGItemInfoTableData = () => {
                 if (subMenu?.label === subMenu?.label) {
                   // Find the "User List" sub-item
                   const userListSubMenu = subMenu?.items?.find(
-                    (subItem) => subItem?.label === "Finish Goods Item List"
+                    (subItem) => subItem?.label === "Client List"
                   );
                   console.log(userListSubMenu)
                   if (userListSubMenu) {
@@ -47,7 +46,6 @@ const FGItemInfoTableData = () => {
               });
             });
           }
-  
           return userList;
         };
   
@@ -61,7 +59,7 @@ const FGItemInfoTableData = () => {
       }
     }, [user, navigate]);
 
-    if (isFGItemloading) {
+    if (isUserloading) {
       return (
         <div className="d-flex justify-content-center align-items-center">
           <button
@@ -80,44 +78,41 @@ const FGItemInfoTableData = () => {
         </div>
       );
     }
-    
     return (
-      <div>
-        <IteminfoList
-          permission={permission}
-          finishGoodInItemInfoData={finishGoodInItemInfoData}
-          click={clickhandler}
-          refetch={refetch}
-        />
-        {permission?.isInserted ? (
-          <div
-            className={`position-absolute`}
-            style={{ right: "20%", bottom: "4%", zIndex: "9999" }}
-          >
-            <div className="">
-              <a
-                href="/main-view/craete-finish-goods-item"
-                target="_blank"
-                className="text-white text-center d-flex justify-content-center align-items-center"
-                style={{
-                  backgroundColor: "#2DDC1B",
-                  height: "40px",
-                  width: "40px",
-                  borderRadius: "50px",
-                }}
-              >
-                <FontAwesomeIcon
-                  className="text-white fs-4"
-                  icon={faPlus}
-                ></FontAwesomeIcon>
-              </a>
+        <div>
+          <ClientInfoList
+            permission={permission}
+            click={clickhandler}
+          />
+          {permission?.isInserted ? (
+            <div
+              className={`position-absolute`}
+              style={{ right: "20%", bottom: "4%", zIndex: "9999" }}
+            >
+              <div className="">
+                <a
+                  href="/main-view/create-supplier"
+                  target="_blank"
+                  className="text-white text-center d-flex justify-content-center align-items-center"
+                  style={{
+                    backgroundColor: "#2DDC1B",
+                    height: "40px",
+                    width: "40px",
+                    borderRadius: "50px",
+                  }}
+                >
+                  <FontAwesomeIcon
+                    className="text-white fs-4"
+                    icon={faPlus}
+                  ></FontAwesomeIcon>
+                </a>
+              </div>
             </div>
-          </div>
-        ) : (
-          ""
-        )}
-      </div>
-    );
+          ) : (
+            ""
+          )}
+        </div>
+      );
 }
 
-export default FGItemInfoTableData
+export default ClientInfoTableData

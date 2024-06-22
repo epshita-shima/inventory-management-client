@@ -9,7 +9,7 @@ import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
 const MenuDataList = () => {
   const clickhandler = (name) => console.log("delete", name);
   const { data: user } = useGetAllUserQuery(undefined);
-  const { data: menuItems, isMenuloading } = useGetAllMenuItemsQuery(undefined);
+  const { data: menuItems, isMenuloading,refetch } = useGetAllMenuItemsQuery(undefined);
   const [permission, setPermission] = useState();
   const navigate = useNavigate();
 
@@ -59,6 +59,7 @@ const MenuDataList = () => {
       navigate("/");
     }
   }, [user, navigate]);
+
   if (isMenuloading) {
     return (
       <div className="d-flex justify-content-center align-items-center">
@@ -78,11 +79,13 @@ const MenuDataList = () => {
       </div>
     );
   }
+  
   return (
     <div>
       <MenuList
         permission={permission}
         menuItems={menuItems}
+        refetch={refetch}
         click={clickhandler}
       />
       {permission?.isInserted ? (

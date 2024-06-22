@@ -30,6 +30,7 @@ const downloadPDF = (companyinfo,reportTitle) => {
   // Save the PDF
   doc.save(`${fileName}.pdf`);
 };
+
 const downloadAllPDF = (companyinfo,reportTitle) => {
   const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
   const doc = new jsPDF();
@@ -61,6 +62,7 @@ const downloadAllPDF = (companyinfo,reportTitle) => {
   // Save the PDF
   doc.save(`${fileName}.pdf`);
 };
+
 const downloadInactivePDF = (companyinfo,reportTitle) => {
   const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
   const doc = new jsPDF();

@@ -1,4 +1,6 @@
 export default function handleCheckboxClick (dataItem,setSelectedData) {
+
+  console.log('click')
     console.log(dataItem);
     setSelectedData((prevSelectedData) => {
       if (prevSelectedData?.includes(dataItem)) {

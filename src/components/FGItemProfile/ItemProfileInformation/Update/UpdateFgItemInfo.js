@@ -72,7 +72,7 @@ const UpdateFgItemInfo = () => {
       console.log(response.data.status);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", "success");
-        navigate("/main-view/item-list-(fg)");
+        navigate("/main-view/finish-goods-item-list");
       } else {
         swal(
           "Not Possible!",
@@ -117,7 +117,7 @@ const UpdateFgItemInfo = () => {
                   letterSpacing: ".5px",
                 }}
               >
-                Update Item Info
+                Update Finish Goods Item Info
               </span>
             </div>
             <div>
@@ -130,7 +130,7 @@ const UpdateFgItemInfo = () => {
                   height: "25px",
                 }}
                 onClick={() => {
-                  navigate("/main-view/item-list-(fg)");
+                  navigate("/main-view/finish-goods-item-list");
                 }}
               >
                 <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>{" "}
@@ -169,7 +169,7 @@ const UpdateFgItemInfo = () => {
                           ...prevData,
                           itemName: e.target.value,
                           updateBy: updatebyUser,
-                          updateDate: new Date().toLocaleDateString("en-CA"),
+                          updateDate: new Date(),
                         }));
                       }}
                       style={{
@@ -222,7 +222,7 @@ const UpdateFgItemInfo = () => {
                             ...prevData,
                             sizeId: e.value,
                             updateBy: updatebyUser,
-                            updateDate: new Date().toLocaleDateString("en-CA"),
+                            updateDate: new Date(),
                           }));
                         }}
                       ></Select>
@@ -281,7 +281,7 @@ const UpdateFgItemInfo = () => {
                             ...prevData,
                             unitId: e.value,
                             updateBy: updatebyUser,
-                            updateDate: new Date().toLocaleDateString("en-CA"),
+                            updateDate: new Date(),
                           }));
                         }}
                       ></Select>
@@ -327,7 +327,7 @@ const UpdateFgItemInfo = () => {
                             ...prevData,
                             openingDate: startDate.toLocaleDateString("en-CA"),
                             updateBy: updatebyUser,
-                            updateDate: new Date().toLocaleDateString("en-CA"),
+                            updateDate: new Date(),
                           }));
                         }
                       }}
@@ -352,7 +352,7 @@ const UpdateFgItemInfo = () => {
                           ...prevData,
                           openingStock: e.target.value,
                           updateBy: updatebyUser,
-                          updateDate: new Date().toLocaleDateString("en-CA"),
+                          updateDate: new Date(),
                         }));
                       }}
                       style={{
@@ -377,7 +377,7 @@ const UpdateFgItemInfo = () => {
                           ...prevData,
                           itemStatus: e.target.checked,
                           updateBy: updatebyUser,
-                          updateDate: new Date().toLocaleDateString("en-CA"),
+                          updateDate: new Date(),
                         }));
                       }}
                     />

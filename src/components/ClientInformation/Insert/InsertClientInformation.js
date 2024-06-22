@@ -1,54 +1,46 @@
 import {
   faArrowAltCircleLeft,
   faPlus,
-  faXmarkCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, FieldArray, Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
-import "./InsertSupplierInformation";
 import {
-  useGetSingleSupplierInfoQuery,
-  useInsertSupplierInformationMutation,
-  useUpdateSupplierDetailsInfoMutation,
-} from "../../../redux/features/supplierInformation/supplierInfoApi";
+  useGetSingleClientInfoQuery,
+  useInsertClientInformationMutation,
+  useUpdateClientDetailsInfoMutation,
+} from "../../../redux/features/clientinformation/clientInfoApi";
 import swal from "sweetalert";
-import { useGetAllCFTInfosQuery } from "../../../redux/features/cftinformation/cftInfosApi";
-const InsertSupplierInformation = () => {
+
+const InsertClientInformation = () => {
   const ArrayHelperRef = useRef();
-  const navigate = useNavigate();
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [insertClientInfo] = useInsertClientInformationMutation();
+  const [updateClientInfo] = useUpdateClientDetailsInfoMutation();
+  const { data: singleClientInfo } = useGetSingleClientInfoQuery(id);
+  const [clientData, setClientData] = useState([]);
   const getUser = localStorage.getItem("user");
   const getUserParse = JSON.parse(getUser);
   const makebyUser = getUserParse[0].username;
   const updatebyUser = getUserParse[0].username;
-  const [insertSupplierInfo] = useInsertSupplierInformationMutation();
-  const { data: singleSupplierInfo } = useGetSingleSupplierInfoQuery(id);
-  const [updateSupplierInfo] = useUpdateSupplierDetailsInfoMutation();
-  const [supplierData, setSupplierData] = useState([]);
-
-  useEffect(() => {
-    if (id) {
-      setSupplierData(singleSupplierInfo);
-    }
-  }, [id, singleSupplierInfo]);
-
+console.log(clientData)
   const initialValues = {
     detailsData: [
       {
-        supplierName: "",
+        clientName: "",
         email: "",
         mobileNo: "",
         contactPerson: "",
         binNo: "",
-        tradeLicenceNo: "",
         tinNo: "",
         address: "",
+        remarks: "",
         isActive: true,
-        supplierApproveStatus: false,
-        supplierApproveDate: null,
+        clientApproveStatus: false,
+        clientApproveDate: null,
         makeBy: makebyUser,
         updateBy: null,
         makeDate: new Date(),
@@ -57,15 +49,19 @@ const InsertSupplierInformation = () => {
     ],
   };
 
+  useEffect(() => {
+    setClientData(singleClientInfo);
+  }, [singleClientInfo]);
+
   const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
     try {
       if (id) {
-        const response = await updateSupplierInfo(supplierData);
+        const response = await updateClientInfo(clientData);
         console.log(response.data.status);
         if (response.data.status === 200) {
           swal("Done", "Data Save Successfully", "success");
-         navigate('/main-view/supplier-list')
+          navigate("/main-view/client-list");
         } else {
           swal(
             "Not Possible!",
@@ -74,7 +70,7 @@ const InsertSupplierInformation = () => {
           );
         }
       } else {
-        const response = await insertSupplierInfo(values.detailsData);
+        const response = await insertClientInfo(values.detailsData);
         console.log(response.data.status);
         if (response.data.status === 200) {
           swal("Done", "Data Save Successfully", "success");
@@ -125,8 +121,8 @@ const InsertSupplierInformation = () => {
                 }}
               >
                 {id
-                  ? "Update  Supplier Information"
-                  : "Create Supplier Information"}
+                  ? "Update  Client Information"
+                  : "Create Client Information"}
               </span>
             </div>
             <div>
@@ -139,7 +135,7 @@ const InsertSupplierInformation = () => {
                   height: "25px",
                 }}
                 onClick={() => {
-                  navigate("/main-view/supplier-list");
+                  navigate("/main-view/client-list");
                 }}
               >
                 <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>
@@ -157,7 +153,7 @@ const InsertSupplierInformation = () => {
               validationSchema={Yup.object({
                 detailsData: Yup.array().of(
                   Yup.object().shape({
-                    supplierName: Yup.string().required("Required"),
+                    clientName: Yup.string().required("Required"),
                     email: Yup.string().required("Required"),
                     mobileNo: Yup.string()
                       .required("Required")
@@ -185,15 +181,15 @@ const InsertSupplierInformation = () => {
                 dirty,
               }) => (
                 <Form
-                  id="itemcreation-form"
+                  id="clientcreation-form"
                   onSubmit={(e) => {
                     handleSubmit(e, values, resetForm);
                   }}
                 >
                   {/* <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex mt-4 mb-4">
-                    </div>
-                  </div> */}
+                        <div className="d-flex mt-4 mb-4">
+                        </div>
+                      </div> */}
 
                   <FieldArray
                     name="detailsData"
@@ -212,16 +208,16 @@ const InsertSupplierInformation = () => {
                                         <div className="col-md-6">
                                           <div className="mb-2">
                                             <label htmlFor="email">
-                                              Supplier Name
+                                              Client Name
                                             </label>
                                             <Field
                                               type="text"
-                                              name={`detailsData.${index}.supplierName`}
-                                              placeholder="Supplier Name"
+                                              name={`detailsData.${index}.clientName`}
+                                              placeholder="Client Name"
                                               value={
                                                 id
-                                                  ? supplierData?.supplierName
-                                                  : detail?.supplierName
+                                                  ? clientData?.clientName
+                                                  : detail?.clientName
                                               }
                                               style={{
                                                 border: "1px solid #2DDC1B",
@@ -232,18 +228,15 @@ const InsertSupplierInformation = () => {
                                               }}
                                               onChange={(e) => {
                                                 if (id) {
-                                                  setSupplierData(
-                                                    (prevData) => ({
-                                                      ...prevData,
-                                                      supplierName:
-                                                        e.target.value,
-                                                      updateBy: updatebyUser,
-                                                      updateDate: new Date(),
-                                                    })
-                                                  );
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    clientName: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
                                                 } else {
                                                   setFieldValue(
-                                                    `detailsData.${index}.supplierName`,
+                                                    `detailsData.${index}.clientName`,
                                                     e.target.value
                                                   );
                                                 }
@@ -253,13 +246,13 @@ const InsertSupplierInformation = () => {
                                             {id
                                               ? ""
                                               : touched.detailsData?.[index]
-                                                  ?.supplierName &&
+                                                  ?.clientName &&
                                                 errors.detailsData?.[index]
-                                                  ?.supplierName && (
+                                                  ?.clientName && (
                                                   <div className="text-danger">
                                                     {
                                                       errors.detailsData[index]
-                                                        .supplierName
+                                                        .clientName
                                                     }
                                                   </div>
                                                 )}
@@ -272,7 +265,7 @@ const InsertSupplierInformation = () => {
                                               placeholder="Email"
                                               value={
                                                 id
-                                                  ? supplierData?.email
+                                                  ? clientData?.email
                                                   : detail?.email
                                               }
                                               style={{
@@ -284,14 +277,12 @@ const InsertSupplierInformation = () => {
                                               }}
                                               onChange={(e) => {
                                                 if (id) {
-                                                  setSupplierData(
-                                                    (prevData) => ({
-                                                      ...prevData,
-                                                      email: e.target.value,
-                                                      updateBy: updatebyUser,
-                                                      updateDate: new Date(),
-                                                    })
-                                                  );
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    email: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
                                                 } else {
                                                   setFieldValue(
                                                     `detailsData.${index}.email`,
@@ -326,7 +317,7 @@ const InsertSupplierInformation = () => {
                                               placeholder="Mobile Number"
                                               value={
                                                 id
-                                                  ? supplierData?.mobileNo
+                                                  ? clientData?.mobileNo
                                                   : detail?.mobileNo
                                               }
                                               style={{
@@ -339,14 +330,12 @@ const InsertSupplierInformation = () => {
                                               }}
                                               onChange={(e) => {
                                                 if (id) {
-                                                  setSupplierData(
-                                                    (prevData) => ({
-                                                      ...prevData,
-                                                      mobileNo: e.target.value,
-                                                      updateBy: updatebyUser,
-                                                      updateDate: new Date(),
-                                                    })
-                                                  );
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    mobileNo: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
                                                 } else {
                                                   setFieldValue(
                                                     `detailsData.${index}.mobileNo`,
@@ -370,8 +359,62 @@ const InsertSupplierInformation = () => {
                                                   </div>
                                                 )}
                                           </div>
+                                          <div className="mb-2">
+                                            {" "}
+                                            <label htmlFor="remarks">
+                                              Remarks
+                                            </label>
+                                            <textarea
+                                              type="textarea"
+                                              name={`detailsData.${index}.remarks`}
+                                              placeholder="Remarks"
+                                              value={
+                                                id
+                                                  ? clientData?.remarks
+                                                  : detail?.remarks
+                                              }
+                                              rows="3"
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                              }}
+                                              onChange={(e) => {
+                                                if (id) {
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    remarks: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
+                                                } else {
+                                                  setFieldValue(
+                                                    `detailsData.${index}.remarks`,
+                                                    e.target.value
+                                                  );
+                                                }
+                                              }}
+                                            />
+                                            {id
+                                              ? ""
+                                              : touched.detailsData?.[index]
+                                                  ?.remarks &&
+                                                errors.detailsData?.[index]
+                                                  ?.remarks && (
+                                                  <div className="text-danger">
+                                                    {
+                                                      errors.detailsData[index]
+                                                        .remarks
+                                                    }
+                                                  </div>
+                                                )}
+                                          </div>
+                                          
+                                        </div>
 
-                                          <div>
+                                        <div className="col-md-6">
+                                        <div className="mb-2">
                                             <label htmlFor="conatctPerson">
                                               Contact Person
                                             </label>
@@ -381,7 +424,7 @@ const InsertSupplierInformation = () => {
                                               placeholder="Contact Person"
                                               value={
                                                 id
-                                                  ? supplierData?.contactPerson
+                                                  ? clientData?.contactPerson
                                                   : detail?.contactPerson
                                               }
                                               style={{
@@ -394,15 +437,13 @@ const InsertSupplierInformation = () => {
                                               }}
                                               onChange={(e) => {
                                                 if (id) {
-                                                  setSupplierData(
-                                                    (prevData) => ({
-                                                      ...prevData,
-                                                      contactPerson:
-                                                        e.target.value,
-                                                      updateBy: updatebyUser,
-                                                      updateDate: new Date(),
-                                                    })
-                                                  );
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    contactPerson:
+                                                      e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
                                                 } else {
                                                   setFieldValue(
                                                     `detailsData.${index}.contactPerson`,
@@ -426,9 +467,6 @@ const InsertSupplierInformation = () => {
                                                   </div>
                                                 )}
                                           </div>
-                                        </div>
-
-                                        <div className="col-md-6">
                                           <div className="mb-2">
                                             <label htmlFor="conatctPerson">
                                               Bin Number
@@ -439,7 +477,7 @@ const InsertSupplierInformation = () => {
                                               placeholder="Bin Number"
                                               value={
                                                 id
-                                                  ? supplierData?.binNo
+                                                  ? clientData?.binNo
                                                   : detail?.binNo
                                               }
                                               style={{
@@ -451,14 +489,12 @@ const InsertSupplierInformation = () => {
                                               }}
                                               onChange={(e) => {
                                                 if (id) {
-                                                  setSupplierData(
-                                                    (prevData) => ({
-                                                      ...prevData,
-                                                      binNo: e.target.value,
-                                                      updateBy: updatebyUser,
-                                                      updateDate: new Date(),
-                                                    })
-                                                  );
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    binNo: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
                                                 } else {
                                                   setFieldValue(
                                                     `detailsData.${index}.binNo`,
@@ -485,61 +521,6 @@ const InsertSupplierInformation = () => {
 
                                           <div className="mb-2">
                                             <label htmlFor="tradeLicenceNo">
-                                              Trade Licence No
-                                            </label>
-                                            <Field
-                                              type="text"
-                                              name={`detailsData.${index}.tradeLicenceNo`}
-                                              placeholder="Trade Licence No"
-                                              value={
-                                                id
-                                                  ? supplierData?.tradeLicenceNo
-                                                  : detail?.tradeLicenceNo
-                                              }
-                                              style={{
-                                                border: "1px solid #2DDC1B",
-                                                padding: "5px",
-                                                width: "100%",
-                                                borderRadius: "5px",
-                                                height: "38px",
-                                              }}
-                                              onChange={(e) => {
-                                                if (id) {
-                                                  setSupplierData(
-                                                    (prevData) => ({
-                                                      ...prevData,
-                                                      tradeLicenceNo:
-                                                        e.target.value,
-                                                      updateBy: updatebyUser,
-                                                      updateDate: new Date(),
-                                                    })
-                                                  );
-                                                } else {
-                                                  setFieldValue(
-                                                    `detailsData.${index}.tradeLicenceNo`,
-                                                    e.target.value
-                                                  );
-                                                }
-                                              }}
-                                            />
-                                            <br />
-                                            {id
-                                              ? ""
-                                              : touched.detailsData?.[index]
-                                                  ?.tradeLicenceNo &&
-                                                errors.detailsData?.[index]
-                                                  ?.tradeLicenceNo && (
-                                                  <div className="text-danger">
-                                                    {
-                                                      errors.detailsData[index]
-                                                        .tradeLicenceNo
-                                                    }
-                                                  </div>
-                                                )}
-                                          </div>
-
-                                          <div className="mb-2">
-                                            <label htmlFor="tradeLicenceNo">
                                               TIN Number
                                             </label>
                                             <Field
@@ -548,7 +529,7 @@ const InsertSupplierInformation = () => {
                                               placeholder="Tin No"
                                               value={
                                                 id
-                                                  ? supplierData?.tinNo
+                                                  ? clientData?.tinNo
                                                   : detail?.tinNo
                                               }
                                               style={{
@@ -560,14 +541,12 @@ const InsertSupplierInformation = () => {
                                               }}
                                               onChange={(e) => {
                                                 if (id) {
-                                                  setSupplierData(
-                                                    (prevData) => ({
-                                                      ...prevData,
-                                                      tinNo: e.target.value,
-                                                      updateBy: updatebyUser,
-                                                      updateDate: new Date(),
-                                                    })
-                                                  );
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    tinNo: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
                                                 } else {
                                                   setFieldValue(
                                                     `detailsData.${index}.tinNo`,
@@ -603,7 +582,7 @@ const InsertSupplierInformation = () => {
                                               placeholder="Address"
                                               value={
                                                 id
-                                                  ? supplierData?.address
+                                                  ? clientData?.address
                                                   : detail?.address
                                               }
                                               rows="3"
@@ -615,14 +594,12 @@ const InsertSupplierInformation = () => {
                                               }}
                                               onChange={(e) => {
                                                 if (id) {
-                                                  setSupplierData(
-                                                    (prevData) => ({
-                                                      ...prevData,
-                                                      address: e.target.value,
-                                                      updateBy: updatebyUser,
-                                                      updateDate: new Date(),
-                                                    })
-                                                  );
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    address: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
                                                 } else {
                                                   setFieldValue(
                                                     `detailsData.${index}.address`,
@@ -645,13 +622,14 @@ const InsertSupplierInformation = () => {
                                                   </div>
                                                 )}
                                           </div>
+                                         
                                         </div>
                                       </div>
                                       <div className="col-md-12">
                                         <div className="d-flex justify-content-center">
                                           <button
                                             type="submit"
-                                            form="itemcreation-form"
+                                            form="clientcreation-form"
                                             className="border-0 "
                                             style={{
                                               backgroundColor: id
@@ -678,7 +656,7 @@ const InsertSupplierInformation = () => {
                                 })
                               : null}
                             {/* </tbody>
-                              </table> */}
+                                  </table> */}
                           </div>
                         </div>
                       );
@@ -694,4 +672,4 @@ const InsertSupplierInformation = () => {
   );
 };
 
-export default InsertSupplierInformation;
+export default InsertClientInformation;

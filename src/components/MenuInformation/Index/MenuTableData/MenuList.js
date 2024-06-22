@@ -1,20 +1,18 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useMemo, useState } from "react";
-import { useDeleteMenuDataMutation, useGetAllMenuItemsQuery } from "../../../../redux/features/menus/menuApi";
+import React, { useMemo } from "react";
+import { useDeleteMenuDataMutation } from "../../../../redux/features/menus/menuApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faEye,
   faPenToSquare,
-  faPlus,
+  faRefresh,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
-import { useGetAllUserQuery } from "../../../../redux/features/user/userApi";
-import FilterComponent from "./FilterComponent";
 import DataTable from "react-data-table-component";
-import { useNavigate } from "react-router-dom";
+
 import './MenuList.css'
-const MenuList = ({permission, menuItems}) => {
+import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
+const MenuList = ({permission, menuItems,refetch}) => {
 const [deleteMenu]=useDeleteMenuDataMutation()
 const [filterText, setFilterText] = React.useState("");
 const [resetPaginationToggle, setResetPaginationToggle] =React.useState(false);
@@ -129,6 +127,7 @@ const [resetPaginationToggle, setResetPaginationToggle] =React.useState(false);
       ),
     },
   ];
+
   const customStyles = {
     rows: {
       style: {
@@ -165,26 +164,28 @@ const [resetPaginationToggle, setResetPaginationToggle] =React.useState(false);
       }
     };
     return (
-      <div className="d-flex justify-content-between align-items-center w-100">
-        <div className="d-flex justify-content-between align-items-center w-25">
-          <h2
-            style={{
-              fontSize: "24px",
-              fontWeight: "bold",
-              letterSpacing: "0.8px",
-            }}
-          >
-            Menu list
-          </h2>
-        </div>
+      <div className="d-flex justify-content-end align-items-center w-100">
+    <div className="d-flex justify-content-end align-items-center">
+          <div className="table-head-icon d-flex ">
+            <div>
+              <FontAwesomeIcon
+                icon={faRefresh}
+                onClick={() => refetch()}
+              ></FontAwesomeIcon>{" "}
+              &nbsp;
+            </div>
+       
+          </div>
+    
         <FilterComponent
           onFilter={(e) => setFilterText(e.target.value)}
           onClear={handleClear}
           filterText={filterText}
         />
       </div>
+      </div>
     );
-  }, [filterText, resetPaginationToggle]);
+  }, [filterText, resetPaginationToggle,refetch]);
 
   return (
       <div className="row p-5 mx-4">

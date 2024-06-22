@@ -22,6 +22,8 @@ import CFTInfosTableData from "./components/CFTInformations/Index/CFTInfosTableD
 import UpdateCFTInfo from "./components/CFTInformations/Update/UpdateCFTInfo";
 import InsertSupplierInformation from "./components/SupplierProfile/Insert/InsertSupplierInformation";
 import SupplierInfoTableData from "./components/SupplierProfile/Index/SupplierInfoTableData/SupplierInfoTableData";
+import InsertClientInformation from "./components/ClientInformation/Insert/InsertClientInformation";
+import ClientInfoTableData from "./components/ClientInformation/Index/ClientInfoTableData";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -94,24 +96,34 @@ function App() {
                 path="user-update/:id"
                 element={<SingleUserDisplay></SingleUserDisplay>}
               ></Route>
-              <Route  path="/main-view/create-item-(rm)" element={<InsertRmItemInfo></InsertRmItemInfo>}></Route>
-              <Route  path="/main-view/item-list-(rm)" element={<RMItemInfoTableData></RMItemInfoTableData>}></Route>
-              <Route  path="update-items-rm/:id" element={<UpdateRmItemInfo></UpdateRmItemInfo>}></Route>
-              {/* <Route path="/main-view/create-item-(rm)" element={<UpdateRmItemInfo></UpdateRmItemInfo>}></Route> */}
+              <Route  path="/main-view/create-raw-material-item" element={<InsertRmItemInfo></InsertRmItemInfo>}></Route>
+              <Route  path="/main-view/raw-material-item-list" element={<RMItemInfoTableData></RMItemInfoTableData>}></Route>
+              <Route  path="update-items-raw-material/:id" element={<UpdateRmItemInfo></UpdateRmItemInfo>}></Route>
+              {/* <Route path="/main-view/create-raw-material-item" element={<UpdateRmItemInfo></UpdateRmItemInfo>}></Route> */}
               <Route
-                path="/main-view/item-list-(fg)"
+                path="/main-view/finish-goods-item-list"
                 element={<FGItemInfoTableData></FGItemInfoTableData>}
               ></Route>
               <Route
-                path="/main-view/create-item-(fg)"
+                path="/main-view/craete-finish-goods-item"
                 element={<InsertFgItemInfo></InsertFgItemInfo>}
               ></Route>
+                 <Route
+                path="update-finish-goods-items/:id"
+                element={<UpdateFgItemInfo></UpdateFgItemInfo>}
+              ></Route>
+              
               <Route path="/main-view/create-cft-infos" element={<InsertCFTInfo></InsertCFTInfo>}></Route>
               <Route path="/main-view/cft-info-list" element={<CFTInfosTableData></CFTInfosTableData>}></Route>
               <Route path="update-cft-info/:id" element={<UpdateCFTInfo></UpdateCFTInfo>}></Route>
+              
               <Route path="/main-view/create-supplier" element={<InsertSupplierInformation></InsertSupplierInformation>}></Route>
-              <Route path="/main-view/supplier-name-list" element={<SupplierInfoTableData></SupplierInfoTableData>}></Route>
+              <Route path="/main-view/supplier-list" element={<SupplierInfoTableData></SupplierInfoTableData>}></Route>
               <Route path="update-supplier-info/:id" element={<InsertSupplierInformation></InsertSupplierInformation>}></Route>
+             
+             <Route path="/main-view/client-list" element={<ClientInfoTableData></ClientInfoTableData>}></Route>
+             <Route path="/main-view/create-client" element={<InsertClientInformation></InsertClientInformation>}></Route>
+             <Route path="update-client-info/:id" element={<InsertClientInformation></InsertClientInformation>}></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={
@@ -133,21 +145,14 @@ function App() {
                 path="update-menu/:id"
                 element={<UpdateMenu></UpdateMenu>}
               ></Route>
-              <Route
-                path="update-items/:id"
-                element={<UpdateFgItemInfo></UpdateFgItemInfo>}
-              ></Route>
+           
               <Route
                 path="menu-list"
                 element={<MenuDataList></MenuDataList>}
               ></Route>
               <Route path="*" element={<NotFound></NotFound>}></Route>
             </Route>
-            {/* <Route path="/" element={<SignUpMongodb/>}></Route> */}
-            {/* <Route path="/login" element={<LoginWithMongodb></LoginWithMongodb>}></Route> */}
-
-            {/* <Route path="/login" element={<Login></Login>}></Route> */}
-            {/* <Route path="/project" element={<Home singleUserData={singleUserData} setSingleUserData={setSingleUserData}></Home>}></Route> */}
+           
           </Routes>
         </div>
       </div>

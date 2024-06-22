@@ -77,7 +77,7 @@ const UpdateRmItemInfo = () => {
       console.log(response.data.status);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", "success");
-        navigate("/main-view/item-list-(rm)");
+        navigate("/main-view/raw-material-item-list");
       } else {
         swal(
           "Not Possible!",

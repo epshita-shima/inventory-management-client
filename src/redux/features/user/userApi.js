@@ -9,6 +9,10 @@ const userApi = api.injectEndpoints({
         body: payload,
       }),
       invalidatesTags: ["createuser"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
+      }),
     }),
     getAllUser: builder.query({
       query: () => "/get-user",

@@ -114,8 +114,6 @@ const UpdateCFTInfo = () => {
                   <div className="d-flex justify-content-center align-items-center w-100 ">
                     <div className="card shadow-lg w-50 p-5">
                      
-    
-                    
                       <Form.Label
                         htmlFor="inputPassword5"
                         style={{ color: "#032339", letterSpacing: "1px" }}
@@ -162,8 +160,8 @@ const UpdateCFTInfo = () => {
                           dateFormat="y-MM-dd"
                           className="text-center custom-datepicker-update"
                           calendarClassName="custom-calendar"
-                          selected={singleCFTInfosData?.openingDate}
-                          value={singleCFTInfosData?.openingDate}
+                          selected={singleCFTInfosData?.closingDate}
+                          value={singleCFTInfosData?.closingDate ? singleCFTInfosData?.closingDate : startDate}
                           required
                           onChange={(startDate) => {
                             console.log(startDate);
@@ -178,7 +176,8 @@ const UpdateCFTInfo = () => {
                               setStartDate(startDate.toLocaleDateString("en-CA"));
                               setSingleCFTInfosData((prevData) => ({
                                 ...prevData,
-                                openingDate: startDate.toLocaleDateString("en-CA"),
+                                closingDate: startDate.toLocaleDateString("en-CA"),
+                                isActive:false,
                                 updateBy: updatebyUser,
                                 updateDate: new Date(),
                               }));
@@ -216,27 +215,7 @@ const UpdateCFTInfo = () => {
                           }}
                         />
                       </InputGroup>
-                      <Form.Label
-                        htmlFor="inputPassword5"
-                        style={{ color: "#032339", letterSpacing: "1px" }}
-                      >
-                       CFT Status
-                      </Form.Label>
-                      <div class="form-check">
-                        <input
-                          type="checkbox"
-                          checked={singleCFTInfosData?.isActive}
-                          id="flexCheckDefault"
-                          onClick={(e) => {
-                            setSingleCFTInfosData((prevData) => ({
-                              ...prevData,
-                              isActive: e.target.checked,
-                              updateBy: updatebyUser,
-                              updateDate: new Date(),
-                            }));
-                          }}
-                        />
-                      </div>
+                    
                     </div>
                   </div>
                   <div className="d-flex justify-content-center align-items-center mt-4 w-100">

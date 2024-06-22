@@ -20,7 +20,10 @@ const ListHeading = ({
   cftInfoInActiveStatus,
   supplierInfoData,
   supplierInfoActiveStatus,
-  supplierInfoInActiveStatus
+  supplierInfoInActiveStatus,
+  clientInfoData,
+  clientInfoActiveStatus,
+  clientInfoInActiveStatus,
 }) => {
   const [totalTitle, setTotalTitle] = useState("");
   const [totalActiveTitle, setTotalActiveTitle] = useState("");
@@ -65,38 +68,38 @@ const ListHeading = ({
       setTotalTitle(`Total ${searchItem[0]?.headerLabelName}`);
       setTotalActiveTitle(`Total Active ${searchItem[0]?.headerLabelName}`);
       setTotalInActiveTitle(`Total InActive ${searchItem[0]?.headerLabelName}`);
-      console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList)
+      console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList);
       if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
-        console.log('fg')
+        console.log("fg");
         grandTotal = finishGoodInItemInfoData?.length;
         totalActive = finishGoodActiveStatus?.length;
         totalInActive = finishGoodInActiveStatus?.length;
       } else if (searchItem[0]?.menuId == MenuIdCollection.userSeting) {
-        console.log('fg')
+        console.log("fg");
         grandTotal = user?.length;
         totalActive = activeUser?.length;
         totalInActive = inActiveUser?.length;
-      }
-       else if (searchItem[0]?.menuId == MenuIdCollection.rmItemList) {
-        console.log('rm')
+      } else if (searchItem[0]?.menuId == MenuIdCollection.rmItemList) {
+        console.log("rm");
         grandTotal = rmItemInfoData?.length;
         totalActive = rmItemActiveStatus?.length;
         totalInActive = rmItemInActiveStatus?.length;
-      }
-      
-       else if (searchItem[0]?.menuId == MenuIdCollection.cftinfolist) {
-        console.log('rm')
+      } else if (searchItem[0]?.menuId == MenuIdCollection.cftinfolist) {
+        console.log("rm");
         grandTotal = cftInfosData?.length;
         totalActive = cftInfoActiveStatus?.length;
         totalInActive = cftInfoInActiveStatus?.length;
-      }
-      
-       else if (searchItem[0]?.menuId == MenuIdCollection.supplierinfolist) {
+      } else if (searchItem[0]?.menuId == MenuIdCollection.supplierinfolist) {
         grandTotal = supplierInfoData?.length;
         totalActive = supplierInfoActiveStatus?.length;
         totalInActive = supplierInfoInActiveStatus?.length;
       }
-      
+       else if (searchItem[0]?.menuId == MenuIdCollection.clientinfolistId) {
+        grandTotal = clientInfoData?.length;
+        totalActive = clientInfoActiveStatus?.length;
+        totalInActive = clientInfoInActiveStatus?.length;
+      }
+
       setGrandTotal(grandTotal);
       setTotalActive(totalActive);
       setTotalInActive(totalInActive);
@@ -118,7 +121,10 @@ const ListHeading = ({
     cftInfoInActiveStatus,
     supplierInfoData,
     supplierInfoActiveStatus,
-    supplierInfoInActiveStatus
+    supplierInfoInActiveStatus,
+    clientInfoData,
+    clientInfoActiveStatus,
+    clientInfoInActiveStatus
   ]);
 
   return (

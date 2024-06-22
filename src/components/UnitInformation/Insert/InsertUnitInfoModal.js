@@ -20,7 +20,7 @@ const InsertUnitInfoModal = () => {
         unitInfo: "",
         makeBy: makebyUser,
         updateBy: null,
-        makeDate: new Date().toLocaleDateString("en-CA"),
+        makeDate: new Date(),
         updateDate: null,
       },
     ],
@@ -89,7 +89,7 @@ const InsertUnitInfoModal = () => {
                     unitInfo: "",
                     makeBy: makebyUser,
                     updateBy: null,
-                    makeDate: new Date().toLocaleDateString("en-CA"),
+                    makeDate: new Date(),
                     updateDate: null,
                   });
                 }}

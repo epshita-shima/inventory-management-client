@@ -22,6 +22,7 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
 
   const [filterText, setFilterText] = useState("");
+  const [extractedAllDataReport, setExtractedAllDataReport] = useState([]);
   const [extractedDataForReport, setExtractedDataForReport] = useState([]);
   const [extractedInActiveDataForReport, setExtractedInActiveDataForReport] =
     useState([]);
@@ -32,9 +33,10 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
   const [deleteCFTInfoData] = useDeleteCFTInfoMutation();
   const [cftInfoActiveStatus, setCFTInfoActiveStaus] = useState([]);
   const [cftInfoInActiveStatus, setCFTInfoInActiveStatus] = useState([]);
-  var reportTitle = "All Active CFT Info List";
+  const [isExisting,setIsExisting]=useState([])
+  var reportTitle = "All CFT Info List";
 
-  console.log(cftInfosData);
+  console.log(cftInfosData)
 
   useEffect(() => {
     const cftInfoActiveStatus = cftInfosData?.filter(
@@ -43,12 +45,19 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
     const cftInfoInActiveStatus = cftInfosData?.filter(
       (item) => item.isActive == false
     );
-    console.log(cftInfoActiveStatus);
-    console.log(cftInfoInActiveStatus);
+
+    const extractedAllFields = cftInfosData?.map((item) => {
+      return {
+        openingDate: item.openingDate,
+        kgPerUnit: item.kgPerUnit,
+        isActive: item.isActive ? "Active" : "InActive",
+      };
+    });
     const extractedFields = cftInfoActiveStatus?.map((item) => {
       return {
         openingDate: item.openingDate,
         kgPerUnit: item.kgPerUnit,
+        isActive: item.isActive ? "Active" : "InActive",
       };
     });
 
@@ -56,12 +65,15 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
       return {
         openingDate: item.openingDate,
         kgPerUnit: item.kgPerUnit,
+        isActive: item.isActive ? "Active" : "InActive",
       };
     });
+    setExtractedAllDataReport(extractedAllFields);
     setCFTInfoActiveStaus(cftInfoActiveStatus);
     setCFTInfoInActiveStatus(cftInfoInActiveStatus);
     setExtractedDataForReport(extractedFields);
     setExtractedInActiveDataForReport(extractedInactiveFields);
+
   }, [cftInfosData?.unitId, cftInfosData]);
 
   const generateColumns = (data, fields) => {
@@ -90,7 +102,23 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
                   type="checkbox"
                   aria-label={`Checkbox for data item ${row.id}`}
                   checked={row.status} // Assuming status is a boolean field
-                  onChange={(e) => handleCheckboxClick(row, setSelectedData)} // Assuming handleCheckboxClick is defined elsewhere
+                  onChange={(e) => {
+                    const existing = cftInfosData?.filter(
+                      (x) => x.isActive == true
+                    );
+            console.log(existing.length,existing.length >1)
+                    if (existing.length > 1) {
+                      swal(
+                        "Not Possible!",
+                        "There is an active CFT,Plase Close it first",
+                        "warning"
+                      );
+                      e.preventDefault();
+                      return;
+                    } else {
+                      handleCheckboxClick(row, setSelectedData);
+                    }
+                  }} // Assuming handleCheckboxClick is defined elsewhere
                 />
               </a>
             </div>
@@ -147,7 +175,11 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
             }}
             //   href={`update-cft-info/${cftInfosData._id}`}
           >
-            {cftInfosData?.isActive == true ? <p>Active</p> : <p>InActive</p>}
+            {cftInfosData?.isActive == true ? (
+              <p className="text-success fw-bold">Active</p>
+            ) : (
+              <p className="text-danger fw-bold">InActive</p>
+            )}
           </a>
         </div>
       ),
@@ -180,7 +212,23 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
                 marginLeft: "10px",
               }}
               onClick={() => {
-                window.open(`update-cft-info/${cftInfosData?._id}`);
+           if(cftInfoActiveStatus.length >0){
+            if(cftInfoActiveStatus[0]?._id==cftInfosData?._id){
+              window.open(`update-cft-info/${cftInfosData?._id}`);
+            }
+            else{
+              swal(
+                "Not Possible!",
+                "There is an active CFT,Plase Close it first",
+                "warning"
+              );
+            }
+           }
+           else{
+            window.open(`update-cft-info/${cftInfosData?._id}`);
+           }
+
+                
               }}
             >
               <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
@@ -320,7 +368,7 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
                     href="#"
                     onClick={() => {
                       handleDownload(
-                        extractedDataForReport,
+                        extractedAllDataReport,
                         companyinfo,
                         reportTitle
                       );
@@ -347,7 +395,7 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
     filterText,
     resetPaginationToggle,
     companyinfo,
-    extractedDataForReport,
+    extractedAllDataReport,
     reportTitle,
     refetch,
   ]);
@@ -387,6 +435,27 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
             <th>Sl.</th>
             <th>Opening Date</th>
             <th>KG per CFT</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {extractedAllDataReport?.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.openingDate}</td>
+              <td>{item.kgPerUnit}</td>
+              <td>{item.isActive}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <table id="my-table2" className="d-none">
+        <thead>
+          <tr>
+            <th>Sl.</th>
+            <th>Opening Date</th>
+            <th>KG per CFT</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -395,6 +464,7 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
               <td>{index + 1}</td>
               <td>{item.openingDate}</td>
               <td>{item.kgPerUnit}</td>
+              <td>{item.isActive}</td>
             </tr>
           ))}
         </tbody>
@@ -406,6 +476,7 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
             <th>Sl.</th>
             <th>Opening Date</th>
             <th>KG per CFT</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -414,6 +485,7 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
               <td>{index + 1}</td>
               <td>{item.openingDate}</td>
               <td>{item.kgPerUnit}</td>
+              <td>{item.isActive}</td>
             </tr>
           ))}
         </tbody>

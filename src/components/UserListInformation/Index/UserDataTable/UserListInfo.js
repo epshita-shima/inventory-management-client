@@ -2,7 +2,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./UserListInfo.css";
 import DataTable from "react-data-table-component";
-import FilterComponent from "./FilterComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDownload,
@@ -20,17 +19,16 @@ import {
   useDeleteUserMutation,
   useGetAllUserQuery,
 } from "../../../../redux/features/user/userApi";
-import UserActiveListModal from "../UserActiveListModal/UserActiveListModal";
 import { Font } from "@react-pdf/renderer";
 import swal from "sweetalert";
 import "jspdf-autotable";
 import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
 import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../ReportProperties/HandelExcelDownload";
-import { Button } from "react-bootstrap";
 import ListHeading from "../../../Common/ListHeading/ListHeading";
 import ActiveListDataModal from "../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
 import handleCheckboxClick from './../../../Common/ListHeadingModal/Function/handleCheckboxClick';
+import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
 
 const UserListInfo = ({
   setChangePassword,
@@ -51,91 +49,39 @@ const UserListInfo = ({
   const inActiveUser = user?.filter((user) => user.isactive == false);
   const [extractedData, setExtractedData] = useState([]);
   const [extractedInActiveData, setExtractedInActiveData] = useState([]);
+  const [extractedAllData, setExtractedAllData] = useState([]);
   const [demoData, setDemoData] = useState(null);
   const [filterText, setFilterText] = React.useState("");
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [selectedData, setSelectedData] = useState([]);
-  var reportTitle = "All Active User";
+  var reportTitle = "All User";
+  console.log(extractedData)
 
-  // useEffect(() => {
-  //   if (localStorage.length > 0) {
-  //     const getUserId = localStorage.getItem("user");
-  //     const userSingleId = JSON.parse(getUserId);
-  //     const userIdFromSession = userSingleId[0]?._id;
-  //     const permidionData = user?.filter(
-  //       (user) => user._id == userIdFromSession
-  //     );
-  //     setPermissionResult(permidionData);
-  //     setUserIdFromLocalStorage(userIdFromSession);
-  //   } else {
-  //     navigate("/");
-  //   }
-  // }, [navigate, user]);
-
-  // const extractUserListForCurrentUser = (userData, userId) => {
-  //   let userList = null;
-
-  //   // Find the user object matching the provided userId
-  //   const currentUser = userData?.find((user) => user._id === userId);
-
-  //   if (currentUser) {
-  //     // Loop through the menus of the current user
-  //     currentUser?.menulist?.forEach((menu) => {
-  //       menu?.items?.forEach((subMenu) => {
-  //         // Check if the subMenu is the "User Profile" menu
-  //         if (subMenu?.label === subMenu?.label) {
-  //           // Find the "User List" sub-item
-  //           const userListSubMenu = subMenu?.items.find(
-  //             (subItem) => subItem?.label === subItem?.label
-  //           );
-  //           if (userListSubMenu) {
-  //             // Set the user list property
-  //             userList = userListSubMenu;
-  //           }
-  //         }
-  //       });
-  //     });
-  //   }
-
-  //   return userList;
-  // };
-
-  // // Call the function to get the user list for the current user
-  // const permission = extractUserListForCurrentUser(
-  //   permissionResult,
-  //   userIdFromLocalStorage
-  // );
-
-  // // Output the user list for the current user
-  // console.log(permission);
- 
-  // const handleCheckboxClick = (dataItem) => {
-  //   console.log(dataItem);
-  //   setSelectedData((prevSelectedData) => {
-  //     if (prevSelectedData?.includes(dataItem)) {
-  //       // Deselect the data item if it's already selected
-  //       return prevSelectedData.filter((item) => item !== dataItem);
-  //     } else {
-  //       // Select the data item if it's not already selected
-  //       return [...prevSelectedData, dataItem];
-  //     }
-  //   });
-  // };
- 
- 
   useEffect(() => {
     const activeUsers = user?.filter((user) => user.isactive == true);
     const inActiveUser = user?.filter((user) => user.isactive == false);
+    const extractedFieldsForAllData = user?.map((item) => ({
+      firstname: item.firstname,
+      mobileNo: item.mobileNo,
+      username: item.username,
+      isactive:item.isactive ? 'Active' : 'InActive'
+    }));
+
     const extractedFields = activeUsers?.map((item) => ({
       firstname: item.firstname,
       mobileNo: item.mobileNo,
       username: item.username,
+      isactive:item.isactive ? 'Active' : 'InActive'
     }));
+
     const extractedInactiveFields = inActiveUser?.map((item) => ({
       firstname: item.firstname,
       mobileNo: item.mobileNo,
       username: item.username,
+      isactive:item.isactive ? 'Active' : 'InActive'
     }));
+    
+    setExtractedAllData(extractedFieldsForAllData)
     setExtractedData(extractedFields);
     setExtractedInActiveData(extractedInactiveFields);
   }, [user]);
@@ -210,29 +156,52 @@ const UserListInfo = ({
   const columns = [
     {
       name: "Sl.",
-      selector: (activeUser, index) => index + 1,
+      selector: (user, index) => index + 1,
       center: true,
       width: "60px",
     },
     {
       name: "Name",
-      selector: (activeUser) => activeUser?.firstname,
+      selector: (user) => user?.firstname,
       sortable: true,
       center: true,
       filterable: true,
     },
     {
       name: "User Name",
-      selector: (activeUser) => activeUser?.username,
+      selector: (user) => user?.username,
       sortable: true,
       center: true,
       filterable: true,
     },
     {
       name: "Mobile No",
-      selector: (activeUser) => activeUser?.mobileNo,
+      selector: (user) => user?.mobileNo,
       sortable: true,
       center: true,
+    },
+    {
+      name: "Status",
+      button: true,
+      width: "200px",
+      grow: 2,
+      cell: (user) => (
+        <div className="d-flex justify-content-between align-content-center">
+          <a
+            target="_blank"
+            className="action-icon"
+            style={{
+              textDecoration: "none",
+              color: "#000",
+              fontSize: "14px",
+              textAlign: "center",
+            }}
+            // href={`UpdateGroupName/${data?.GroupId}`}
+          >
+            {user?.isactive == true ? <p className="text-success fw-bold">Active</p> : <p className="text-danger fw-bold">InActive</p>}
+          </a>
+        </div>
+      ),
     },
 
     {
@@ -240,7 +209,7 @@ const UserListInfo = ({
       button: true,
       width: "200px",
       grow: 2,
-      cell: (activeUser) => (
+      cell: (user) => (
         <div className="d-flex justify-content-between align-content-center">
           <a
             target="_blank"
@@ -264,7 +233,7 @@ const UserListInfo = ({
               }}
             ></FontAwesomeIcon>
           </a>
-          {permission?.update ? (
+          {permission?.isUpdated ? (
             <a
               target="_blank"
               className="action-icon"
@@ -279,7 +248,7 @@ const UserListInfo = ({
                 marginLeft: "10px",
               }}
               onClick={() => {
-                window.open(`user-update/${activeUser?._id}`);
+                window.open(`user-update/${user?._id}`);
                 // handleActiveStatus(activeUser?._id);
               }}
             >
@@ -313,7 +282,7 @@ const UserListInfo = ({
               }}
             ></FontAwesomeIcon>
           </a>
-          {permission?.delete ? (
+          {permission?.isRemoved ? (
             <a
               target="_blank"
               className="action-icon "
@@ -336,7 +305,7 @@ const UserListInfo = ({
                   dangerMode: true,
                 }).then((willDelete) => {
                   if (willDelete) {
-                    deleteUser(activeUser?._id);
+                    deleteUser(user?._id);
                     swal("Poof! Your data has been deleted!", {
                       icon: "success",
                     });
@@ -378,7 +347,7 @@ const UserListInfo = ({
     },
   };
 
-  const filteredItems = activeUser?.filter(
+  const filteredItems = user?.filter(
     (item) =>
       JSON.stringify(item).toLowerCase().indexOf(filterText.toLowerCase()) !==
       -1
@@ -428,7 +397,7 @@ const UserListInfo = ({
                     class="dropdown-item"
                     href="#"
                     onClick={() => {
-                      handleDownload(extractedData, companyinfo, reportTitle);
+                      handleDownload(extractedAllData, companyinfo, reportTitle);
                     }}
                   >
                     Excel
@@ -452,8 +421,8 @@ const UserListInfo = ({
     filterText,
     resetPaginationToggle,
     companyinfo,
-    extractedData,
     reportTitle,
+    extractedAllData
   ]);
 
   return (
@@ -496,6 +465,29 @@ const UserListInfo = ({
             <th>First name</th>
             <th>User Name</th>
             <th>Mobile No</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {extractedAllData?.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.firstname}</td>
+              <td>{item.username}</td>
+              <td>{item.mobileNo}</td>
+              <td>{item.isactive}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <table id="my-table2" className="d-none">
+        <thead>
+          <tr>
+            <th>Sl.</th>
+            <th>First name</th>
+            <th>User Name</th>
+            <th>Mobile No</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -505,6 +497,7 @@ const UserListInfo = ({
               <td>{item.firstname}</td>
               <td>{item.username}</td>
               <td>{item.mobileNo}</td>
+              <td>{item.isactive}</td>
             </tr>
           ))}
         </tbody>
@@ -516,6 +509,7 @@ const UserListInfo = ({
             <th>First name</th>
             <th>User Name</th>
             <th>Mobile No</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -525,6 +519,7 @@ const UserListInfo = ({
               <td>{item.firstname}</td>
               <td>{item.username}</td>
               <td>{item.mobileNo}</td>
+              <td>{item.isactive}</td>
             </tr>
           ))}
         </tbody>

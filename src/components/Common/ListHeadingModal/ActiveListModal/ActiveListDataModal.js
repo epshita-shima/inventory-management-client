@@ -5,16 +5,19 @@ import React, { useEffect, useMemo, useState } from "react";
 import swal from "sweetalert";
 import DataTable from "react-data-table-component";
 import {
+  downloadAllPDF,
   downloadInactivePDF,
   downloadPDF,
 } from "../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../ReportProperties/HandelExcelDownload";
-import FilterComponent from "../../../UserListInformation/Index/UserDataTable/FilterComponent";
 import { useUpdateMultipleUserStatusMutation } from "../../../../redux/features/user/userApi";
 import MenuIdCollection from "../../MenuIdCollection/MenuIdCollection";
 import { useUpdateRawMaterialStatusMutation } from "../../../../redux/features/iteminformation/rmItemInfoApi";
 import { useUpdateCFTInfoStatusMutation } from "../../../../redux/features/cftinformation/cftInfosApi";
 import { useUpdateFinishGoodStatusMutation } from "../../../../redux/features/iteminformation/iteminfoApi";
+import { useUpdateSupplierInfoStatusMutation } from "../../../../redux/features/supplierInformation/supplierInfoApi";
+import { useUpdateClientInfoStatusMutation } from "../../../../redux/features/clientinformation/clientInfoApi";
+import FilterComponent from "../../ListDataSearchBoxDesign/FilterComponent";
 
 const ActiveListDataModal = ({
   listData,
@@ -34,17 +37,22 @@ const ActiveListDataModal = ({
   const [updateStatusForRawMeterial] = useUpdateRawMaterialStatusMutation();
   const [updateStatusForFinishGood] = useUpdateFinishGoodStatusMutation();
   const [updateCFTInfoStatus] = useUpdateCFTInfoStatusMutation();
-  const activeReportTitle = "All Active listData";
-  const inActiveReportTitle = "All Inactive listData";
-
+  const [updateSupplierInfoStatus]=useUpdateSupplierInfoStatusMutation();
+  const [updateClientInfoStatus]=useUpdateClientInfoStatusMutation();
+  const currentUrl = window.location.href;
+  const pathname = new URL(currentUrl).pathname;
+  const wordsURL = pathname.split("/");
+  const repStr = wordsURL[2].replaceAll("-", " ");
+  const pathNameConvertCapitalize=repStr.charAt(0).toUpperCase() + repStr.slice(1)
+  const activeReportTitle = `All Active ${pathNameConvertCapitalize}`;
+  const inActiveReportTitle = `All Inactive ${pathNameConvertCapitalize}`;
+ 
   const getUserFromLocal = localStorage.getItem("user");
   const getUserFromLocalConvert = JSON.parse(getUserFromLocal);
   const getMenuListFromLOcalUser = getUserFromLocalConvert[0]?.menulist;
   // const [columns,setColumns]=useState([])
 
-  console.log(extractedInActiveData);
-  const currentUrl = window.location.href;
-  const pathname = new URL(currentUrl).pathname;
+
 
   const traverse = (items) => {
     const urls = [];
@@ -83,6 +91,10 @@ const ActiveListDataModal = ({
     columns = generateColumns(listData, fieldsToDisplay);
   } else if (searchItem[0]?.menuId == MenuIdCollection.supplierinfolist) {
     const fieldsToDisplay = ["supplierName", "mobileNo", "isActive"];
+    columns = generateColumns(listData, fieldsToDisplay);
+  }
+   else if (searchItem[0]?.menuId == MenuIdCollection.clientinfolistId) {
+    const fieldsToDisplay = ["clientName", "mobileNo", "isActive"];
     columns = generateColumns(listData, fieldsToDisplay);
   }
 
@@ -160,6 +172,48 @@ const ActiveListDataModal = ({
           isActive: false,
         }));
         const response = await updateCFTInfoStatus(updateCftInfo);
+        console.log(response.data.status);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      }
+      else if (
+        activeDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.supplierinfolist
+      ) {
+        const updateSupplierInfo = selectedData.map((item) => ({
+          ...item,
+          isActive: false,
+        }));
+        const response = await updateSupplierInfoStatus(updateSupplierInfo);
+        console.log(response.data.status);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      }
+      else if (
+        activeDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.clientinfolistId
+      ) {
+        const updateClientInfo = selectedData.map((item) => ({
+          ...item,
+          isActive: false,
+        }));
+        const response = await updateClientInfoStatus(updateClientInfo);
         console.log(response.data.status);
         if (response.data.status === 200) {
           swal("Done", "Data Update status Successfully", "success");
@@ -254,58 +308,52 @@ const ActiveListDataModal = ({
           );
         }
       }
+      else if (
+        inActiveDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.supplierinfolist
+      ) {
+        const updateSupplierInfo = selectedData.map((item) => ({
+          ...item,
+          isActive: true,
+        }));
+        const response = await updateSupplierInfoStatus(updateSupplierInfo);
+        console.log(response.data.status);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      }
+      else if (
+        inActiveDataModal &&
+        searchItem[0]?.menuId == MenuIdCollection.clientinfolistId
+      ) {
+        const updateClientInfo = selectedData.map((item) => ({
+          ...item,
+          isActive: true,
+        }));
+        const response = await updateClientInfoStatus(updateClientInfo);
+        console.log(response.data.status);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update status Successfully", "success");
+          setSelectedData([]);
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      }
     } catch (error) {
       console.error("Error updating data:", error);
     }
   };
-
-  //   const columns = [
-  //     {
-  //       name: "Sl.",
-  //       selector: (listData, index) => index + 1,
-  //       center: true,
-  //       width: "60px",
-  //     },
-  //     {
-  //       name: "Name",
-  //       selector: (listData) => listData?.firstname,
-  //       sortable: true,
-  //       center: true,
-  //       filterable: true,
-  //     },
-  //     {
-  //       name: "Mobile No",
-  //       selector: (listData) => listData?.mobileNo,
-  //       sortable: true,
-  //       center: true,
-  //     },
-  //     {
-  //       name: "Status",
-  //       button: true,
-  //       width: "200px",
-  //       grow: 2,
-  //       cell: (listData) => (
-  //         <div className="d-flex justify-content-between align-content-center">
-  //           <a
-  //             target="_blank"
-  //             className="action-icon"
-  //             style={{
-  //               textDecoration: "none",
-  //               color: "#000",
-  //               fontSize: "14px",
-  //               textAlign: "center",
-  //             }}
-  //           >
-  //             <input
-  //               type="checkbox"
-  //               aria-label={`Checkbox for data item ${listData._id}`}
-  //               onClick={(e) => handleCheckboxClick(listData)}
-  //             />
-  //           </a>
-  //         </div>
-  //       ),
-  //     },
-  //   ];
 
   const customStyles = {
     table: {
@@ -383,7 +431,7 @@ const ActiveListDataModal = ({
                           href="#"
                           onClick={() => {
                             if (companyinfo?.length !== 0 || undefined) {
-                              downloadPDF({ companyinfo }, activeReportTitle);
+                              downloadAllPDF({ companyinfo }, activeReportTitle);
                             }
                           }}
                         >
@@ -488,6 +536,8 @@ const ActiveListDataModal = ({
     activeDataModal,
     extractedInActiveData,
     listData?.length,
+    inActiveReportTitle,
+    activeReportTitle
   ]);
   return (
     <div

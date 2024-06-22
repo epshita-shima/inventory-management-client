@@ -100,7 +100,7 @@ const CFTInfosTableData = () => {
         >
           <div className="">
             <a
-              href="/main-view/craete-cft-infos"
+              href="/main-view/create-cft-infos"
               target="_blank"
               className="text-white text-center d-flex justify-content-center align-items-center"
               style={{

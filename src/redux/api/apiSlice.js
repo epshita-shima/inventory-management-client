@@ -31,6 +31,10 @@ export const api = createApi({
         method: "POST",
         body: payload,
       }),
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
+      }),
     }),
     // getUserRole:builder.query({
     //   query:()=>"/get-user-role"

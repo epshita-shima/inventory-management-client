@@ -61,9 +61,9 @@ console.log(categoryInfoConvertedOptions)
         categoryId: "",
         itemName: "",
         unitId: "",
-        openingStock: "",
+        openingStock: '',
         description: "",
-        itemStatus: false,
+        itemStatus: true,
         openingDate: startDate,
         ladgerApproveStatus: false,
         ladgerApproveDate: null,
@@ -140,7 +140,7 @@ console.log(categoryInfoConvertedOptions)
                   height: "25px",
                 }}
                 onClick={() => {
-                  navigate("/main-view/item-list-(rm)");
+                  navigate("/main-view/raw-material-item-list");
                 }}
               >
                 <FontAwesomeIcon icon={faArrowAltCircleLeft}></FontAwesomeIcon>{" "}
@@ -246,9 +246,9 @@ console.log(categoryInfoConvertedOptions)
                             categoryId: "",
                             itemName: "",
                             unitId: "",
-                            openingStock: "",
+                            openingStock: 0,
                             description: "",
-                            itemStatus: false,
+                            itemStatus: true,
                             openingDate: startDate,
                             ladgerApproveStatus: false,
                             ladgerApproveDate: null,

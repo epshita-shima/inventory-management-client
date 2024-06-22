@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
 import ListHeading from "../../../Common/ListHeading/ListHeading";
 import DataTable from "react-data-table-component";
-import { useGetAllSupplierInformationQuery } from "../../../../redux/features/supplierInformation/supplierInfoApi";
+import { useDeleteSupplierInfoMutation, useGetAllSupplierInformationQuery } from "../../../../redux/features/supplierInformation/supplierInfoApi";
 import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
 import handleCheckboxClick from "../../../Common/ListHeadingModal/Function/handleCheckboxClick";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,11 +12,13 @@ import swal from "sweetalert";
 import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../ReportProperties/HandelExcelDownload";
 import ActiveListDataModal from "../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
+
 const SupplierInfoList = ({permission}) => {
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
   const { data: supplierInfoData, refetch } =
     useGetAllSupplierInformationQuery(undefined);
   const [filterText, setFilterText] = useState("");
+  const [extractedAllDataReport, setExtractedAllDataReport] = useState([]);
   const [extractedDataForReport, setExtractedDataForReport] = useState([]);
   const [extractedInActiveDataForReport, setExtractedInActiveDataForReport] =
     useState([]);
@@ -26,10 +28,10 @@ const SupplierInfoList = ({permission}) => {
   const [inActiveSupplierInfoModal, setInActiveSupplierInfoModal] =
     useState(false);
   const [selectedData, setSelectedData] = useState([]);
-  // const [deleteRMItemInfo] = useDeleteRMItemInfoMutation();
+  const [deleteSupplierInfo] = useDeleteSupplierInfoMutation();
   const [supplierInfoActiveStatus, setSupplierInfoActiveStaus] = useState([]);
   const [supplierInfoInActiveStatus, setSupplierInfoInActiveStatus] = useState([]);
-  var reportTitle = "All Active Supplier List";
+  var reportTitle = "All Supplier List";
 
   useEffect(() => {
     const supplierInfoActiveStatus = supplierInfoData?.filter(
@@ -38,8 +40,17 @@ const SupplierInfoList = ({permission}) => {
     const supplierInfoInActiveStatus = supplierInfoData?.filter(
       (item) => item.isActive == false
     );
-    console.log(supplierInfoActiveStatus);
-    console.log(supplierInfoInActiveStatus);
+
+    const extractedFieldsForAllData = supplierInfoData?.map((item) => {
+      return {
+        supplierName: item.supplierName,
+        email: item.email,
+        mobileNo: item.mobileNo,
+        contactPerson: item.contactPerson,
+        address: item.address,
+        isActive:item.isActive ? 'Active': 'InActive'
+      };
+    });
     const extractedFields = supplierInfoActiveStatus?.map((item) => {
       return {
         supplierName: item.supplierName,
@@ -47,6 +58,7 @@ const SupplierInfoList = ({permission}) => {
         mobileNo: item.mobileNo,
         contactPerson: item.contactPerson,
         address: item.address,
+        isActive:item.isActive ? 'Active': 'InActive'
       };
     });
 
@@ -57,8 +69,10 @@ const SupplierInfoList = ({permission}) => {
         mobileNo: item.mobileNo,
         contactPerson: item.contactPerson,
         address: item.address,
+        isActive:item.isActive ? 'Active': 'InActive'
       };
     });
+    setExtractedAllDataReport(extractedFieldsForAllData)
     setSupplierInfoActiveStaus(supplierInfoActiveStatus);
     setSupplierInfoInActiveStatus(supplierInfoInActiveStatus);
     setExtractedDataForReport(extractedFields);
@@ -171,11 +185,7 @@ const SupplierInfoList = ({permission}) => {
             }}
             // href={`UpdateGroupName/${data?.GroupId}`}
           >
-            {supplierInfoData?.isActive == true ? (
-              <p>Active</p>
-            ) : (
-              <p>InActive</p>
-            )}
+            {supplierInfoData?.isActive == true ? <p className="text-success fw-bold">Active</p> : <p className="text-danger fw-bold">InActive</p>}
           </a>
         </div>
       ),
@@ -239,25 +249,25 @@ const SupplierInfoList = ({permission}) => {
                   buttons: true,
                   dangerMode: true,
                 }).then(async (willDelete) => {
-                //   if (willDelete) {
-                //     const response = await deleteRMItemInfo(
-                //       supplierInfoData?._id
-                //     ).unwrap();
-                //     console.log(response);
-                //     if (response.status === 200) {
-                //       swal("Deleted!", "Your selected item has been deleted!", {
-                //         icon: "success",
-                //       });
-                //     } else {
-                //       swal(
-                //         "Error",
-                //         "An error occurred while creating the data",
-                //         "error"
-                //       );
-                //     }
-                //   } else {
-                //     swal(" Cancel! Your selected item is safe!");
-                //   }
+                  if (willDelete) {
+                    const response = await deleteSupplierInfo(
+                      supplierInfoData?._id
+                    ).unwrap();
+                    console.log(response);
+                    if (response.status === 200) {
+                      swal("Deleted!", "Your selected item has been deleted!", {
+                        icon: "success",
+                      });
+                    } else {
+                      swal(
+                        "Error",
+                        "An error occurred while creating the data",
+                        "error"
+                      );
+                    }
+                  } else {
+                    swal(" Cancel! Your selected item is safe!");
+                  }
                 });
               }}
             >
@@ -348,7 +358,7 @@ const SupplierInfoList = ({permission}) => {
                     href="#"
                     onClick={() => {
                       handleDownload(
-                        extractedDataForReport,
+                        extractedAllDataReport,
                         companyinfo,
                         reportTitle
                       );
@@ -375,7 +385,7 @@ const SupplierInfoList = ({permission}) => {
     filterText,
     resetPaginationToggle,
     companyinfo,
-    extractedDataForReport,
+    extractedAllDataReport,
     reportTitle,
     refetch,
   ]);
@@ -419,6 +429,33 @@ const SupplierInfoList = ({permission}) => {
             <th>Mobile Number</th>
             <th>Contact Person</th>
             <th>Address</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {extractedAllDataReport?.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.supplierName}</td>
+              <td>{item.email}</td>
+              <td>{item.mobileNo}</td>
+              <td>{item.contactPerson}</td>
+              <td>{item.address}</td>
+              <td>{item.isActive}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <table id="my-table2" className="d-none">
+        <thead>
+          <tr>
+            <th>Sl.</th>
+            <th>Supplier Name</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>Contact Person</th>
+            <th>Address</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -430,6 +467,7 @@ const SupplierInfoList = ({permission}) => {
               <td>{item.mobileNo}</td>
               <td>{item.contactPerson}</td>
               <td>{item.address}</td>
+              <td>{item.isActive}</td>
             </tr>
           ))}
         </tbody>
@@ -444,6 +482,7 @@ const SupplierInfoList = ({permission}) => {
             <th>Mobile Number</th>
             <th>Contact Person</th>
             <th>Address</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -455,6 +494,7 @@ const SupplierInfoList = ({permission}) => {
               <td>{item.mobileNo}</td>
               <td>{item.contactPerson}</td>
               <td>{item.address}</td>
+              <td>{item.isActive}</td>
             </tr>
           ))}
         </tbody>

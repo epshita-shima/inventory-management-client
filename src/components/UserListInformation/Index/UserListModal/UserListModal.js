@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
 import "./UserListModal.css";
-import FilterComponent from "../UserDataTable/FilterComponent";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import DataTable from "react-data-table-component";
@@ -11,6 +11,7 @@ import {
   downloadPDF,
 } from "../../../ReportProperties/HeaderFooter";
 import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
+import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
 
 const UserListModal = ({ user }) => {
   const [extractedData, setExtractedData] = useState([]);

@@ -23,7 +23,7 @@ const UpdateMenu = () => {
   const [changingParentId, setChangingParentId] = useState("");
   const [changeParentData, setChangeParentData] = useState([]);
   const [singleMatchingItemData, setSingleMatchingItemData] = useState([]);
-const [masterMenuData,setMasterMenuData]=useState([])
+  const [masterMenuData, setMasterMenuData] = useState([]);
   const { data: singleMenu, isLoading: singleMenuLoading } =
     useGetSingleMenuQuery(id);
   const { data: changeParent } =
@@ -36,7 +36,8 @@ const [masterMenuData,setMasterMenuData]=useState([])
   console.log(changeParentData);
   console.log(singleMatchingItemData);
   console.log(JSON.stringify(singleMenu));
-  console.log(JSON.stringify(masterMenuData));
+  console.log(singleMenuData);
+  console.log(masterMenuData);
 
   const {
     data: menuItems,
@@ -73,7 +74,7 @@ const [masterMenuData,setMasterMenuData]=useState([])
     { value: "child", label: "Child" },
     { value: "parent", label: "Parent" },
   ];
-  useEffect(()=>{
+  useEffect(() => {
     const updatedSingleData = (data) => {
       const matchedData = data?.items?.find((items) => {
         if (items._id == id) {
@@ -92,85 +93,95 @@ const [masterMenuData,setMasterMenuData]=useState([])
       }
       return data;
     };
-  
+
     const tableUpdatedData = updatedSingleData(singleMenu);
-console.log(JSON.stringify(tableUpdatedData))
-setSingleMenuData(tableUpdatedData)
-  },[id,singleMenu])
+    console.log(JSON.stringify(tableUpdatedData));
+    setSingleMenuData(tableUpdatedData);
+  }, [id, singleMenu]);
 
   useEffect(() => {
-//     const parentMenuOptionsData = (options) => {
-//       const parentMenuRecursive = (options, parentLabel) => {
-//         let result = [];
-//         options?.forEach((option) => {
-//           if (option.isParent == true) {
-//             result.push({
-//               _id: option._id,
-//               label: option.label,
-//               trackId: option.trackId,
-//               items: option.items,
-//               isParent: option.isParent,
-//               url: option.url,
-//               permissions: option.permissions,
-//               createdAt: option.createdAt,
-//               updatedAt: option.updatedAt,
-//             });
-//           } else {
-//           }
-//           if (option.items && option.items.length > 0) {
-//             result = result.concat(
-//               parentMenuRecursive(option.items, option.label)
-//             );
-//           }
-//         });
-//         return result;
-//       };
-//       return parentMenuRecursive(options);
-//     };
-//     const parentMenusOptionsData = parentMenuOptionsData(menuItems);
-// console.log(parentMenusOptionsData)
+    //     const parentMenuOptionsData = (options) => {
+    //       const parentMenuRecursive = (options, parentLabel) => {
+    //         let result = [];
+    //         options?.forEach((option) => {
+    //           if (option.isParent == true) {
+    //             result.push({
+    //               _id: option._id,
+    //               label: option.label,
+    //               trackId: option.trackId,
+    //               items: option.items,
+    //               isParent: option.isParent,
+    //               url: option.url,
+    //               permissions: option.permissions,
+    //               createdAt: option.createdAt,
+    //               updatedAt: option.updatedAt,
+    //             });
+    //           } else {
+    //           }
+    //           if (option.items && option.items.length > 0) {
+    //             result = result.concat(
+    //               parentMenuRecursive(option.items, option.label)
+    //             );
+    //           }
+    //         });
+    //         return result;
+    //       };
+    //       return parentMenuRecursive(options);
+    //     };
+    //     const parentMenusOptionsData = parentMenuOptionsData(menuItems);
+    // console.log(parentMenusOptionsData)
 
-// const matchingData = parentMenusOptionsData?.find(
-//   (x) => x._id == changingParentId
-// );
-// console.log(matchingData)
-//     function separateItem(data, id) {
-//       console.log(data);
-//       const isExisting = data?.items?.find((item) => item?._id === id);
-//       return isExisting;
-//     }
+    // const matchingData = parentMenusOptionsData?.find(
+    //   (x) => x._id == changingParentId
+    // );
+    // console.log(matchingData)
+    //     function separateItem(data, id) {
+    //       console.log(data);
+    //       const isExisting = data?.items?.find((item) => item?._id === id);
+    //       return isExisting;
+    //     }
 
-//     // Example usage: Separating the "PI Report" item
-//     const piReportItem = separateItem(singleMenu, id);
-// console.log(piReportItem)
-//     function searchParentWithItem(data) {
-//       console.log("test", id);
-//       return {
-//         ...data,
-//         items: data?.items.filter((item) => item._id === id || item.isParent),
-//       };
-//     }
+    //     // Example usage: Separating the "PI Report" item
+    //     const piReportItem = separateItem(singleMenu, id);
+    // console.log(piReportItem)
+    //     function searchParentWithItem(data) {
+    //       console.log("test", id);
+    //       return {
+    //         ...data,
+    //         items: data?.items.filter((item) => item._id === id || item.isParent),
+    //       };
+    //     }
 
     setMasterMenuData(singleMenu);
   }, [singleMenu, id, changingParentId, menuItems]);
 
-  useEffect(()=>{
-    setMasterMenuData(prevMasterData => ({
-      ...prevMasterData,
-      items:prevMasterData?.items?.map(item => {
-        if (item._id === singleMenuData._id) {
-            return { ...singleMenuData, isParent: true };
-        } else {
-            return item;
-        }
-    })}))
-  },[singleMenuData])
+  useEffect(() => {
+    setMasterMenuData((prevMasterData) => {
+      const itemExists = prevMasterData?.items?.some(
+        (item) => item._id === singleMenuData._id
+      );
+      console.log(itemExists);
+      if (!itemExists) {
+        return singleMenuData;
+      } else {
+        return {
+          ...prevMasterData,
+          items: prevMasterData?.items?.map((item) => {
+            if (item._id === singleMenuData._id) {
+              return { ...singleMenuData };
+            } else {
+              return item;
+            }
+          }),
+        };
+      }
+    });
+  }, [singleMenuData]);
 
   const handleToggle = () => {
     setIsToggled(!isToggled);
   };
 
-  
   const removeItem = (index) => {
     setSingleMenuData((prev) => {
       const temp__details = [...prev.items];
@@ -185,6 +196,7 @@ setSingleMenuData(tableUpdatedData)
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isUpdateAsChangeParent) {
+      console.log(masterMenuData);
       const response = await updateSingleMenus({ masterMenuData, singleMenu });
       console.log(response);
       if (response.data.status === 200) {
@@ -196,6 +208,7 @@ setSingleMenuData(tableUpdatedData)
         swal("Error", "An error occurred while creating the data", "error");
       }
     } else {
+      console.log(masterMenuData);
       const response = await updateSingleMenu(masterMenuData);
       console.log(response);
       if (response.data.status === 200) {
@@ -487,7 +500,7 @@ setSingleMenuData(tableUpdatedData)
                                                 }; // Return a new object with updated items array
                                               });
                                             }}
-                                            style={{color:'white'}}
+                                            style={{ color: "white" }}
                                           >
                                             {detail.isParent ? "P" : "C"}
                                             <div className="toggle-handle" />
@@ -516,16 +529,20 @@ setSingleMenuData(tableUpdatedData)
                                             setSingleMenuData((prevState) => {
                                               const updatedItems = [
                                                 ...prevState.items,
-                                              ]; 
+                                              ];
                                               updatedItems[index] = {
                                                 ...updatedItems[index],
                                                 label: e.target.value,
-                                                url:'/main-view/'+e.target.value.toLowerCase().replace(/\s+/g, "-")
-                                              }; 
+                                                url:
+                                                  "/main-view/" +
+                                                  e.target.value
+                                                    .toLowerCase()
+                                                    .replace(/\s+/g, "-"),
+                                              };
                                               return {
                                                 ...prevState,
                                                 items: updatedItems,
-                                              }; 
+                                              };
                                             });
                                           }}
                                         />
