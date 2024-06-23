@@ -33,11 +33,13 @@ const cftInfosApi= api.injectEndpoints({
       }),
 
       updateCFTInfo: builder.mutation({
-        query: (payload) => ({
-          url: `/cftinfo/${payload._id}`,
+        query: (payload) => (
+          {
+          url: `/cftinfo/${payload.id}`,
           method: "PUT",
-          body: payload,
-        }),
+          body: payload.data,
+        }
+      ),
         invalidatesTags: ["updatecftinfo"],
         transformResponse: (response, meta) => ({
           data: response,

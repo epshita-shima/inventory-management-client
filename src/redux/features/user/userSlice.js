@@ -100,7 +100,7 @@ const initialState = {
 export const register = createAsyncThunk('auth/register', async (userData, { rejectWithValue }) => {
  console.log(userData)
   try {
-    const response = await fetch('http://localhost:5000/register', {
+    const response = await fetch(`${process.env.REACT_APP_BASE_URL}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export const register = createAsyncThunk('auth/register', async (userData, { rej
 export const login = createAsyncThunk('auth/login', async (userData, { rejectWithValue }) => {
  console.log(userData)
   try {
-    const response = await fetch('http://localhost:5000/login', {
+    const response = await fetch(`${process.env.REACT_APP_BASE_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/img-redundant-alt */
 /* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
@@ -20,7 +21,7 @@ import ActiveListDataModal from "../../../Common/ListHeadingModal/ActiveListModa
 import { useDeleteCFTInfoMutation } from "../../../../redux/features/cftinformation/cftInfosApi";
 const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
-
+  console.log(cftInfosData);
   const [filterText, setFilterText] = useState("");
   const [extractedAllDataReport, setExtractedAllDataReport] = useState([]);
   const [extractedDataForReport, setExtractedDataForReport] = useState([]);
@@ -33,10 +34,10 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
   const [deleteCFTInfoData] = useDeleteCFTInfoMutation();
   const [cftInfoActiveStatus, setCFTInfoActiveStaus] = useState([]);
   const [cftInfoInActiveStatus, setCFTInfoInActiveStatus] = useState([]);
-  const [isExisting,setIsExisting]=useState([])
+  const [isExisting, setIsExisting] = useState([]);
   var reportTitle = "All CFT Info List";
 
-  console.log(cftInfosData)
+  console.log(cftInfosData);
 
   useEffect(() => {
     const cftInfoActiveStatus = cftInfosData?.filter(
@@ -73,7 +74,6 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
     setCFTInfoInActiveStatus(cftInfoInActiveStatus);
     setExtractedDataForReport(extractedFields);
     setExtractedInActiveDataForReport(extractedInactiveFields);
-
   }, [cftInfosData?.unitId, cftInfosData]);
 
   const generateColumns = (data, fields) => {
@@ -106,7 +106,7 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
                     const existing = cftInfosData?.filter(
                       (x) => x.isActive == true
                     );
-            console.log(existing.length,existing.length >1)
+                    console.log(existing.length, existing.length > 1);
                     if (existing.length > 1) {
                       swal(
                         "Not Possible!",
@@ -155,6 +155,23 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
       sortable: true,
       center: true,
       filterable: true,
+    },
+    {
+      name: "Status",
+      button: true,
+      width: "200px",
+      grow: 2,
+      cell: (cftInfosData) => (
+        <div style={{ textAlign: "center" }} onClick={()=>{
+     if(cftInfosData?.image){
+      window.open(`${process.env.REACT_APP_BASE_URL}/${cftInfosData?.image}`);
+     }
+          
+        }}>
+          {cftInfosData?.image ?'File uploaded' : 'No file upload'
+          }
+        </div>
+      ),
     },
 
     {
@@ -212,23 +229,19 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
                 marginLeft: "10px",
               }}
               onClick={() => {
-           if(cftInfoActiveStatus.length >0){
-            if(cftInfoActiveStatus[0]?._id==cftInfosData?._id){
-              window.open(`update-cft-info/${cftInfosData?._id}`);
-            }
-            else{
-              swal(
-                "Not Possible!",
-                "There is an active CFT,Plase Close it first",
-                "warning"
-              );
-            }
-           }
-           else{
-            window.open(`update-cft-info/${cftInfosData?._id}`);
-           }
-
-                
+                if (cftInfoActiveStatus.length > 0) {
+                  if (cftInfoActiveStatus[0]?._id == cftInfosData?._id) {
+                    window.open(`update-cft-info/${cftInfosData?._id}`);
+                  } else {
+                    swal(
+                      "Not Possible!",
+                      "There is an active CFT,Plase Close it first",
+                      "warning"
+                    );
+                  }
+                } else {
+                  window.open(`update-cft-info/${cftInfosData?._id}`);
+                }
               }}
             >
               <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>

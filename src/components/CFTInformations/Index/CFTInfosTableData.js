@@ -16,7 +16,7 @@ const CFTInfosTableData = () => {
   } = useGetAllCFTInfosQuery(undefined);
   const [permission, setPermission] = useState();
   const navigate = useNavigate();
-
+console.log({cftInfosData})
   useEffect(() => {
     if (localStorage.length > 0) {
       const getUserId = localStorage.getItem("user");
