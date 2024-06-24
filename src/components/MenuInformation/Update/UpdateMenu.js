@@ -446,23 +446,23 @@ const UpdateMenu = () => {
                             <table className="table w-full table-bordered ">
                               <thead className="w-100">
                                 <tr>
-                                  <th className="bg-white text-center align-middle text-[#581C87] ">
+                                  <th className="bg-white text-center align-middle  ">
                                     Sl
                                   </th>
 
-                                  <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
+                                  <th className="bg-white text-center align-middle ">
                                     Menu Type
                                     <span className="text-danger fw-bold fs-2">
                                       *
                                     </span>
                                   </th>
-                                  <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
+                                  <th className="bg-white text-center align-middle ">
                                     Menu Name
                                     <span className="text-danger fw-bold fs-2">
                                       *
                                     </span>
                                   </th>
-                                  <th className="bg-white text-center align-middle text-[#581C87] text-[13px]">
+                                  <th className="bg-white text-center align-middle ">
                                     Action
                                   </th>
                                 </tr>

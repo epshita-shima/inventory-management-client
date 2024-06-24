@@ -23,7 +23,8 @@ import UpdateCFTInfo from "./components/CFTInformations/Update/UpdateCFTInfo";
 import InsertSupplierInformation from "./components/SupplierProfile/Insert/InsertSupplierInformation";
 import SupplierInfoTableData from "./components/SupplierProfile/Index/SupplierInfoTableData/SupplierInfoTableData";
 import InsertClientInformation from "./components/ClientInformation/Insert/InsertClientInformation";
-import ClientInfoTableData from "./components/ClientInformation/Index/ClientInfoTableData";
+import ClientInfoTableData from './components/ClientInformation/Index/ClientInfoTableData';
+import InsertPurchaseOrder from "./components/PurchaseManagement/PurchaseOrder/Insert/InsertPurchaseOrder";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -124,6 +125,8 @@ function App() {
              <Route path="/main-view/client-list" element={<ClientInfoTableData></ClientInfoTableData>}></Route>
              <Route path="/main-view/create-client" element={<InsertClientInformation></InsertClientInformation>}></Route>
              <Route path="update-client-info/:id" element={<InsertClientInformation></InsertClientInformation>}></Route>
+
+             <Route path="/main-view/purchase-order" element={<InsertPurchaseOrder></InsertPurchaseOrder>}></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={
