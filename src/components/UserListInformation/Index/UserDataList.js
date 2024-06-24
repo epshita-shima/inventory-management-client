@@ -57,17 +57,22 @@ const UserDataList = ({
 
     // Find the user object matching the provided userId
     const currentUser = userData?.find((user) => user._id === userId);
-
+console.log(currentUser)
     if (currentUser) {
       // Loop through the menus of the current user
       currentUser?.menulist?.forEach((menu) => {
         menu?.items?.forEach((subMenu) => {
-          // Check if the subMenu is the "User Profile" menu
+          
+          if(subMenu.items.length <= 0){
+            if(subMenu.label=='User Setting'){
+              userList=subMenu
+            }
+          }
           if (subMenu?.label === subMenu?.label) {
-            // Find the "User List" sub-item
             const userListSubMenu = subMenu?.items.find(
-              (subItem) => subItem?.label === subItem?.label
+              (subItem) => subItem?.label === 'User Setting'
             );
+            console.log( userListSubMenu)
             if (userListSubMenu) {
               // Set the user list property
               userList = userListSubMenu;
@@ -114,6 +119,7 @@ const UserDataList = ({
                 height: "40px",
                 width: "40px",
                 borderRadius: "50px",
+                border:'1px solid #fff'
               }}
             >
               <FontAwesomeIcon

@@ -2,6 +2,7 @@ import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
 const handleDownload = (data, companyinfo,reportTitle) => {
+    const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Userlist Report');
 
@@ -62,7 +63,7 @@ const handleDownload = (data, companyinfo,reportTitle) => {
     // Generate buffer
     workbook.xlsx.writeBuffer().then((buffer) => {
         // Save the Excel file
-        saveAs(new Blob([buffer]), 'userlist_report.xlsx');
+        saveAs(new Blob([buffer]), `${fileName}.xlsx`);
     });
 }
 

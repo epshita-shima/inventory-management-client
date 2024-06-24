@@ -7,7 +7,7 @@ const menuApi = api.injectEndpoints({
       providesTags: ["getallmenu", "getallchildmenu", "deletemenu","updatenestedmenudata","updatesinglemenudata,updatesingleportionmenu"],
       refetchOnReconnect: true,
       refetchOnFocus: true,
-      // refetchOnTags: ["getallmenu", "getallchildmenu"],
+      refetchOnTags: ["getallmenu", "getallchildmenu", "deletemenu","updatenestedmenudata","updatesinglemenudata,updatesingleportionmenu"],
     }),
     createMenu: builder.mutation({
       query: (payload) => ({
@@ -71,12 +71,6 @@ const menuApi = api.injectEndpoints({
         method: "PUT",
         body: payload,
       }),
-      // async onQueryStarted(payload, { dispatch, queryFulfilled }) {
-      //   try {
-      //     dispatch(api.util.invalidateTags(["getallmenu", "getallchildmenu"]));
-      //     await dispatch(api.endpoints.getAllMenuItems.initiate());
-      //   } catch {}
-      // },
       
       invalidatesTags: ["updatesingleportionmenu"],
       transformResponse: (response, meta) => ({

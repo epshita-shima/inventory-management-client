@@ -35,7 +35,7 @@ const SingleUserDisplay = () => {
   useEffect(() => {
     setSingleUserData(singleUser);
   }, [singleUser]);
-  console.log(singleUser);
+
 
   const [validated, setValidated] = useState(false);
   const parentIds = [];
@@ -105,7 +105,7 @@ const SingleUserDisplay = () => {
       await updateUser(singleUserData);
       // Data has been successfully updated
       swal("Done", "Data Update Successfully", "success");
-      navigate("/main-view/user-list");
+      navigate("/main-view/user-setting");
     } catch (error) {
       // An error occurred while updating data
       swal("Not possible", "Try again", "warning");

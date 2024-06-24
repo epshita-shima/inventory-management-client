@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const api = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://meb-inventory-backend.vercel.app" }),
+  baseQuery: fetchBaseQuery({ baseUrl:process.env.REACT_APP_BASE_URL}),
   tagTypes: ['createuser','changestatus','changesmanytatus','deleteuser'],
   endpoints: (builder) => ({
     addNewUser: builder.mutation({
@@ -30,6 +30,10 @@ export const api = createApi({
         url: "/serial-create",
         method: "POST",
         body: payload,
+      }),
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
       }),
     }),
     // getUserRole:builder.query({

@@ -1,43 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { Form, InputGroup } from "react-bootstrap";
-import { useAddNewUserRoleMutation, useGetUserRoleQuery } from "../../../redux/features/userrole/userroleApi";
+import {
+  useAddNewUserRoleMutation,
+  useGetUserRoleQuery,
+} from "../../../redux/features/userrole/userroleApi";
 import swal from "sweetalert";
 
 const UserRoleEntryModal = () => {
   const [createUserRole] = useAddNewUserRoleMutation();
   const [existingUserRoles, setExistingUserRoles] = useState([]);
-  const {data:userRoles,error, isLoading}=useGetUserRoleQuery(undefined)
+  const { data: userRoles, error, isLoading } = useGetUserRoleQuery(undefined);
 
-  const [userRoleName, setUserRoleName] = useState('');
+  const [userRoleName, setUserRoleName] = useState("");
 
   useEffect(() => {
     if (userRoles) {
-        setExistingUserRoles(userRoles.map(role => role.name));
+      setExistingUserRoles(userRoles.map((role) => role.name));
     }
-}, [userRoles]);
+  }, [userRoles]);
   const handleUserRoleHandle = () => {
     if (existingUserRoles.includes(userRoleName)) {
-      alert('User role already exists!');
+      alert("User role already exists!");
       return;
-  }
-  try {
-    // Call the mutation to create a new user role
-    const userRoleFormData = {
-      makeby: "",
-      updateby: "",
-      userrolename: userRoleName,
-    };
+    }
+    try {
+      // Call the mutation to create a new user role
+      const userRoleFormData = {
+        makeby: "",
+        updateby: "",
+        userrolename: userRoleName,
+      };
 
-    createUserRole(userRoleFormData);
-    swal("Done", "Save Successfully", "success");
-    // Clear the input field after successful creation
-    setUserRoleName('');
-    
-} catch (error) {
-    console.error('Error creating user role:', error);
-}
- 
- };
+      createUserRole(userRoleFormData);
+      swal("Done", "Save Successfully", "success");
+      // Clear the input field after successful creation
+      setUserRoleName("");
+    } catch (error) {
+      console.error("Error creating user role:", error);
+    }
+  };
 
   return (
     <div

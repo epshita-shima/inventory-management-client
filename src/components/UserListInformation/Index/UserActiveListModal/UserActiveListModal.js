@@ -2,13 +2,13 @@
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useMemo, useState } from "react";
-import FilterComponent from "../UserDataTable/FilterComponent";
 import DataTable from "react-data-table-component";
 import { useUpdateMultipleUserStatusMutation } from "../../../../redux/features/user/userApi";
 import swal from "sweetalert";
 import { downloadInactivePDF, downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../ReportProperties/HandelExcelDownload";
 import './UserActivationModal.css'
+import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
 
 const UserActiveListModal = ({
   user,
@@ -116,7 +116,7 @@ console.log(user)
   const customStyles = {
     table: {
       style: {
-        height: "350px",
+        height: "250px",
         overflow: "auto",
       },
     },
@@ -279,7 +279,8 @@ console.log(user)
     role="dialog"
     aria-labelledby="exampleModalCenterTitle"
     aria-hidden="true"
-    style={{height:'550px'}}
+    style={{overflow:'hidden'}}
+
     >
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -304,7 +305,7 @@ console.log(user)
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
+          <div className="modal-body">
             <DataTable
               columns={columns}
               data={filteredItems}

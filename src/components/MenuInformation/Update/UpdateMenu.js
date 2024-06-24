@@ -23,7 +23,7 @@ const UpdateMenu = () => {
   const [changingParentId, setChangingParentId] = useState("");
   const [changeParentData, setChangeParentData] = useState([]);
   const [singleMatchingItemData, setSingleMatchingItemData] = useState([]);
-
+  const [masterMenuData, setMasterMenuData] = useState([]);
   const { data: singleMenu, isLoading: singleMenuLoading } =
     useGetSingleMenuQuery(id);
   const { data: changeParent } =
@@ -35,8 +35,9 @@ const UpdateMenu = () => {
   console.log(changeParent);
   console.log(changeParentData);
   console.log(singleMatchingItemData);
+  console.log(JSON.stringify(singleMenu));
   console.log(singleMenuData);
-  console.log(isUpdateAsChangeParent);
+  console.log(masterMenuData);
 
   const {
     data: menuItems,
@@ -73,85 +74,114 @@ const UpdateMenu = () => {
     { value: "child", label: "Child" },
     { value: "parent", label: "Parent" },
   ];
+  useEffect(() => {
+    const updatedSingleData = (data) => {
+      const matchedData = data?.items?.find((items) => {
+        if (items._id == id) {
+          console.log("checked");
+        } else {
+          if (items.items.length > 0) {
+            const matchingChild = items.items.find((x) => x._id == id);
+            console.log(matchingChild);
+            return matchingChild;
+          }
+        }
+      });
+      console.log(matchedData);
+      if (matchedData?.items?.length > 0) {
+        return matchedData;
+      }
+      return data;
+    };
+
+    const tableUpdatedData = updatedSingleData(singleMenu);
+    console.log(JSON.stringify(tableUpdatedData));
+    setSingleMenuData(tableUpdatedData);
+  }, [id, singleMenu]);
 
   useEffect(() => {
-    // const parentMenuOptionsData = (options) => {
-    //   const parentMenuRecursive = (options, parentLabel) => {
-    //     let result = [];
-    //     options?.forEach((option) => {
-    //       if (option.isParent == true) {
-    //         result.push({
-    //           _id: option._id,
-    //           label: option.label,
-    //           trackId: option.trackId,
-    //           items: option.items,
-    //           isParent: option.isParent,
-    //           url: option.url,
-    //           permissions: option.permissions,
-    //           createdAt: option.createdAt,
-    //           updatedAt: option.updatedAt,
+    //     const parentMenuOptionsData = (options) => {
+    //       const parentMenuRecursive = (options, parentLabel) => {
+    //         let result = [];
+    //         options?.forEach((option) => {
+    //           if (option.isParent == true) {
+    //             result.push({
+    //               _id: option._id,
+    //               label: option.label,
+    //               trackId: option.trackId,
+    //               items: option.items,
+    //               isParent: option.isParent,
+    //               url: option.url,
+    //               permissions: option.permissions,
+    //               createdAt: option.createdAt,
+    //               updatedAt: option.updatedAt,
+    //             });
+    //           } else {
+    //           }
+    //           if (option.items && option.items.length > 0) {
+    //             result = result.concat(
+    //               parentMenuRecursive(option.items, option.label)
+    //             );
+    //           }
     //         });
-    //       } else {
-    //       }
-    //       if (option.items && option.items.length > 0) {
-    //         result = result.concat(
-    //           parentMenuRecursive(option.items, option.label)
-    //         );
-    //       }
-    //     });
-    //     return result;
-    //   };
-    //   return parentMenuRecursive(options);
-    // };
-    // const parentMenusOptionsData = parentMenuOptionsData(menuItems);
+    //         return result;
+    //       };
+    //       return parentMenuRecursive(options);
+    //     };
+    //     const parentMenusOptionsData = parentMenuOptionsData(menuItems);
+    // console.log(parentMenusOptionsData)
 
-    // const updatedSingleData = (data) => {
-    //   const matchedData = data?.items?.find((items) => {
-    //     if (items._id == id) {
-    //       console.log("checked");
-    //     } else {
-    //       if (items.items.length > 0) {
-    //         const matchingChild = items.items.find((x) => x._id == id);
-    //         console.log(matchingChild);
-    //         return matchingChild;
-    //       }
-    //     }
-    //   });
-    //   console.log(matchedData);
-    //   if (matchedData?.items?.length > 0) {
-    //     return matchedData;
-    //   }
-    //   return data;
-    // };
     // const matchingData = parentMenusOptionsData?.find(
     //   (x) => x._id == changingParentId
     // );
+    // console.log(matchingData)
+    //     function separateItem(data, id) {
+    //       console.log(data);
+    //       const isExisting = data?.items?.find((item) => item?._id === id);
+    //       return isExisting;
+    //     }
 
-    // const tableUpdatedData = updatedSingleData(singleMenu);
+    //     // Example usage: Separating the "PI Report" item
+    //     const piReportItem = separateItem(singleMenu, id);
+    // console.log(piReportItem)
+    //     function searchParentWithItem(data) {
+    //       console.log("test", id);
+    //       return {
+    //         ...data,
+    //         items: data?.items.filter((item) => item._id === id || item.isParent),
+    //       };
+    //     }
 
-    // function separateItem(data, id) {
-    //   console.log(data);
-    //   const isExisting = data?.items?.find((item) => item?._id === id);
-    //   return isExisting;
-    // }
-
-    // Example usage: Separating the "PI Report" item
-    // const piReportItem = separateItem(singleMenu, id);
-
-    // function searchParentWithItem(data) {
-    //   console.log("test", id);
-    //   return {
-    //     ...data,
-    //     items: data?.items.filter((item) => item._id === id || item.isParent),
-    //   };
-    // }
-
-    setSingleMenuData(singleMenu);
+    setMasterMenuData(singleMenu);
   }, [singleMenu, id, changingParentId, menuItems]);
+
+  useEffect(() => {
+    setMasterMenuData((prevMasterData) => {
+      const itemExists = prevMasterData?.items?.some(
+        (item) => item._id === singleMenuData._id
+      );
+      console.log(itemExists);
+      if (!itemExists) {
+        return singleMenuData;
+      } else {
+        return {
+          ...prevMasterData,
+          items: prevMasterData?.items?.map((item) => {
+            if (item._id === singleMenuData._id) {
+              return { ...singleMenuData };
+            } else {
+              return item;
+            }
+          }),
+        };
+      }
+    });
+  }, [singleMenuData]);
 
   const handleToggle = () => {
     setIsToggled(!isToggled);
   };
+
   const removeItem = (index) => {
     setSingleMenuData((prev) => {
       const temp__details = [...prev.items];
@@ -166,7 +196,8 @@ const UpdateMenu = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isUpdateAsChangeParent) {
-      const response = await updateSingleMenus({ singleMenuData, singleMenu });
+      console.log(masterMenuData);
+      const response = await updateSingleMenus({ masterMenuData, singleMenu });
       console.log(response);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", {
@@ -177,7 +208,8 @@ const UpdateMenu = () => {
         swal("Error", "An error occurred while creating the data", "error");
       }
     } else {
-      const response = await updateSingleMenu(singleMenuData);
+      console.log(masterMenuData);
+      const response = await updateSingleMenu(masterMenuData);
       console.log(response);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", {
@@ -468,7 +500,7 @@ const UpdateMenu = () => {
                                                 }; // Return a new object with updated items array
                                               });
                                             }}
-                                            style={{color:'white'}}
+                                            style={{ color: "white" }}
                                           >
                                             {detail.isParent ? "P" : "C"}
                                             <div className="toggle-handle" />
@@ -494,28 +526,23 @@ const UpdateMenu = () => {
                                             borderRadius: "5px",
                                           }}
                                           onChange={(e) => {
-                                            // setSingleMenuData((prevState) => {
-                                            //   const temp_details = {
-                                            //     ...prevState,
-                                            //   };
-                                            //   const temp__items =
-                                            //     temp_details.items;
-                                            //   temp__items[index]["label"] =
-                                            //     e.target.value;
-                                            //   return temp_details;
-                                            // });
                                             setSingleMenuData((prevState) => {
                                               const updatedItems = [
                                                 ...prevState.items,
-                                              ]; // Create a new array
+                                              ];
                                               updatedItems[index] = {
                                                 ...updatedItems[index],
                                                 label: e.target.value,
-                                              }; // Create a new object for the item with updated label
+                                                url:
+                                                  "/main-view/" +
+                                                  e.target.value
+                                                    .toLowerCase()
+                                                    .replace(/\s+/g, "-"),
+                                              };
                                               return {
                                                 ...prevState,
                                                 items: updatedItems,
-                                              }; // Return a new object with updated items array
+                                              };
                                             });
                                           }}
                                         />

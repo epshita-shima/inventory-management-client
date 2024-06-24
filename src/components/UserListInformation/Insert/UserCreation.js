@@ -47,6 +47,9 @@ const UserCreation = () => {
   const [createSerialNo] = useCreateSerialNoMutation();
   const [createNewUser] = useCreateUserMutation();
   const navigate = useNavigate();
+  const getUser = localStorage.getItem("user");
+  const getUserParse = JSON.parse(getUser);
+  const makebyUser = getUserParse[0].username;
 
   useEffect(()=>{
     if( serialNo && serialNo.length > 0){
@@ -203,7 +206,7 @@ const UserCreation = () => {
     };
 });
   
-const checkedData=mergedArray.filter(x=>x.isChecked==true)
+const checkedData=mergedArray?.filter(x=>x.isChecked==true)
 
   const handleCreateUser =async (e) => {
     e.preventDefault();
@@ -235,8 +238,8 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
     const serialData = {
       serialNo: serialNo?.serialNo,
       type: "user",
-      year: "2024",
-      makeby: "shima",
+      year:new Date().toLocaleDateString("en-CA"),
+      makeby: makebyUser,
       updateby: "",
     };
     // Check if any field is empty
@@ -252,9 +255,9 @@ const checkedData=mergedArray.filter(x=>x.isChecked==true)
      console.log(responseSerial)
      const responseUser=await createNewUser(dataWithoutMenulistId);
      console.log(responseUser)
-     if (responseSerial.data.status === 200 && responseUser.data.status === 200) {
+     if (responseSerial.data.status === 201 && responseUser.data.status === 200) {
       swal("Done", "Data Save Successfully", "success");
-      navigate("/main-view/user-list");
+      navigate("/main-view/user-setting");
     } else {
       swal("Error", "An error occurred while creating the user", "error");
     }

@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 
 const downloadPDF = (companyinfo,reportTitle) => {
+  const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
   const doc = new jsPDF();
-  console.log(companyinfo)
   doc.autoTable({
     html: "#my-table",
     startY: 50,
@@ -28,11 +28,13 @@ const downloadPDF = (companyinfo,reportTitle) => {
   addFooter(doc, companyinfo,reportTitle);
 
   // Save the PDF
-  doc.save("userlist.pdf");
+  doc.save(`${fileName}.pdf`);
 };
+
 const downloadAllPDF = (companyinfo,reportTitle) => {
+  const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
   const doc = new jsPDF();
-  console.log(companyinfo)
+ 
   doc.autoTable({
     html: "#my-table2",
     startY: 50,
@@ -58,9 +60,11 @@ const downloadAllPDF = (companyinfo,reportTitle) => {
   addFooter(doc, companyinfo,reportTitle);
 
   // Save the PDF
-  doc.save("userlist.pdf");
+  doc.save(`${fileName}.pdf`);
 };
+
 const downloadInactivePDF = (companyinfo,reportTitle) => {
+  const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
   const doc = new jsPDF();
   console.log(companyinfo)
   doc.autoTable({
@@ -88,7 +92,182 @@ const downloadInactivePDF = (companyinfo,reportTitle) => {
   addFooter(doc, companyinfo,reportTitle);
 
   // Save the PDF
-  doc.save("userlist.pdf");
+  doc.save(`${fileName}.pdf`);
+};
+
+const getBase64Image = (imgUrl, callback) => {
+  const img = new Image();
+  img.setAttribute('crossOrigin', 'anonymous'); // Allow cross-origin image loading
+  img.onload = function () {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const fixedWidth = 300;
+    const fixedHeight = 300;
+
+    canvas.width = fixedWidth;
+    canvas.height = fixedHeight;
+
+    // Draw image onto canvas
+    ctx.drawImage(this, 0, 0, fixedWidth, fixedHeight);
+
+    const dataURL = canvas.toDataURL('image/png');
+    callback(dataURL);
+  };
+  img.src = imgUrl;
+};
+
+
+const downloadImage =async (data,companyinfo,reportTitle) => {
+  console.log(data)
+  const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
+  const doc = new jsPDF();
+  const processedData = await Promise.all(
+    data.map((item) => {
+      return new Promise((resolve) => {
+        getBase64Image(`${process.env.REACT_APP_BASE_URL}/${item?.image}`, (base64Image) => {
+          resolve({
+            image: base64Image,
+            makeDate: new Date(item.makeDate).toLocaleDateString('en-CA')
+          });
+        });
+      });
+    })
+  );
+
+  const finalRows = processedData.map((row, index) => [
+    index + 1,
+    row.makeDate,
+    {content:'', image: row.image,width: 60, height: 40 },
+  ]);
+
+  doc.autoTable({
+  head: [['Sl.', 'Make Date', 'Image']],
+  body: finalRows,
+  startY: 50,
+  margin: { top: 50, bottom: 32 },
+  headerStyles: {
+    fillColor: [128, 128, 128], 
+    textColor: [255, 255, 255], 
+  },
+  theme: 'grid', 
+  tableLineWidth: 0.5, 
+  styles: {
+    lineColor: [0, 0, 0], 
+    textColor: [0, 0, 0], 
+    font: 'times', 
+    fontSize: 10, 
+ 
+    valign: 'middle', 
+    halign: 'center', 
+
+  },
+ 
+  columnStyles: {
+    0: { cellPadding: 2, cellWidth: 10 }, 
+    // 1: { cellPadding: 2, cellWidth: 40 }, 
+    2: { cellPadding: { top: 15, right: 5, bottom: 15, left: 5 }, cellWidth: 60 } 
+  },
+  
+  didParseCell: function (data) {
+    data.cell.styles.halign = 'center';
+  },
+  
+ didDrawCell: function (data) {
+  console.log(data.cell.minWidth)
+  if (data.column.index === 2 && data.cell.section === 'body') {
+    const imageSize = 30; 
+    const cellHeight = data.cell.height;
+    const cellPaddingTop = data.cell.styles.cellPadding.top || 0; 
+    const cellPaddingBottom = data.cell.styles.cellPadding.bottom || 0;
+    const imageMargin = (cellHeight - imageSize - cellPaddingTop - cellPaddingBottom) / 2; 
+    doc.addImage(data.cell.raw.image, 'PNG', data.cell.x + 10, data.cell.y + cellPaddingTop + imageMargin, imageSize, imageSize);
+    
+  }
+}
+
+});
+
+  addFooter(doc, companyinfo,reportTitle);
+
+  doc.save(`${fileName}.pdf`);
+};
+const downloadAllImage =async (data,companyinfo,reportTitle) => {
+  console.log(data)
+  const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
+  const doc = new jsPDF();
+  const processedData = await Promise.all(
+    data.map((item) => {
+      return new Promise((resolve) => {
+        getBase64Image(`${process.env.REACT_APP_BASE_URL}/${item?.image}`, (base64Image) => {
+          resolve({
+            image: base64Image,
+            makeDate: new Date(item.makeDate).toLocaleDateString('en-CA'),
+            status:item.status
+          });
+        });
+      });
+    })
+  );
+
+  const finalRows = processedData.map((row, index) => [
+    index + 1,
+    row.makeDate,
+    {content:'', image: row.image,width: 60, height: 40 },
+    row?.status
+  ]);
+
+  doc.autoTable({
+  head: [['Sl.', 'Make Date', 'Image','Status']],
+  body: finalRows,
+  startY: 50,
+  margin: { top: 50, bottom: 32 },
+  headerStyles: {
+    fillColor: [128, 128, 128], 
+    textColor: [255, 255, 255], 
+  },
+  theme: 'grid', 
+  tableLineWidth: 0.5, 
+  styles: {
+    lineColor: [0, 0, 0], 
+    textColor: [0, 0, 0], 
+    font: 'times', 
+    fontSize: 10, 
+ 
+    valign: 'middle', 
+    halign: 'center', 
+
+  },
+ 
+  columnStyles: {
+    0: { cellPadding: 2, cellWidth: 10 }, 
+    // 1: { cellPadding: 2, cellWidth: 40 }, 
+    2: { cellPadding: { top: 15, right: 5, bottom: 15, left: 5 }, cellWidth: 60 } 
+  },
+  
+  didParseCell: function (data) {
+    data.cell.styles.halign = 'center';
+  },
+
+ didDrawCell: function (data) {
+  console.log(data.cell.minWidth)
+  if (data.column.index === 2 && data.cell.section === 'body') {
+    const imageSize = 30; 
+    const cellHeight = data.cell.height;
+    const cellPaddingTop = data.cell.styles.cellPadding.top || 0; 
+    const cellPaddingBottom = data.cell.styles.cellPadding.bottom || 0;
+    const imageMargin = (cellHeight - imageSize - cellPaddingTop - cellPaddingBottom) / 2; 
+    doc.addImage(data.cell.raw.image, 'PNG', data.cell.x + 10, data.cell.y + cellPaddingTop + imageMargin, imageSize, imageSize);
+    
+  }
+}
+
+});
+
+
+
+  addFooter(doc, companyinfo,reportTitle);
+
+  doc.save(`${fileName}.pdf`);
 };
 
 const addFooter = (doc, companyinfo,reportTitle) => {
@@ -227,4 +406,4 @@ if(companyinfo && companyinfo?.companyinfo[0]){
     }
   };
 
-export { downloadPDF,downloadAllPDF,downloadInactivePDF };
+export { downloadPDF,downloadAllPDF,downloadInactivePDF ,downloadImage,downloadAllImage};
