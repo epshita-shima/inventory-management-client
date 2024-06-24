@@ -52,7 +52,7 @@ const ActiveListDataModal = ({
   const getMenuListFromLOcalUser = getUserFromLocalConvert[0]?.menulist;
   // const [columns,setColumns]=useState([])
 
-
+console.log(selectedData)
 
   const traverse = (items) => {
     const urls = [];

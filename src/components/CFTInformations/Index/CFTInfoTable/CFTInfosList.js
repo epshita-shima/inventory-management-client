@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import swal from "sweetalert";
 import DataTable from "react-data-table-component";
-import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
+import { downloadAllImage, downloadImage, downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import handleDownload from "../../../ReportProperties/HandelExcelDownload";
 import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
 import ListHeading from "../../../Common/ListHeading/ListHeading";
@@ -27,6 +27,9 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
   const [extractedDataForReport, setExtractedDataForReport] = useState([]);
   const [extractedInActiveDataForReport, setExtractedInActiveDataForReport] =
     useState([]);
+    const [activeImageForReport,setActiveImageForReport]=useState([])
+    const [inActiveImageForReport,setInActiveImageForReport]=useState([])
+    const [allImageForReport,setAllImageForReport]=useState([])
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [activeCFTInfosModal, setActiveCFTInfosModal] = useState(false);
   const [inActiveCFTInfosModal, setInActiveCFTInfosModal] = useState(false);
@@ -36,6 +39,9 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
   const [cftInfoInActiveStatus, setCFTInfoInActiveStatus] = useState([]);
   const [isExisting, setIsExisting] = useState([]);
   var reportTitle = "All CFT Info List";
+  var reportTitleActiveImage = "All CFT All Active Image";
+  var reportTitleInActiveImage = "All CFT All InActive Image";
+  var reportTitleForAllImage = "All CFT All Image";
 
   console.log(cftInfosData);
 
@@ -46,6 +52,15 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
     const cftInfoInActiveStatus = cftInfosData?.filter(
       (item) => item.isActive == false
     );
+    const cftInfoActiveStatusImage = cftInfosData?.filter(
+      (item) => item.isActive == true && item.image !=undefined
+    );
+    const cftInfoInActiveStatusWithImage = cftInfosData?.filter(
+      (item) => item.isActive == false && item.image !=undefined
+    );
+    const cftInfoAllStatusWithImage = cftInfosData?.filter(
+      (item) => item.image !=undefined
+    );
 
     const extractedAllFields = cftInfosData?.map((item) => {
       return {
@@ -54,6 +69,26 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
         isActive: item.isActive ? "Active" : "InActive",
       };
     });
+    const extractedActiveImageFields=cftInfoActiveStatusImage?.map((item)=>{
+      return{
+        image:item?.image,
+        makeDate:item.makeDate
+      }
+    })
+    const extractedInActiveImageFields=cftInfoInActiveStatusWithImage?.map((item)=>{
+      return{
+        image:item?.image,
+        makeDate:item.makeDate
+      }
+    })
+    const extractedAllImageFields=cftInfoAllStatusWithImage?.map((item)=>{
+      return{
+        image:item?.image,
+        makeDate:item.makeDate,
+        status:item.isActive  ? "Active" : "InActive",
+      }
+    })
+
     const extractedFields = cftInfoActiveStatus?.map((item) => {
       return {
         openingDate: item.openingDate,
@@ -74,6 +109,9 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
     setCFTInfoInActiveStatus(cftInfoInActiveStatus);
     setExtractedDataForReport(extractedFields);
     setExtractedInActiveDataForReport(extractedInactiveFields);
+    setActiveImageForReport(extractedActiveImageFields)
+    setInActiveImageForReport(extractedInActiveImageFields)
+    setAllImageForReport(extractedAllImageFields)
   }, [cftInfosData?.unitId, cftInfosData]);
 
   const generateColumns = (data, fields) => {
@@ -103,11 +141,13 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
                   aria-label={`Checkbox for data item ${row.id}`}
                   checked={row.status} // Assuming status is a boolean field
                   onChange={(e) => {
+                  
                     const existing = cftInfosData?.filter(
                       (x) => x.isActive == true
                     );
                     console.log(existing.length, existing.length > 1);
-                    if (existing.length > 1) {
+                  if(inActiveCFTInfosModal){
+                    if (existing.length > 0 || selectedData.length > 0) {
                       swal(
                         "Not Possible!",
                         "There is an active CFT,Plase Close it first",
@@ -118,6 +158,10 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
                     } else {
                       handleCheckboxClick(row, setSelectedData);
                     }
+                  }
+                  else{
+                    handleCheckboxClick(row, setSelectedData);
+                  }
                   }} // Assuming handleCheckboxClick is defined elsewhere
                 />
               </a>
@@ -390,6 +434,46 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
                     Excel
                   </a>
                 </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onClick={() => {
+                      if (companyinfo?.length !== 0 || undefined) {
+                        downloadImage(activeImageForReport,{ companyinfo }, reportTitleActiveImage);
+                      }
+                    }}
+                  >
+                    Active Image
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onClick={() => {
+                      if (companyinfo?.length !== 0 || undefined) {
+                        downloadImage(inActiveImageForReport,{ companyinfo }, reportTitleInActiveImage);
+                      }
+                    }}
+                  >
+                 Inactive Image
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onClick={() => {
+                      if (companyinfo?.length !== 0 || undefined) {
+                        downloadAllImage(allImageForReport,{ companyinfo }, reportTitleForAllImage);
+                      }
+                    }}
+                  >
+                    All Image
+                  </a>
+                </li>
+              
               </ul>
             </div>
           </div>
@@ -404,14 +488,7 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
         </div>
       </div>
     );
-  }, [
-    filterText,
-    resetPaginationToggle,
-    companyinfo,
-    extractedAllDataReport,
-    reportTitle,
-    refetch,
-  ]);
+  }, [filterText, resetPaginationToggle, refetch, companyinfo, reportTitle, extractedAllDataReport, activeImageForReport, reportTitleActiveImage, inActiveImageForReport, reportTitleInActiveImage, allImageForReport, reportTitleForAllImage]);
 
   return (
     <div className="row px-5 mx-4">
@@ -499,6 +576,24 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
               <td>{item.openingDate}</td>
               <td>{item.kgPerUnit}</td>
               <td>{item.isActive}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <table id="my-table-active-image" className="d-none">
+        <thead>
+          <tr>
+            <th>Sl.</th>
+            <th>MakeDate</th>
+            <th>Image</th>
+          </tr>
+        </thead>
+        <tbody>
+          {activeImageForReport?.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.makeDate}</td>
+              <img src={`${process.env.REACT_APP_BASE_URL}/${item.image}`} alt="Image description" />
             </tr>
           ))}
         </tbody>
