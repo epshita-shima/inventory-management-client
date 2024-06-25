@@ -1,23 +1,38 @@
 import { faPlus, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, FieldArray, Form, Formik } from "formik";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import * as Yup from "yup";
 import Select from "react-select";
-import { supplierDropdown } from "../../../Common/CommonDropdown/CommonDropdown";
+import {
+  rawMaterialItemDropdown,
+  supplierDropdown,
+} from "../../../Common/CommonDropdown/CommonDropdown";
 import { useGetAllSupplierInformationQuery } from "../../../../redux/features/supplierInformation/supplierInfoApi";
-
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
+import swal from "sweetalert";
+import "./InsertPurchaseOrder.css";
+import { useGetAllRMItemInformationQuery } from "../../../../redux/features/iteminformation/rmItemInfoApi";
+import SupplierInsertModal from "../../../Common/CommonModal/SupplierInsertModal";
 const InsertPurchaseOrder = () => {
   const ArrayHelperRef = useRef();
+  const [activeSupplierModal, setActiveSupplierModal] = useState(false);
+  const [activeItemInfoModal, setActiveItemInfoModal] = useState(false);
+  const [acivePaymentModal, setAcivePaymentModal] = useState(false);
+  const [startDate, setStartDate] = useState(
+    new Date().toLocaleDateString("en-CA")
+  );
   const { data: supplierInfo, isLoading } =
     useGetAllSupplierInformationQuery(undefined);
+  const { data: itemInfo } = useGetAllRMItemInformationQuery(undefined);
+  console.log(itemInfo);
   const initialValues = {
     supplierId: "",
     currency: "",
     paymentId: "",
     bankId: "",
     deliveryDate: "",
-    challanNo: "",
     grandTotalAmount: "",
     grandTotalQuantity: "",
     makeBy: "",
@@ -37,7 +52,22 @@ const InsertPurchaseOrder = () => {
   };
   const supplierOptions = supplierDropdown(supplierInfo);
   console.log(supplierOptions);
-
+  const rawMaterialItemOptions = rawMaterialItemDropdown(itemInfo);
+  console.log(rawMaterialItemOptions);
+  const currencyOptions = [
+    {
+      value: "euro",
+      label: "EURO",
+    },
+    {
+      value: "taka",
+      label: "TAKA",
+    },
+    {
+      value: "dollar",
+      label: "DOLLAR",
+    },
+  ];
   const handleSubmit = (e, values, resetForm) => {
     e.preventDefault();
   };
@@ -51,7 +81,7 @@ const InsertPurchaseOrder = () => {
       }}
     >
       <div class="overflow-hidden">
-        <div className="shadow-lg mt-2 mt-sm-4 mt-md-4 mt-lg-4 p-4 rounded-4">
+        <div className=" mt-2 mt-sm-4 mt-md-4 mt-lg-4 px-4 rounded-4">
           <div className="mt-3">
             <Formik
               initialValues={initialValues}
@@ -88,533 +118,793 @@ const InsertPurchaseOrder = () => {
                     handleSubmit(e, values, resetForm);
                   }}
                 >
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex mt-2 mb-4">
-                      <button
-                        type="submit"
-                        form="itemcreation-form"
-                        className="border-0 "
-                        style={{
-                          backgroundColor:
-                            isValid && dirty ? "#2DDC1B" : "gray",
-                          color: "white",
-                          padding: "5px 10px",
-                          fontSize: "14px",
-                          borderRadius: "5px",
-                          width: "100px",
-                        }}
-                        disabled={!(isValid && dirty)}
-                      >
-                        Save
-                      </button>
-
-                      <div
-                        className="border-0 "
-                        style={{
-                          // backgroundColor: "#00B987",
-                          backgroundColor: "#2DDC1B",
-                          color: "black",
-                          padding: "5px 10px",
-                          fontSize: "14px",
-                          borderRadius: "5px",
-                          marginLeft: "5px",
-                        }}
-                        onClick={() => {
-                          console.log("ArrayHelperRef ");
-                          ArrayHelperRef.current.push({
-                            itemId: "",
-                            itemDescription: "",
-                            quantity: "",
-                            challanNo: "",
-                            unitPrice: "",
-                            totalAmount: "",
-                          });
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> Add
-                        Row
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="row shadow-lg">
-                    <div className="col-md-12 p-5">
-                      <div className="col-md-6">
-                        <div>
-                        <label htmlFor="supplierId">Supplier Name</label>
-                          <div className="w-100 d-flex justify-content-between mt-2">
-                            <div className="w-100">
-                              <Select
-                                class="form-select"
-                                className="w-100 mb-3"
-                                aria-label="Default select example"
-                                name="sizeinfo"
-                                options={supplierOptions}
-                                defaultValue={{
-                                  label: "Select Size",
-                                  value: 0,
-                                }}
-                               
-                                value={supplierOptions.filter(function (
-                                  option
-                                ) {
-                                  return option.value === values.supplierId;
-                                })}
-                                styles={{
-                                  control: (baseStyles, state) => ({
-                                    ...baseStyles,
-                                    width: "100%",
-                                    borderColor: state.isFocused
-                                      ? "#fff"
-                                      : "#fff",
-                                    border: "1px solid #2DDC1B",
-                                  }),
-                                  menu: (provided) => ({
-                                    ...provided,
-                                    zIndex: 9999,
-                                    height: "auto",
-                                    // overflowY: "scroll",
-                                  }),
-                                }}
-                                theme={(theme) => ({
-                                  ...theme,
-                                  colors: {
-                                    ...theme.colors,
-                                    primary25: "#B8FEB3",
-                                    primary: "#2DDC1B",
-                                  },
-                                })}
-                                onChange={(e) => {}}
-                              ></Select>
-
-                              {touched.supplierId && errors.supplierId && (
-                                <div className="text-danger">
-                                  {errors.supplierId}
-                                </div>
-                              )}
-                            </div>
-                            <div className="ms-2 mt-2">
-                              <FontAwesomeIcon
-                                className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
-                                style={{
-                                  background: "#2DDC1B",
-                                }}
-                                icon={faPlus}
-                                data-toggle="modal"
-                                data-target="#exampleModal1"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                        <label htmlFor="paymentId">Payument</label>
-                          <div className="w-100 d-flex justify-content-between mt-2">
-                            <div className="w-100">
-                              <Select
-                                class="form-select"
-                                className="w-100 mb-3"
-                                aria-label="Default select example"
-                                name="sizeinfo"
-                                options={supplierOptions}
-                                defaultValue={{
-                                  label: "Select Size",
-                                  value: 0,
-                                }}
-                               
-                                value={supplierOptions.filter(function (
-                                  option
-                                ) {
-                                  return option.value === values.supplierId;
-                                })}
-                                styles={{
-                                  control: (baseStyles, state) => ({
-                                    ...baseStyles,
-                                    width: "100%",
-                                    borderColor: state.isFocused
-                                      ? "#fff"
-                                      : "#fff",
-                                    border: "1px solid #2DDC1B",
-                                  }),
-                                  menu: (provided) => ({
-                                    ...provided,
-                                    zIndex: 9999,
-                                    height: "auto",
-                                    // overflowY: "scroll",
-                                  }),
-                                }}
-                                theme={(theme) => ({
-                                  ...theme,
-                                  colors: {
-                                    ...theme.colors,
-                                    primary25: "#B8FEB3",
-                                    primary: "#2DDC1B",
-                                  },
-                                })}
-                                onChange={(e) => {}}
-                              ></Select>
-
-                              {touched.supplierId && errors.supplierId && (
-                                <div className="text-danger">
-                                  {errors.supplierId}
-                                </div>
-                              )}
-                            </div>
-                            <div className="ms-2 mt-2">
-                              <FontAwesomeIcon
-                                className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
-                                style={{
-                                  background: "#2DDC1B",
-                                }}
-                                icon={faPlus}
-                                data-toggle="modal"
-                                data-target="#exampleModal1"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <label htmlFor="Currency">Currency</label>
-                          <Field
-                            type="text"
-                            name={`currency`}
-                            placeholder="Currency"
-                            value={values.currency}
-                            style={{
-                              border: "1px solid #2DDC1B",
-                              padding: "5px",
-                              width: "100%",
-                              borderRadius: "5px",
-                              height: "38px",
-                            }}
-                            onChange={(e) => {
-                              setFieldValue(`currency`, e.target.value);
-                            }}
-                          />
-                          <br />
-                          {touched.currency && errors.currency && (
-                            <div className="text-danger">{errors.currency}</div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div>
-                          <label htmlFor="remarks">Remarks</label>
-                          <textarea
-                            type="textarea"
-                            name={`remarks`}
-                            placeholder="Remarks"
-                            value={values.remarks}
-                            rows="3"
-                            style={{
-                              border: "1px solid #2DDC1B",
-                              padding: "5px",
-                              width: "100%",
-                              borderRadius: "5px",
-                            }}
-                            onChange={(e) => {
-                              setFieldValue(`remarks`, e.target.value);
-                            }}
-                          />
-                          {touched.remarks && errors.remarks && (
-                            <div className="text-danger">{errors.remarks}</div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  {/* <div className="d-flex justify-content-between align-items-center">
+                    <h2 style={{ fontSize: "24px", fontWeight: "bold" }}>
+                      
+                    </h2>
+                    <div className="d-flex mt-2 mb-4"></div>
+                  </div> */}
                   <FieldArray
                     name="detailsData"
                     render={(arrayHelpers) => {
                       ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
                       return (
-                        <div
-                          className=" flex-1 items-center d-flex-nowrap mt-3"
-                          style={{ height: "300px", overflowY: "auto" }}
-                        >
-                          <table className="table w-full table-bordered">
-                            <thead className="w-100">
-                              <tr>
-                                <th className="bg-white text-center align-middle  ">
-                                  Sl
-                                </th>
+                        <div className=" flex-1 items-center d-flex-nowrap mt-3 shadow-lg py-2 px-5">
+                          <div>
+                            <h2
+                              style={{ fontSize: "24px", fontWeight: "bold" }}
+                            >
+                              Purchase Order Form
+                            </h2>
+                            <div class="container">
+                              <div class="row row-cols-2 row-cols-lg-3">
+                                <div class="col-6 col-lg-4">
+                                  <label htmlFor="supplierId">
+                                    Supplier Name
+                                  </label>
+                                  <div className="w-75 d-flex justify-content-between mt-2">
+                                    <div className="w-100">
+                                      <Select
+                                        class="form-select"
+                                        className="w-100 mb-3"
+                                        aria-label="Default select example"
+                                        name="sizeinfo"
+                                        options={supplierOptions}
+                                        defaultValue={{
+                                          label: "Select Size",
+                                          value: 0,
+                                        }}
+                                        value={supplierOptions.filter(function (
+                                          option
+                                        ) {
+                                          return (
+                                            option.value === values.supplierId
+                                          );
+                                        })}
+                                        styles={{
+                                          control: (baseStyles, state) => ({
+                                            ...baseStyles,
+                                            width: "100%",
+                                            borderColor: state.isFocused
+                                              ? "#fff"
+                                              : "#fff",
+                                            border: "1px solid #2DDC1B",
+                                          }),
+                                          menu: (provided) => ({
+                                            ...provided,
+                                            zIndex: 9999,
+                                            height: "auto",
+                                            // overflowY: "scroll",
+                                          }),
+                                        }}
+                                        theme={(theme) => ({
+                                          ...theme,
+                                          colors: {
+                                            ...theme.colors,
+                                            primary25: "#B8FEB3",
+                                            primary: "#2DDC1B",
+                                          },
+                                        })}
+                                        onChange={(e) => {}}
+                                      ></Select>
 
-                                <th className="bg-white text-center align-middle ">
-                                  Item Name
-                                  <span className="text-danger fw-bold fs-2">
-                                    *
-                                  </span>
-                                </th>
-                                <th className="bg-white text-center align-middle ">
-                                  Item Description
-                                  <span className="text-danger fw-bold fs-2">
-                                    *
-                                  </span>
-                                </th>
-                                <th className="bg-white text-center align-middle ">
-                                  Quantity
-                                  <span className="text-danger fw-bold fs-2">
-                                    *
-                                  </span>
-                                </th>
-                                <th className="bg-white text-center align-middle ">
-                                  Unit Price
-                                  <span className="text-danger fw-bold fs-2">
-                                    *
-                                  </span>
-                                </th>
-                                <th className="bg-white text-center align-middle ">
-                                  Challan No
-                                  <span className="text-danger fw-bold fs-2">
-                                    *
-                                  </span>
-                                </th>
-                                <th className="bg-white text-center align-middle ">
-                                  Total Amount
-                                  <span className="text-danger fw-bold fs-2">
-                                    *
-                                  </span>
-                                </th>
-                                <th className="bg-white text-center align-middle ">
-                                  Action
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {details && details.length > 0
-                                ? details.map((detail, index) => {
-                                    console.log(detail);
-                                    return (
-                                      <tr key={index}>
-                                        <td className="text-center align-middle">
-                                          {index + 1}
-                                        </td>
-                                        <td className="text-center align-middle">
-                                          <Field
-                                            type="text"
-                                            name={`detailsData.${index}.itemId`}
-                                            placeholder="Item Name"
-                                            value={detail?.itemId}
-                                            style={{
-                                              border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "100%",
-                                              borderRadius: "5px",
-                                              height: "38px",
-                                            }}
-                                            onChange={(e) => {
-                                              setFieldValue(
-                                                `detailsData.${index}.itemId`,
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                          <br />
-                                          {touched.detailsData?.[index]
-                                            ?.itemId &&
-                                            errors.detailsData?.[index]
-                                              ?.itemId && (
-                                              <div className="text-danger">
-                                                {
-                                                  errors.detailsData[index]
-                                                    .itemId
-                                                }
-                                              </div>
-                                            )}
-                                        </td>
+                                      {touched.supplierId &&
+                                        errors.supplierId && (
+                                          <div className="text-danger">
+                                            {errors.supplierId}
+                                          </div>
+                                        )}
+                                    </div>
+                                    <div className="ms-2 mt-2">
+                                      <FontAwesomeIcon
+                                        className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
+                                        style={{
+                                          background: "#2DDC1B",
+                                        }}
+                                        icon={faPlus}
+                                        data-toggle="modal"
+                                        data-target="#commonInsertModalCenter"
+                                        onClick={() => {
+                                          setActiveSupplierModal(true);
+                                          setAcivePaymentModal(false);
+                                          setActiveItemInfoModal(false)
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-6 col-lg-4">
+                                  <label htmlFor="paymentId">Payment</label>
+                                  <div className="w-75 d-flex justify-content-between mt-2">
+                                    <div className="w-100">
+                                      <Select
+                                        class="form-select"
+                                        className="w-100 mb-3"
+                                        aria-label="Default select example"
+                                        name="sizeinfo"
+                                        options={supplierOptions}
+                                        defaultValue={{
+                                          label: "Select Size",
+                                          value: 0,
+                                        }}
+                                        value={supplierOptions.filter(function (
+                                          option
+                                        ) {
+                                          return (
+                                            option.value === values.supplierId
+                                          );
+                                        })}
+                                        styles={{
+                                          control: (baseStyles, state) => ({
+                                            ...baseStyles,
+                                            width: "100%",
+                                            borderColor: state.isFocused
+                                              ? "#fff"
+                                              : "#fff",
+                                            border: "1px solid #2DDC1B",
+                                          }),
+                                          menu: (provided) => ({
+                                            ...provided,
+                                            zIndex: 9999,
+                                            height: "auto",
+                                            // overflowY: "scroll",
+                                          }),
+                                        }}
+                                        theme={(theme) => ({
+                                          ...theme,
+                                          colors: {
+                                            ...theme.colors,
+                                            primary25: "#B8FEB3",
+                                            primary: "#2DDC1B",
+                                          },
+                                        })}
+                                        onChange={(e) => {}}
+                                      ></Select>
 
-                                        <td className="text-center align-middle">
-                                          <textarea
-                                            type="textarea"
-                                            name={`detailsData.${index}.itemDescription`}
-                                            placeholder="Item description"
-                                            value={detail?.itemDescription}
-                                            rows="1"
-                                            style={{
-                                              border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "100%",
-                                              borderRadius: "5px",
-                                              height: "38px",
-                                            }}
-                                            onChange={(e) => {
-                                              setFieldValue(
-                                                `detailsData.${index}.itemDescription`,
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                          <br />
-                                          {touched.detailsData?.[index]
-                                            ?.itemDescription &&
-                                            errors.detailsData?.[index]
-                                              ?.itemDescription && (
-                                              <div className="text-danger">
-                                                {
-                                                  errors.detailsData[index]
-                                                    .itemDescription
-                                                }
-                                              </div>
-                                            )}
-                                        </td>
+                                      {touched.supplierId &&
+                                        errors.supplierId && (
+                                          <div className="text-danger">
+                                            {errors.supplierId}
+                                          </div>
+                                        )}
+                                    </div>
+                                    <div className="ms-2 mt-2">
+                                      <FontAwesomeIcon
+                                        className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
+                                        style={{
+                                          background: "#2DDC1B",
+                                        }}
+                                        icon={faPlus}
+                                        data-toggle="modal"
+                                        data-target="#commonInsertModalCenter"
+                                        onClick={() => {
+                                          setAcivePaymentModal(true);
+                                          setActiveItemInfoModal(false)
+                                          setActiveSupplierModal(false)
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-6 col-lg-4">
+                                  <label htmlFor="bankId">
+                                    Bank Information
+                                  </label>
+                                  <div className="w-75 d-flex justify-content-between mt-2">
+                                    <div className="w-100">
+                                      <Select
+                                        class="form-select"
+                                        className="w-100 mb-3"
+                                        aria-label="Default select example"
+                                        name="bankInformation"
+                                        options={supplierOptions}
+                                        defaultValue={{
+                                          label: "Select Size",
+                                          value: 0,
+                                        }}
+                                        value={supplierOptions.filter(function (
+                                          option
+                                        ) {
+                                          return (
+                                            option.value === values.supplierId
+                                          );
+                                        })}
+                                        styles={{
+                                          control: (baseStyles, state) => ({
+                                            ...baseStyles,
+                                            width: "100%",
+                                            borderColor: state.isFocused
+                                              ? "#fff"
+                                              : "#fff",
+                                            border: "1px solid #2DDC1B",
+                                          }),
+                                          menu: (provided) => ({
+                                            ...provided,
+                                            zIndex: 9999,
+                                            height: "auto",
+                                            // overflowY: "scroll",
+                                          }),
+                                        }}
+                                        theme={(theme) => ({
+                                          ...theme,
+                                          colors: {
+                                            ...theme.colors,
+                                            primary25: "#B8FEB3",
+                                            primary: "#2DDC1B",
+                                          },
+                                        })}
+                                        onChange={(e) => {}}
+                                      ></Select>
 
-                                        <td className="text-center align-middle">
-                                          <Field
-                                            type="number"
-                                            name={`detailsData.${index}.quantity`}
-                                            placeholder="Quantity"
-                                            value={detail?.quantity}
-                                            style={{
-                                              border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "100%",
-                                              borderRadius: "5px",
-                                              height: "38px",
-                                              marginBottom: "5px",
-                                              textAlign: "center",
-                                            }}
-                                            onChange={(e) => {
-                                              setFieldValue(
-                                                `detailsData.${index}.quantity`,
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                          <br />
-                                          {touched.detailsData?.[index]
-                                            ?.quantity &&
-                                            errors.detailsData?.[index]
-                                              ?.quantity && (
-                                              <div className="text-danger">
-                                                {
-                                                  errors.detailsData[index]
-                                                    .quantity
-                                                }
+                                      {touched.bankId && errors.bankId && (
+                                        <div className="text-danger">
+                                          {errors.bankId}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="ms-2 mt-2">
+                                      <FontAwesomeIcon
+                                        className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
+                                        style={{
+                                          background: "#2DDC1B",
+                                        }}
+                                        icon={faPlus}
+                                        data-toggle="modal"
+                                        data-target="#exampleModal1"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="col-6 col-lg-4">
+                                  <label htmlFor="">Delivery Date</label>
+                                  <br />
+                                  <DatePicker
+                                    dateFormat="y-MM-dd"
+                                    className="text-center custom-datepicker"
+                                    //   value={isEdit ? updateOpeningStore?.OpeningDate : startDate}
+                                    calendarClassName="custom-calendar"
+                                    selected={startDate}
+                                    required
+                                    onChange={(startDate) => {
+                                      if (startDate > new Date()) {
+                                        swal({
+                                          title: "Select Valid Date",
+                                          text: "Date should be equal or earlier than today",
+                                          icon: "warning",
+                                          button: "OK",
+                                        });
+                                      } else {
+                                        setStartDate(
+                                          startDate.toLocaleDateString("en-CA")
+                                        );
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div class="col-6 col-lg-4">
+                                  <label htmlFor="Currency">Currency</label>
+                                  <br />
+                                  <div className="w-75">
+                                    <Select
+                                      class="form-select"
+                                      className="w-100 mb-3"
+                                      aria-label="Default select example"
+                                      name="bankInformation"
+                                      options={currencyOptions}
+                                      defaultValue={{
+                                        label: "Select Size",
+                                        value: 0,
+                                      }}
+                                      value={currencyOptions.filter(function (
+                                        option
+                                      ) {
+                                        return (
+                                          option.value === values.currencyId
+                                        );
+                                      })}
+                                      styles={{
+                                        control: (baseStyles, state) => ({
+                                          ...baseStyles,
+                                          width: "100%",
+                                          borderColor: state.isFocused
+                                            ? "#fff"
+                                            : "#fff",
+                                          border: "1px solid #2DDC1B",
+                                        }),
+                                        menu: (provided) => ({
+                                          ...provided,
+                                          zIndex: 9999,
+                                          height: "auto",
+                                          // overflowY: "scroll",
+                                        }),
+                                      }}
+                                      theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                          ...theme.colors,
+                                          primary25: "#B8FEB3",
+                                          primary: "#2DDC1B",
+                                        },
+                                      })}
+                                      onChange={(e) => {}}
+                                    ></Select>
+                                  </div>
+                                  <br />
+                                  {touched.currency && errors.currency && (
+                                    <div className="text-danger">
+                                      {errors.currency}
+                                    </div>
+                                  )}
+                                </div>
+                                <div class="col-6 col-lg-4">
+                                  <label htmlFor="remarks">Remarks</label>
+                                  <br />
+                                  <textarea
+                                    type="textarea"
+                                    name={`remarks`}
+                                    placeholder="Remarks"
+                                    value={values.remarks}
+                                    rows="2"
+                                    style={{
+                                      border: "1px solid #2DDC1B",
+                                      padding: "5px",
+                                      width: "73%",
+                                      borderRadius: "5px",
+                                    }}
+                                    onChange={(e) => {
+                                      setFieldValue(`remarks`, e.target.value);
+                                    }}
+                                  />
+                                  {touched.remarks && errors.remarks && (
+                                    <div className="text-danger">
+                                      {errors.remarks}
+                                    </div>
+                                  )}
+                                </div>
+                                {/* <div class="col-6 col-lg-4"></div> */}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <h2
+                              style={{ fontSize: "20px", fontWeight: "bold" }}
+                            >
+                              Details Information
+                            </h2>
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                              <div className="d-flex justify-content-between">
+                                <button
+                                  type="submit"
+                                  form="itemcreation-form"
+                                  className="border-0 "
+                                  style={{
+                                    backgroundColor:
+                                      isValid && dirty ? "#2DDC1B" : "gray",
+                                    color: "white",
+                                    padding: "5px 10px",
+                                    fontSize: "14px",
+                                    borderRadius: "5px",
+                                    width: "100px",
+                                  }}
+                                  disabled={!(isValid && dirty)}
+                                >
+                                  Save
+                                </button>
+                                <div
+                                  className="border-0 "
+                                  style={{
+                                    // backgroundColor: "#00B987",
+                                    backgroundColor: "#2DDC1B",
+                                    color: "#fff",
+                                    padding: "5px 10px",
+                                    fontSize: "14px",
+                                    borderRadius: "5px",
+                                    marginLeft: "5px",
+                                    width: "100px",
+                                  }}
+                                  onClick={() => {
+                                    console.log("ArrayHelperRef ");
+                                    ArrayHelperRef.current.push({
+                                      itemId: "",
+                                      itemDescription: "",
+                                      quantity: "",
+                                      challanNo: "",
+                                      unitPrice: "",
+                                      totalAmount: "",
+                                    });
+                                  }}
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faPlus}
+                                  ></FontAwesomeIcon>
+                                  Add Row
+                                </div>
+                              </div>
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <label
+                                    htmlFor="grandTotalQuantity"
+                                    style={{ fontSize: "16px" }}
+                                  >
+                                    Grand Total Quantity
+                                  </label>
+                                  <Field
+                                    type="text"
+                                    name={`grandTotalQuantity`}
+                                    placeholder="Grand Total Quantity"
+                                    disabled
+                                    value={values.grandTotalQuantity}
+                                    style={{
+                                      border: "1px solid #2DDC1B",
+                                      padding: "5px",
+                                      width: "50%",
+                                      borderRadius: "5px",
+                                      marginLeft: "10px",
+                                      height: "38px",
+                                    }}
+                                  />
+                                </div>
+                                <div>
+                                  <label
+                                    htmlFor="grandTotalAmount"
+                                    style={{ fontSize: "16px" }}
+                                  >
+                                    Grand Total Amount
+                                  </label>
+                                  <Field
+                                    type="text"
+                                    name={`grandTotalAmount`}
+                                    placeholder="Grand Total Amount"
+                                    disabled
+                                    value={values.grandTotalAmount}
+                                    style={{
+                                      border: "1px solid #2DDC1B",
+                                      padding: "5px",
+                                      width: "50%",
+                                      borderRadius: "5px",
+                                      marginLeft: "10px",
+                                      height: "38px",
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{ height: "300px", overflowY: "auto" }}>
+                            <table className="table w-full table-bordered">
+                              <thead className="w-100">
+                                <tr>
+                                  <th className="bg-white text-center align-middle  ">
+                                    Sl
+                                  </th>
+
+                                  <th
+                                    className="bg-white text-center align-middle"
+                                    style={{ width: "20%" }}
+                                  >
+                                    Item Name
+                                    <span className="text-danger fw-bold fs-2">
+                                      *
+                                    </span>
+                                  </th>
+                                  <th className="bg-white text-center align-middle ">
+                                    Item Description
+                                    <span className="text-danger fw-bold fs-2">
+                                      *
+                                    </span>
+                                  </th>
+                                  <th className="bg-white text-center align-middle ">
+                                    Challan No
+                                    <span className="text-danger fw-bold fs-2">
+                                      *
+                                    </span>
+                                  </th>
+                                  <th className="bg-white text-center align-middle ">
+                                    Quantity
+                                    <span className="text-danger fw-bold fs-2">
+                                      *
+                                    </span>
+                                  </th>
+                                  <th className="bg-white text-center align-middle ">
+                                    Unit Price
+                                    <span className="text-danger fw-bold fs-2">
+                                      *
+                                    </span>
+                                  </th>
+
+                                  <th className="bg-white text-center align-middle ">
+                                    Total Amount
+                                    <span className="text-danger fw-bold fs-2">
+                                      *
+                                    </span>
+                                  </th>
+                                  <th className="bg-white text-center align-middle ">
+                                    Action
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {details && details.length > 0
+                                  ? details.map((detail, index) => {
+                                      console.log(detail);
+                                      return (
+                                        <tr key={index}>
+                                          <td className="text-center align-middle">
+                                            {index + 1}
+                                          </td>
+                                          <td className="d-flex ">
+                                            <div className="w-100 d-flex justify-content-between ">
+                                              <div className="w-100">
+                                                <Select
+                                                  class="form-select"
+                                                  className="w-100 mb-3"
+                                                  aria-label="Default select example"
+                                                  name="itemName"
+                                                  options={
+                                                    rawMaterialItemOptions
+                                                  }
+                                                  defaultValue={{
+                                                    label: "Select Size",
+                                                    value: 0,
+                                                  }}
+                                                  value={rawMaterialItemOptions.filter(
+                                                    function (option) {
+                                                      return (
+                                                        option.value ===
+                                                        values.itemId
+                                                      );
+                                                    }
+                                                  )}
+                                                  styles={{
+                                                    control: (
+                                                      baseStyles,
+                                                      state
+                                                    ) => ({
+                                                      ...baseStyles,
+                                                      width: "100%",
+                                                      borderColor:
+                                                        state.isFocused
+                                                          ? "#fff"
+                                                          : "#fff",
+                                                      border:
+                                                        "1px solid #2DDC1B",
+                                                    }),
+                                                    menu: (provided) => ({
+                                                      ...provided,
+                                                      zIndex: 9999,
+                                                      // height: "200px",
+                                                      // overflowY: "scroll",
+                                                    }),
+                                                  }}
+                                                  theme={(theme) => ({
+                                                    ...theme,
+                                                    colors: {
+                                                      ...theme.colors,
+                                                      primary25: "#B8FEB3",
+                                                      primary: "#2DDC1B",
+                                                    },
+                                                  })}
+                                                  onChange={(e) => {}}
+                                                ></Select>
+
+                                                {touched.itemId &&
+                                                  errors.itemId && (
+                                                    <div className="text-danger">
+                                                      {errors.itemId}
+                                                    </div>
+                                                  )}
                                               </div>
-                                            )}
-                                        </td>
-                                        <td className="text-center align-middle">
-                                          <Field
-                                            type="text"
-                                            name={`detailsData.${index}.challanNo`}
-                                            placeholder="Challan no"
-                                            value={detail?.challanNo}
-                                            style={{
-                                              border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "100%",
-                                              borderRadius: "5px",
-                                              height: "38px",
-                                              textAlign: "center",
-                                            }}
-                                            onChange={(e) => {
-                                              setFieldValue(
-                                                `detailsData.${index}.challanNo`,
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                          {touched.detailsData?.[index]
-                                            ?.challanNo &&
-                                            errors.detailsData?.[index]
-                                              ?.challanNo && (
-                                              <div className="text-danger">
-                                                {
-                                                  errors.detailsData[index]
-                                                    .challanNo
-                                                }
+                                              <div className="ms-2 mt-2">
+                                                <FontAwesomeIcon
+                                                  className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
+                                                  style={{
+                                                    background: "#2DDC1B",
+                                                  }}
+                                                  icon={faPlus}
+                                                  data-toggle="modal"
+                                                  data-target="#commonInsertModalCenter"
+                                                  onClick={() => {
+                                                    setActiveItemInfoModal(true);
+                                                    setAcivePaymentModal(false)
+                                                    setActiveSupplierModal(false)
+                                                  }}
+                                                />
                                               </div>
-                                            )}
-                                        </td>
-                                        <td className="text-center align-middle">
-                                          <Field
-                                            type="text"
-                                            name={`detailsData.${index}.unitPrice`}
-                                            placeholder="Unit Price"
-                                            value={detail?.unitPrice}
-                                            style={{
-                                              border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "100%",
-                                              borderRadius: "5px",
-                                              height: "38px",
-                                              marginBottom: "5px",
-                                              textAlign: "center",
-                                            }}
-                                            onChange={(e) => {
-                                              setFieldValue(
-                                                `detailsData.${index}.unitPrice`,
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                          <br />
-                                          {touched.detailsData?.[index]
-                                            ?.unitPrice &&
-                                            errors.detailsData?.[index]
-                                              ?.unitPrice && (
-                                              <div className="text-danger">
-                                                {
-                                                  errors.detailsData[index]
-                                                    .unitPrice
-                                                }
-                                              </div>
-                                            )}
-                                        </td>
-                                        <td className="text-center align-middle">
-                                          <Field
-                                            type="text"
-                                            name={`detailsData.${index}.totalAmount`}
-                                            placeholder="Total Amount"
-                                            value={detail?.totalAmount}
-                                            style={{
-                                              border: "1px solid #2DDC1B",
-                                              padding: "5px",
-                                              width: "100%",
-                                              borderRadius: "5px",
-                                              height: "38px",
-                                              textAlign: "center",
-                                            }}
-                                            onChange={(e) => {
-                                              setFieldValue(
-                                                `detailsData.${index}.totalAmount`,
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                          <br />
-                                          {touched.detailsData?.[index]
-                                            ?.totalAmount &&
-                                            errors.detailsData?.[index]
-                                              ?.totalAmount && (
-                                              <div className="text-danger">
-                                                {
-                                                  errors.detailsData[index]
-                                                    .totalAmount
-                                                }
-                                              </div>
-                                            )}
-                                        </td>
-                                        <td className="text-center align-middle">
-                                          <button
-                                            type="button"
-                                            className=" border-0 rounded  bg-transparent"
-                                            onClick={() => {
-                                              arrayHelpers.remove(index, 1);
-                                            }}
-                                          >
-                                            <FontAwesomeIcon
-                                              icon={faXmarkCircle}
-                                              className="text-danger fs-1"
-                                            ></FontAwesomeIcon>
-                                          </button>
-                                        </td>
-                                      </tr>
-                                    );
-                                  })
-                                : null}
-                            </tbody>
-                          </table>
+                                            </div>
+                                            <br />
+                                            {touched.detailsData?.[index]
+                                              ?.itemId &&
+                                              errors.detailsData?.[index]
+                                                ?.itemId && (
+                                                <div className="text-danger">
+                                                  {
+                                                    errors.detailsData[index]
+                                                      .itemId
+                                                  }
+                                                </div>
+                                              )}
+                                          </td>
+
+                                          <td className="text-center align-middle">
+                                            <textarea
+                                              type="textarea"
+                                              name={`detailsData.${index}.itemDescription`}
+                                              placeholder="Item description"
+                                              value={detail?.itemDescription}
+                                              rows="1"
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                                height: "38px",
+                                              }}
+                                              onChange={(e) => {
+                                                setFieldValue(
+                                                  `detailsData.${index}.itemDescription`,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                            <br />
+                                            {touched.detailsData?.[index]
+                                              ?.itemDescription &&
+                                              errors.detailsData?.[index]
+                                                ?.itemDescription && (
+                                                <div className="text-danger">
+                                                  {
+                                                    errors.detailsData[index]
+                                                      .itemDescription
+                                                  }
+                                                </div>
+                                              )}
+                                          </td>
+                                          <td className="text-center align-middle">
+                                            <Field
+                                              type="text"
+                                              name={`detailsData.${index}.challanNo`}
+                                              placeholder="Challan no"
+                                              value={detail?.challanNo}
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                                height: "38px",
+                                                textAlign: "center",
+                                              }}
+                                              onChange={(e) => {
+                                                setFieldValue(
+                                                  `detailsData.${index}.challanNo`,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                            {touched.detailsData?.[index]
+                                              ?.challanNo &&
+                                              errors.detailsData?.[index]
+                                                ?.challanNo && (
+                                                <div className="text-danger">
+                                                  {
+                                                    errors.detailsData[index]
+                                                      .challanNo
+                                                  }
+                                                </div>
+                                              )}
+                                          </td>
+                                          <td className="text-center align-middle">
+                                            <Field
+                                              type="number"
+                                              name={`detailsData.${index}.quantity`}
+                                              placeholder="Quantity"
+                                              value={detail?.quantity}
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                                height: "38px",
+                                                marginBottom: "5px",
+                                                textAlign: "center",
+                                              }}
+                                              onChange={(e) => {
+                                                setFieldValue(
+                                                  `detailsData.${index}.quantity`,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                            <br />
+                                            {touched.detailsData?.[index]
+                                              ?.quantity &&
+                                              errors.detailsData?.[index]
+                                                ?.quantity && (
+                                                <div className="text-danger">
+                                                  {
+                                                    errors.detailsData[index]
+                                                      .quantity
+                                                  }
+                                                </div>
+                                              )}
+                                          </td>
+
+                                          <td className="text-center align-middle">
+                                            <Field
+                                              type="text"
+                                              name={`detailsData.${index}.unitPrice`}
+                                              placeholder="Unit Price"
+                                              value={detail?.unitPrice}
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                                height: "38px",
+                                                marginBottom: "5px",
+                                                textAlign: "center",
+                                              }}
+                                              onChange={(e) => {
+                                                setFieldValue(
+                                                  `detailsData.${index}.unitPrice`,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                            <br />
+                                            {touched.detailsData?.[index]
+                                              ?.unitPrice &&
+                                              errors.detailsData?.[index]
+                                                ?.unitPrice && (
+                                                <div className="text-danger">
+                                                  {
+                                                    errors.detailsData[index]
+                                                      .unitPrice
+                                                  }
+                                                </div>
+                                              )}
+                                          </td>
+                                          <td className="text-center align-middle">
+                                            <Field
+                                              type="text"
+                                              name={`detailsData.${index}.totalAmount`}
+                                              placeholder="Total Amount"
+                                              value={detail?.totalAmount}
+                                              disabled
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                                height: "38px",
+                                                textAlign: "center",
+                                              }}
+                                            />
+                                          </td>
+                                          <td className="text-center align-middle">
+                                            <button
+                                              type="button"
+                                              className=" border-0 rounded  bg-transparent"
+                                              onClick={() => {
+                                                arrayHelpers.remove(index, 1);
+                                              }}
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={faXmarkCircle}
+                                                className="text-danger fs-1"
+                                              ></FontAwesomeIcon>
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })
+                                  : null}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       );
                     }}
@@ -625,6 +915,14 @@ const InsertPurchaseOrder = () => {
           </div>
         </div>
       </div>
+      <SupplierInsertModal
+        activeSupplierModal={activeSupplierModal}
+        setActiveSupplierModal={setActiveSupplierModal}
+        activeItemInfoModal={activeItemInfoModal}
+        setActiveItemInfoModal={setActiveItemInfoModal}
+        acivePaymentModal={acivePaymentModal}
+        setAcivePaymentModal={setAcivePaymentModal}
+      ></SupplierInsertModal>
     </div>
   );
 };

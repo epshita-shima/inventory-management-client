@@ -9,4 +9,16 @@ const supplierDropdown=(options)=>{
     });
     return result;
 }
-export {supplierDropdown}
+const rawMaterialItemDropdown=(options)=>{
+    let result = [];
+    options?.forEach((option) => {
+      result.push({
+        value: option._id,
+        label: option.itemName,
+      });
+    });
+    return result;
+}
+
+
+export {supplierDropdown,rawMaterialItemDropdown}
