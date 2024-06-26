@@ -19,6 +19,26 @@ const rawMaterialItemDropdown=(options)=>{
     });
     return result;
 }
+const paymentInfoDropdown=(options)=>{
+    let result = [];
+    options?.forEach((option) => {
+      result.push({
+        value: option._id,
+        label: option.paymentType,
+      });
+    });
+    return result;
+}
+const bankInformationDropdown=(options)=>{
+    let result = [];
+    options?.forEach((option) => {
+      result.push({
+        value: option._id,
+        label: option.bankName + '-' + option.branchName + '-' + option.routingNumber,
+      });
+    });
+    return result;
+}
 
 
-export {supplierDropdown,rawMaterialItemDropdown}
+export {supplierDropdown,rawMaterialItemDropdown,paymentInfoDropdown,bankInformationDropdown}

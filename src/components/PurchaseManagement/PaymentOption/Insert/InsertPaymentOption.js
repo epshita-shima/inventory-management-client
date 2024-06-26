@@ -3,9 +3,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, FieldArray, Form, Formik } from "formik";
 import React, { useRef } from "react";
 import * as Yup from "yup";
+import { useInsertPaymentInformationMutation } from "../../../../redux/features/paymnetinformation/paymentInfoApi";
+import swal from "sweetalert";
 
 const InsertPaymentOption = () => {
   const ArrayHelperRef = useRef();
+  const[insertPaymentInfo,{isLoading}]=useInsertPaymentInformationMutation()
   const getUser = localStorage.getItem("user");
   const getUserParse = JSON.parse(getUser);
   const makebyUser = getUserParse[0].username;
@@ -22,10 +25,23 @@ const InsertPaymentOption = () => {
   };
 
   console.log(initialValues);
-  const handleSubmit = (e,values,resetForm) => {
+  const handleSubmit =async (e,values,resetForm) => {
     e.preventDefault();
-    console.log(values);
-    resetForm()
+  
+    try {
+      const response = await insertPaymentInfo(values.detailsData);
+      console.log(response?.error?.data?.message);
+      if (response?.data?.status === 200) {
+        swal("Done", "Data Save Successfully", "success");
+        resetForm();
+      } else if((response?.error?.status === 400)){
+        swal("Not Possible!", response?.error?.data?.message, "error");
+      }
+    } catch (err) {
+      console.error(err);
+      swal("Error", "An error occurred while creating the data", "error");
+    }
+
   };
 
   return (
@@ -64,7 +80,7 @@ const InsertPaymentOption = () => {
                 dirty,
               }) => (
                 <Form
-                  id="menucreation-form"
+                  id="paymnetinfocreation-form"
                   onSubmit={(e) => {
                     handleSubmit(e, values, resetForm);
                   }}
@@ -72,7 +88,7 @@ const InsertPaymentOption = () => {
                   <div className="d-flex align-items-center mb-4">
                     <button
                       type="submit"
-                      form="itemcreation-form"
+                      form="paymnetinfocreation-form"
                       className="border-0 "
                       style={{
                         backgroundColor: isValid && dirty ? "#2DDC1B" : "gray",
@@ -84,7 +100,7 @@ const InsertPaymentOption = () => {
                       }}
                       disabled={!(isValid && dirty)}
                     >
-                      Save
+                     {isLoading ? 'Loading' :'Save'} 
                     </button>
                     <div
                       className="border-0 "
@@ -99,8 +115,8 @@ const InsertPaymentOption = () => {
                       }}
                       onClick={() => {
                         ArrayHelperRef.current.push({
-                          paymentType: makebyUser,
-                          makeBy: "",
+                          paymentType: '',
+                          makeBy: makebyUser,
                           updateBy: null,
                           makeDate: new Date(),
                           updateDate: null,

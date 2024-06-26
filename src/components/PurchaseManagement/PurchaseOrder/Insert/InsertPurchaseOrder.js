@@ -5,6 +5,8 @@ import React, { useRef, useState } from "react";
 import * as Yup from "yup";
 import Select from "react-select";
 import {
+  bankInformationDropdown,
+  paymentInfoDropdown,
   rawMaterialItemDropdown,
   supplierDropdown,
 } from "../../../Common/CommonDropdown/CommonDropdown";
@@ -15,26 +17,35 @@ import swal from "sweetalert";
 import "./InsertPurchaseOrder.css";
 import { useGetAllRMItemInformationQuery } from "../../../../redux/features/iteminformation/rmItemInfoApi";
 import SupplierInsertModal from "../../../Common/CommonModal/SupplierInsertModal";
+import { useGetAllPaymentInformationQuery } from "../../../../redux/features/paymnetinformation/paymentInfoApi";
+import { useGetAllBankInformationQuery } from "../../../../redux/features/bankinformation/bankInfoAPi";
+import { useInsertPurchaseOrderInformationMutation } from "../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
 const InsertPurchaseOrder = () => {
   const ArrayHelperRef = useRef();
   const [activeSupplierModal, setActiveSupplierModal] = useState(false);
   const [activeItemInfoModal, setActiveItemInfoModal] = useState(false);
   const [acivePaymentModal, setAcivePaymentModal] = useState(false);
+  const [aciveBankInfoModal, setAciveBankInfoModal] = useState(false);
   const [startDate, setStartDate] = useState(
     new Date().toLocaleDateString("en-CA")
   );
   const { data: supplierInfo, isLoading } =
     useGetAllSupplierInformationQuery(undefined);
   const { data: itemInfo } = useGetAllRMItemInformationQuery(undefined);
-  console.log(itemInfo);
+  const { data: paymentTypeInfo } = useGetAllPaymentInformationQuery(undefined);
+  const { data: bankInfo } = useGetAllBankInformationQuery(undefined);
+  const [totalGrandQuantity, setTotalGrandQuantity] = useState("");
+  const [totalGrandTotalAmount, setTotalGrandTotalAmount] = useState("");
+  const [insertPurchaseOrderInfo] = useInsertPurchaseOrderInformationMutation();
+
   const initialValues = {
     supplierId: "",
-    currency: "",
+    currencyId: "",
     paymentId: "",
     bankId: "",
     deliveryDate: "",
-    grandTotalAmount: "",
-    grandTotalQuantity: "",
+    grandTotalAmount: totalGrandTotalAmount,
+    grandTotalQuantity: totalGrandQuantity,
     makeBy: "",
     updateBy: null,
     makeDate: new Date(),
@@ -53,7 +64,8 @@ const InsertPurchaseOrder = () => {
   const supplierOptions = supplierDropdown(supplierInfo);
   console.log(supplierOptions);
   const rawMaterialItemOptions = rawMaterialItemDropdown(itemInfo);
-  console.log(rawMaterialItemOptions);
+  const paymentTypeOptions = paymentInfoDropdown(paymentTypeInfo);
+  const bankInfoOptions = bankInformationDropdown(bankInfo);
   const currencyOptions = [
     {
       value: "euro",
@@ -129,6 +141,7 @@ const InsertPurchaseOrder = () => {
                     render={(arrayHelpers) => {
                       ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
+                      console.log(values);
                       return (
                         <div className=" flex-1 items-center d-flex-nowrap mt-3 shadow-lg py-2 px-5">
                           <div>
@@ -186,7 +199,9 @@ const InsertPurchaseOrder = () => {
                                             primary: "#2DDC1B",
                                           },
                                         })}
-                                        onChange={(e) => {}}
+                                        onChange={(e) => {
+                                          setFieldValue("supplierId", e.value);
+                                        }}
                                       ></Select>
 
                                       {touched.supplierId &&
@@ -198,7 +213,7 @@ const InsertPurchaseOrder = () => {
                                     </div>
                                     <div className="ms-2 mt-2">
                                       <FontAwesomeIcon
-                                        className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
+                                        className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
                                         style={{
                                           background: "#2DDC1B",
                                         }}
@@ -208,7 +223,8 @@ const InsertPurchaseOrder = () => {
                                         onClick={() => {
                                           setActiveSupplierModal(true);
                                           setAcivePaymentModal(false);
-                                          setActiveItemInfoModal(false)
+                                          setActiveItemInfoModal(false);
+                                          setAciveBankInfoModal(false);
                                         }}
                                       />
                                     </div>
@@ -223,18 +239,18 @@ const InsertPurchaseOrder = () => {
                                         className="w-100 mb-3"
                                         aria-label="Default select example"
                                         name="sizeinfo"
-                                        options={supplierOptions}
+                                        options={paymentTypeOptions}
                                         defaultValue={{
                                           label: "Select Size",
                                           value: 0,
                                         }}
-                                        value={supplierOptions.filter(function (
-                                          option
-                                        ) {
-                                          return (
-                                            option.value === values.supplierId
-                                          );
-                                        })}
+                                        value={paymentTypeOptions.filter(
+                                          function (option) {
+                                            return (
+                                              option.value === values.paymentId
+                                            );
+                                          }
+                                        )}
                                         styles={{
                                           control: (baseStyles, state) => ({
                                             ...baseStyles,
@@ -259,7 +275,9 @@ const InsertPurchaseOrder = () => {
                                             primary: "#2DDC1B",
                                           },
                                         })}
-                                        onChange={(e) => {}}
+                                        onChange={(e) => {
+                                          setFieldValue("paymentId", e.value);
+                                        }}
                                       ></Select>
 
                                       {touched.supplierId &&
@@ -271,7 +289,7 @@ const InsertPurchaseOrder = () => {
                                     </div>
                                     <div className="ms-2 mt-2">
                                       <FontAwesomeIcon
-                                        className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
+                                        className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
                                         style={{
                                           background: "#2DDC1B",
                                         }}
@@ -280,8 +298,9 @@ const InsertPurchaseOrder = () => {
                                         data-target="#commonInsertModalCenter"
                                         onClick={() => {
                                           setAcivePaymentModal(true);
-                                          setActiveItemInfoModal(false)
-                                          setActiveSupplierModal(false)
+                                          setActiveItemInfoModal(false);
+                                          setActiveSupplierModal(false);
+                                          setAciveBankInfoModal(false);
                                         }}
                                       />
                                     </div>
@@ -298,17 +317,15 @@ const InsertPurchaseOrder = () => {
                                         className="w-100 mb-3"
                                         aria-label="Default select example"
                                         name="bankInformation"
-                                        options={supplierOptions}
+                                        options={bankInfoOptions}
                                         defaultValue={{
                                           label: "Select Size",
                                           value: 0,
                                         }}
-                                        value={supplierOptions.filter(function (
+                                        value={bankInfoOptions.filter(function (
                                           option
                                         ) {
-                                          return (
-                                            option.value === values.supplierId
-                                          );
+                                          return option.value === values.bankId;
                                         })}
                                         styles={{
                                           control: (baseStyles, state) => ({
@@ -334,7 +351,9 @@ const InsertPurchaseOrder = () => {
                                             primary: "#2DDC1B",
                                           },
                                         })}
-                                        onChange={(e) => {}}
+                                        onChange={(e) => {
+                                          setFieldValue("bankId", e.value);
+                                        }}
                                       ></Select>
 
                                       {touched.bankId && errors.bankId && (
@@ -345,13 +364,19 @@ const InsertPurchaseOrder = () => {
                                     </div>
                                     <div className="ms-2 mt-2">
                                       <FontAwesomeIcon
-                                        className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
+                                        className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
                                         style={{
                                           background: "#2DDC1B",
                                         }}
                                         icon={faPlus}
                                         data-toggle="modal"
-                                        data-target="#exampleModal1"
+                                        data-target="#commonInsertModalCenter"
+                                        onClick={() => {
+                                          setAciveBankInfoModal(true);
+                                          setAcivePaymentModal(false);
+                                          setActiveItemInfoModal(false);
+                                          setActiveSupplierModal(false);
+                                        }}
                                       />
                                     </div>
                                   </div>
@@ -377,6 +402,10 @@ const InsertPurchaseOrder = () => {
                                         });
                                       } else {
                                         setStartDate(
+                                          startDate.toLocaleDateString("en-CA")
+                                        );
+                                        setFieldValue(
+                                          "deliveryDate",
                                           startDate.toLocaleDateString("en-CA")
                                         );
                                       }
@@ -428,13 +457,15 @@ const InsertPurchaseOrder = () => {
                                           primary: "#2DDC1B",
                                         },
                                       })}
-                                      onChange={(e) => {}}
+                                      onChange={(e) => {
+                                        setFieldValue("currencyId", e.value);
+                                      }}
                                     ></Select>
                                   </div>
                                   <br />
-                                  {touched.currency && errors.currency && (
+                                  {touched.currencyId && errors.currencyId && (
                                     <div className="text-danger">
-                                      {errors.currency}
+                                      {errors.currencyId}
                                     </div>
                                   )}
                                 </div>
@@ -536,12 +567,13 @@ const InsertPurchaseOrder = () => {
                                     name={`grandTotalQuantity`}
                                     placeholder="Grand Total Quantity"
                                     disabled
-                                    value={values.grandTotalQuantity}
+                                    value={totalGrandQuantity}
                                     style={{
                                       border: "1px solid #2DDC1B",
                                       padding: "5px",
                                       width: "50%",
                                       borderRadius: "5px",
+                                      textAlign: "center",
                                       marginLeft: "10px",
                                       height: "38px",
                                     }}
@@ -559,13 +591,14 @@ const InsertPurchaseOrder = () => {
                                     name={`grandTotalAmount`}
                                     placeholder="Grand Total Amount"
                                     disabled
-                                    value={values.grandTotalAmount}
+                                    value={totalGrandTotalAmount}
                                     style={{
                                       border: "1px solid #2DDC1B",
                                       padding: "5px",
                                       width: "50%",
                                       borderRadius: "5px",
                                       marginLeft: "10px",
+                                      textAlign: "center",
                                       height: "38px",
                                     }}
                                   />
@@ -578,12 +611,12 @@ const InsertPurchaseOrder = () => {
                             <table className="table w-full table-bordered">
                               <thead className="w-100">
                                 <tr>
-                                  <th className="bg-white text-center align-middle  ">
+                                  <th className="bg-white text-center  align-items-center  ">
                                     Sl
                                   </th>
 
                                   <th
-                                    className="bg-white text-center align-middle"
+                                    className="bg-white text-center  align-items-center"
                                     style={{ width: "20%" }}
                                   >
                                     Item Name
@@ -591,38 +624,38 @@ const InsertPurchaseOrder = () => {
                                       *
                                     </span>
                                   </th>
-                                  <th className="bg-white text-center align-middle ">
+                                  <th className="bg-white text-center  align-items-center ">
                                     Item Description
                                     <span className="text-danger fw-bold fs-2">
                                       *
                                     </span>
                                   </th>
-                                  <th className="bg-white text-center align-middle ">
+                                  <th className="bg-white text-center  align-items-center ">
                                     Challan No
                                     <span className="text-danger fw-bold fs-2">
                                       *
                                     </span>
                                   </th>
-                                  <th className="bg-white text-center align-middle ">
+                                  <th className="bg-white text-center  align-items-center ">
                                     Quantity
                                     <span className="text-danger fw-bold fs-2">
                                       *
                                     </span>
                                   </th>
-                                  <th className="bg-white text-center align-middle ">
+                                  <th className="bg-white text-center  align-items-center ">
                                     Unit Price
                                     <span className="text-danger fw-bold fs-2">
                                       *
                                     </span>
                                   </th>
 
-                                  <th className="bg-white text-center align-middle ">
+                                  <th className="bg-white text-center  align-items-center ">
                                     Total Amount
                                     <span className="text-danger fw-bold fs-2">
                                       *
                                     </span>
                                   </th>
-                                  <th className="bg-white text-center align-middle ">
+                                  <th className="bg-white text-center  align-items-center ">
                                     Action
                                   </th>
                                 </tr>
@@ -630,10 +663,40 @@ const InsertPurchaseOrder = () => {
                               <tbody>
                                 {details && details.length > 0
                                   ? details.map((detail, index) => {
-                                      console.log(detail);
+                                      let singleQuantity;
+                                      let singleTotalAmount;
+                                      let calGrandTotalQuantity = 0;
+                                      let getCalGrandTotalQuantity = 0;
+                                      let calTotalAmount = 0;
+                                      let getCalTotalAmount = 0;
+                                      for (let i = 0; i < details.length; i++) {
+                                        singleQuantity = details[i].quantity;
+                                        singleTotalAmount =
+                                          details[i].totalAmount;
+                                        console.log(singleTotalAmount);
+                                        calGrandTotalQuantity +=
+                                          +singleQuantity;
+                                        getCalGrandTotalQuantity =
+                                          Math.round(
+                                            calGrandTotalQuantity * 100
+                                          ) / 100;
+                                        calTotalAmount += +singleTotalAmount;
+                                        console.log(calTotalAmount);
+                                        getCalTotalAmount =
+                                          Math.round(calTotalAmount * 100) /
+                                          100;
+                                        console.log(getCalTotalAmount);
+
+                                        setTotalGrandQuantity(
+                                          getCalGrandTotalQuantity
+                                        );
+                                        setTotalGrandTotalAmount(
+                                          getCalTotalAmount
+                                        );
+                                      }
                                       return (
                                         <tr key={index}>
-                                          <td className="text-center align-middle">
+                                          <td className="text-center  align-middle">
                                             {index + 1}
                                           </td>
                                           <td className="d-flex ">
@@ -655,7 +718,7 @@ const InsertPurchaseOrder = () => {
                                                     function (option) {
                                                       return (
                                                         option.value ===
-                                                        values.itemId
+                                                        detail.itemId
                                                       );
                                                     }
                                                   )}
@@ -688,7 +751,12 @@ const InsertPurchaseOrder = () => {
                                                       primary: "#2DDC1B",
                                                     },
                                                   })}
-                                                  onChange={(e) => {}}
+                                                  onChange={(e) => {
+                                                    setFieldValue(
+                                                      `detailsData.${index}.itemId`,
+                                                      e.value
+                                                    );
+                                                  }}
                                                 ></Select>
 
                                                 {touched.itemId &&
@@ -700,7 +768,7 @@ const InsertPurchaseOrder = () => {
                                               </div>
                                               <div className="ms-2 mt-2">
                                                 <FontAwesomeIcon
-                                                  className="border align-middle text-center p-2 fs-3 rounded-5 text-light "
+                                                  className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
                                                   style={{
                                                     background: "#2DDC1B",
                                                   }}
@@ -708,9 +776,16 @@ const InsertPurchaseOrder = () => {
                                                   data-toggle="modal"
                                                   data-target="#commonInsertModalCenter"
                                                   onClick={() => {
-                                                    setActiveItemInfoModal(true);
-                                                    setAcivePaymentModal(false)
-                                                    setActiveSupplierModal(false)
+                                                    setActiveItemInfoModal(
+                                                      true
+                                                    );
+                                                    setAcivePaymentModal(false);
+                                                    setActiveSupplierModal(
+                                                      false
+                                                    );
+                                                    setAciveBankInfoModal(
+                                                      false
+                                                    );
                                                   }}
                                                 />
                                               </div>
@@ -729,7 +804,7 @@ const InsertPurchaseOrder = () => {
                                               )}
                                           </td>
 
-                                          <td className="text-center align-middle">
+                                          <td className="text-center  align-items-center">
                                             <textarea
                                               type="textarea"
                                               name={`detailsData.${index}.itemDescription`}
@@ -763,7 +838,7 @@ const InsertPurchaseOrder = () => {
                                                 </div>
                                               )}
                                           </td>
-                                          <td className="text-center align-middle">
+                                          <td className="text-center  align-items-center">
                                             <Field
                                               type="text"
                                               name={`detailsData.${index}.challanNo`}
@@ -796,7 +871,7 @@ const InsertPurchaseOrder = () => {
                                                 </div>
                                               )}
                                           </td>
-                                          <td className="text-center align-middle">
+                                          <td className="text-center  align-items-center">
                                             <Field
                                               type="number"
                                               name={`detailsData.${index}.quantity`}
@@ -816,6 +891,14 @@ const InsertPurchaseOrder = () => {
                                                   `detailsData.${index}.quantity`,
                                                   e.target.value
                                                 );
+                                                const calculateTotalAmount =
+                                                  e.target.value *
+                                                  detail.unitPrice;
+
+                                                setFieldValue(
+                                                  `detailsData.${index}.totalAmount`,
+                                                  calculateTotalAmount
+                                                );
                                               }}
                                             />
                                             <br />
@@ -832,7 +915,7 @@ const InsertPurchaseOrder = () => {
                                               )}
                                           </td>
 
-                                          <td className="text-center align-middle">
+                                          <td className="text-center  align-items-center">
                                             <Field
                                               type="text"
                                               name={`detailsData.${index}.unitPrice`}
@@ -852,6 +935,13 @@ const InsertPurchaseOrder = () => {
                                                   `detailsData.${index}.unitPrice`,
                                                   e.target.value
                                                 );
+                                                const calculateTotalAmount =
+                                                  e.target.value *
+                                                  detail.quantity;
+                                                setFieldValue(
+                                                  `detailsData.${index}.totalAmount`,
+                                                  calculateTotalAmount
+                                                );
                                               }}
                                             />
                                             <br />
@@ -867,7 +957,7 @@ const InsertPurchaseOrder = () => {
                                                 </div>
                                               )}
                                           </td>
-                                          <td className="text-center align-middle">
+                                          <td className="text-center  align-items-center">
                                             <Field
                                               type="text"
                                               name={`detailsData.${index}.totalAmount`}
@@ -884,7 +974,7 @@ const InsertPurchaseOrder = () => {
                                               }}
                                             />
                                           </td>
-                                          <td className="text-center align-middle">
+                                          <td className="text-center  align-middle">
                                             <button
                                               type="button"
                                               className=" border-0 rounded  bg-transparent"
@@ -922,6 +1012,8 @@ const InsertPurchaseOrder = () => {
         setActiveItemInfoModal={setActiveItemInfoModal}
         acivePaymentModal={acivePaymentModal}
         setAcivePaymentModal={setAcivePaymentModal}
+        aciveBankInfoModal={aciveBankInfoModal}
+        setAciveBankInfoModal={setAciveBankInfoModal}
       ></SupplierInsertModal>
     </div>
   );

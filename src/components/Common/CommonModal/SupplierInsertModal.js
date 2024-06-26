@@ -2,6 +2,8 @@ import React from "react";
 import InsertSupplierInformation from "./../../SupplierProfile/Insert/InsertSupplierInformation";
 import InsertRmItemInfo from "./../../RMItemProfile/ItemProfileInformation/Insert/InsertRmItemInfo";
 import InsertPaymentOption from "../../PurchaseManagement/PaymentOption/Insert/InsertPaymentOption";
+import InsertBankInformation from "../../PurchaseManagement/BankInformation/Insert/InsertBankInformation";
+import './SupplierInsertModal.css'
 
 const SupplierInsertModal = ({
   activeSupplierModal,
@@ -9,8 +11,11 @@ const SupplierInsertModal = ({
   activeItemInfoModal,
   setActiveItemInfoModal,
   acivePaymentModal,
-  setAcivePaymentModal
+  setAcivePaymentModal,
+  aciveBankInfoModal,
+  setAciveBankInfoModal
 }) => {
+
   return (
     <div
       class="modal fade"
@@ -28,9 +33,10 @@ const SupplierInsertModal = ({
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="commonInsertModalCenterLongTitle">
-              {activeSupplierModal && "   Insert Supplier Information"}
-              {activeItemInfoModal && "   Insert Raw Material Item Information"}
+              {activeSupplierModal && "Insert Supplier Information"}
+              {activeItemInfoModal && "Insert Raw Material Item Information"}
               {acivePaymentModal && "Insert Payment Information"}
+              {aciveBankInfoModal&& "Insert Bank Information"}
             </h5>
             <button
               type="button"
@@ -45,6 +51,9 @@ const SupplierInsertModal = ({
                 }
                 else if(acivePaymentModal){
                   setAcivePaymentModal(false);
+                }
+                else if(aciveBankInfoModal){
+                  setAciveBankInfoModal(false)
                 }
               }}
             >
@@ -61,6 +70,9 @@ const SupplierInsertModal = ({
             {
               acivePaymentModal ? <InsertPaymentOption></InsertPaymentOption> :''
             }
+            {aciveBankInfoModal ? <InsertBankInformation></InsertBankInformation>
+              
+            :''}
           </div>
         </div>
       </div>
