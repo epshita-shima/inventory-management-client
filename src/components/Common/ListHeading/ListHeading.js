@@ -24,6 +24,9 @@ const ListHeading = ({
   clientInfoData,
   clientInfoActiveStatus,
   clientInfoInActiveStatus,
+  purchaseInfoData,
+  purchaseInCash,
+  purchaseInLCAtSight
 }) => {
   const [totalTitle, setTotalTitle] = useState("");
   const [totalActiveTitle, setTotalActiveTitle] = useState("");
@@ -68,6 +71,11 @@ const ListHeading = ({
       setTotalTitle(`Total ${searchItem[0]?.headerLabelName}`);
       setTotalActiveTitle(`Total Active ${searchItem[0]?.headerLabelName}`);
       setTotalInActiveTitle(`Total InActive ${searchItem[0]?.headerLabelName}`);
+
+      if(searchItem[0]?.menuId == MenuIdCollection.purchaseorderlist){
+        setTotalActiveTitle(`Total Purchase in Cash`);
+      setTotalInActiveTitle(`Total Purchase in LC At Sight`);
+      }
       console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList);
       if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
         console.log("fg");
@@ -99,6 +107,11 @@ const ListHeading = ({
         totalActive = clientInfoActiveStatus?.length;
         totalInActive = clientInfoInActiveStatus?.length;
       }
+      else if(searchItem[0]?.menuId == MenuIdCollection.purchaseorderlist){
+        grandTotal = purchaseInfoData?.length;
+        totalActive = purchaseInCash?.length;
+        totalInActive = purchaseInLCAtSight?.length;
+      }
 
       setGrandTotal(grandTotal);
       setTotalActive(totalActive);
@@ -124,7 +137,10 @@ const ListHeading = ({
     supplierInfoInActiveStatus,
     clientInfoData,
     clientInfoActiveStatus,
-    clientInfoInActiveStatus
+    clientInfoInActiveStatus,
+    purchaseInfoData,
+    purchaseInCash,
+    purchaseInLCAtSight
   ]);
 
   return (
@@ -172,7 +188,11 @@ const ListHeading = ({
               data-toggle="modal"
               data-target="#exampleModalCenter"
               onClick={() => {
-                setActiveDataModal(true);
+                const searchItem = mainData?.filter((x) => x.url == pathname);
+                if(searchItem[0]?.menuId !== MenuIdCollection.purchaseorderlist){
+                  setActiveDataModal(true);
+                }
+               
               }}
             >
               <p
@@ -204,7 +224,11 @@ const ListHeading = ({
               data-toggle="modal"
               data-target="#exampleModalCenter"
               onClick={() => {
-                setInActiveDataModal(true);
+                const searchItem = mainData?.filter((x) => x.url == pathname);
+                if(searchItem[0]?.menuId !== MenuIdCollection.purchaseorderlist){
+                  setInActiveDataModal(true);
+                }
+                
               }}
             >
               <p

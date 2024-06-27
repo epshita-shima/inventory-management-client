@@ -3,20 +3,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, FieldArray, Form, Formik } from "formik";
 import React, { useRef } from "react";
 import * as Yup from "yup";
+import Select from "react-select";
 import { useInsertPaymentInformationMutation } from "../../../../redux/features/paymnetinformation/paymentInfoApi";
 import swal from "sweetalert";
 
 const InsertPaymentOption = () => {
   const ArrayHelperRef = useRef();
-  const[insertPaymentInfo,{isLoading}]=useInsertPaymentInformationMutation()
+  const [insertPaymentInfo, { isLoading }] =
+    useInsertPaymentInformationMutation();
   const getUser = localStorage.getItem("user");
   const getUserParse = JSON.parse(getUser);
   const makebyUser = getUserParse[0].username;
+
+  const paymentTypeOptions = [
+    { value: "cash", label: "Cash" },
+    { value: "lcatsight", label: "LC At Sight" },
+  ];
   const initialValues = {
     detailsData: [
       {
+        paymentMode: "",
         paymentType: "",
-        makeBy:makebyUser,
+        makeBy: makebyUser,
         updateBy: null,
         makeDate: new Date(),
         updateDate: null,
@@ -25,23 +33,22 @@ const InsertPaymentOption = () => {
   };
 
   console.log(initialValues);
-  const handleSubmit =async (e,values,resetForm) => {
+  const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
-  
+
     try {
       const response = await insertPaymentInfo(values.detailsData);
       console.log(response?.error?.data?.message);
       if (response?.data?.status === 200) {
         swal("Done", "Data Save Successfully", "success");
         resetForm();
-      } else if((response?.error?.status === 400)){
+      } else if (response?.error?.status === 400) {
         swal("Not Possible!", response?.error?.data?.message, "error");
       }
     } catch (err) {
       console.error(err);
       swal("Error", "An error occurred while creating the data", "error");
     }
-
   };
 
   return (
@@ -60,6 +67,7 @@ const InsertPaymentOption = () => {
               validationSchema={Yup.object({
                 detailsData: Yup.array().of(
                   Yup.object().shape({
+                    paymentMode: Yup.string().required("Required"),
                     paymentType: Yup.string().required("Required"),
                   })
                 ),
@@ -100,14 +108,14 @@ const InsertPaymentOption = () => {
                       }}
                       disabled={!(isValid && dirty)}
                     >
-                     {isLoading ? 'Loading' :'Save'} 
+                      {isLoading ? "Loading" : "Save"}
                     </button>
                     <div
                       className="border-0 "
                       style={{
                         // backgroundColor: "#2DDC1B",
-                        backgroundColor: "#2DDC1B",
-                        color: "#fff",
+                        backgroundColor: "#B8FEB3",
+                        color: "#000",
                         padding: "5px 10px",
                         fontSize: "14px",
                         borderRadius: "5px",
@@ -115,7 +123,8 @@ const InsertPaymentOption = () => {
                       }}
                       onClick={() => {
                         ArrayHelperRef.current.push({
-                          paymentType: '',
+                          paymentMode:'',
+                          paymentType: "",
                           makeBy: makebyUser,
                           updateBy: null,
                           makeDate: new Date(),
@@ -126,7 +135,7 @@ const InsertPaymentOption = () => {
                       <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon> Add Row
                     </div>
 
-                    <div className="d-flex mt-2 mb-4"></div>
+                   
                   </div>
                   <FieldArray
                     name="detailsData"
@@ -142,10 +151,16 @@ const InsertPaymentOption = () => {
                           <table className="table w-full table-bordered">
                             <thead className="w-100">
                               <tr>
-                                <th className="bg-white text-center align-middle  ">
+                                <th className="bg-white text-center align-middle">
                                   Sl
                                 </th>
 
+                                <th className="bg-white text-center align-middle ">
+                                  Payment Mode
+                                  <span className="text-danger fw-bold fs-2">
+                                    *
+                                  </span>
+                                </th>
                                 <th className="bg-white text-center align-middle ">
                                   Payment Type
                                   <span className="text-danger fw-bold fs-2">
@@ -162,25 +177,26 @@ const InsertPaymentOption = () => {
                                   return (
                                     <tbody>
                                       <tr key={index}>
-                                        <td className="bg-white text-center align-middle">
+                                        <td className="bg-white text-center align-items-center">
                                           {index + 1}
                                         </td>
 
-                                        <td className="text-center align-middle">
+                                        <td className="text-center align-items-center">
                                           <Field
                                             type="text"
-                                            name={`detailsData.${index}.paymentType`}
-                                            placeholder="Payment Type"
-                                            value={detail?.paymentType}
+                                            name={`detailsData.${index}.paymentMode`}
+                                            placeholder="Payment mode"
+                                            value={detail?.paymentMode}
                                             style={{
                                               border: "1px solid #2DDC1B",
                                               padding: "5px",
-                                              width: "75%",
+                                              width: "100%",
                                               borderRadius: "5px",
+                                              height:'38px'
                                             }}
                                             onClick={(e) => {
                                               setFieldValue(
-                                                `detailsData.${index}.paymentType`,
+                                                `detailsData.${index}.paymentMode`,
                                                 e.target.value
                                               );
                                             }}
@@ -198,7 +214,82 @@ const InsertPaymentOption = () => {
                                               </div>
                                             )}
                                         </td>
-                                        <td className="text-center align-middle">
+                                        <td className="text-center align-items-center">
+                                          <div className="w-100">
+                                            <Select
+                                              class="form-select"
+                                              className="w-100"
+                                              aria-label="Default select example"
+                                              name={`detailsData.${index}.paymentType`}
+                                              options={paymentTypeOptions}
+                                              defaultValue={{
+                                                label: "Select payment type",
+                                                value: 0,
+                                              }}
+                                              // value={paymentTypeOptions.filter(
+                                              //   function (option) {
+                                              //     return (
+                                              //       option.value ===
+                                              //       values.paymentType
+                                              //     );
+                                              //   }
+                                              // )}
+                                              styles={{
+                                                control: (
+                                                  baseStyles,
+                                                  state
+                                                ) => ({
+                                                  ...baseStyles,
+                                                  width: "100%",
+                                                  borderColor: state.isFocused
+                                                    ? "#fff"
+                                                    : "#fff",
+                                                  border: "1px solid #2DDC1B",
+                                                }),
+                                                menu: (provided) => ({
+                                                  ...provided,
+                                                  zIndex: 9999,
+                                                  height: "auto",
+                                                  // overflowY: "scroll",
+                                                }),
+                                              }}
+                                              theme={(theme) => ({
+                                                ...theme,
+                                                colors: {
+                                                  ...theme.colors,
+                                                  primary25: "#B8FEB3",
+                                                  primary: "#2DDC1B",
+                                                },
+                                              })}
+                                              onChange={(e) => {
+                                                // if(detail.paymentMode=='Cash' && e.value=='lcatsight'){
+                                                //   swal("Not Possible!", "Cash can not LC at sight", "error");
+                                                // }
+                                                // else{
+                                                  setFieldValue(
+                                                    `detailsData.${index}.paymentType`,
+                                                    e.value
+                                                  );
+                                                // }
+                                                
+                                              }}
+                                            ></Select>
+                                            
+                                          </div>
+                                          <br />
+                                          {touched.detailsData?.[index]
+                                            ?.paymentType &&
+                                            errors.detailsData?.[index]
+                                              ?.paymentType && (
+                                              <div className="text-danger">
+                                                {
+                                                  errors.detailsData[index]
+                                                    .paymentType
+                                                }
+                                              </div>
+                                            )}
+                                        </td>
+                                        <td className="text-center align-items-center">
                                           <button
                                             type="button"
                                             className=" border-0 rounded  bg-transparent"

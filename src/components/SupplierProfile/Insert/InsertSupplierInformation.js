@@ -39,6 +39,7 @@ const InsertSupplierInformation = () => {
     detailsData: [
       {
         supplierName: "",
+        supplierShortName:'',
         email: "",
         mobileNo: "",
         contactPerson: "",
@@ -158,6 +159,7 @@ const InsertSupplierInformation = () => {
                 detailsData: Yup.array().of(
                   Yup.object().shape({
                     supplierName: Yup.string().required("Required"),
+                    supplierShortName: Yup.string().required("Required"),
                     email: Yup.string().required("Required"),
                     mobileNo: Yup.string()
                       .required("Required")
@@ -211,7 +213,7 @@ const InsertSupplierInformation = () => {
                                       <div>
                                         <div className="col-md-6">
                                           <div className="mb-2">
-                                            <label htmlFor="email">
+                                            <label htmlFor="supplierName">
                                               Supplier Name
                                             </label>
                                             <Field
@@ -260,6 +262,60 @@ const InsertSupplierInformation = () => {
                                                     {
                                                       errors.detailsData[index]
                                                         .supplierName
+                                                    }
+                                                  </div>
+                                                )}
+                                          </div>
+                                          <div className="mb-2">
+                                            <label htmlFor="supplierShortName">
+                                              Supplier Short Name
+                                            </label>
+                                            <Field
+                                              type="text"
+                                              name={`detailsData.${index}.supplierShortName`}
+                                              placeholder="Supplier short name"
+                                              value={
+                                                id
+                                                  ? supplierData?.supplierShortName
+                                                  : detail?.supplierShortName
+                                              }
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                                height: "38px",
+                                              }}
+                                              onChange={(e) => {
+                                                if (id) {
+                                                  setSupplierData(
+                                                    (prevData) => ({
+                                                      ...prevData,
+                                                      supplierShortName:
+                                                        e.target.value,
+                                                      updateBy: updatebyUser,
+                                                      updateDate: new Date(),
+                                                    })
+                                                  );
+                                                } else {
+                                                  setFieldValue(
+                                                    `detailsData.${index}.supplierShortName`,
+                                                    e.target.value
+                                                  );
+                                                }
+                                              }}
+                                            />
+                                            <br />
+                                            {id
+                                              ? ""
+                                              : touched.detailsData?.[index]
+                                                  ?.supplierShortName &&
+                                                errors.detailsData?.[index]
+                                                  ?.supplierShortName && (
+                                                  <div className="text-danger">
+                                                    {
+                                                      errors.detailsData[index]
+                                                        .supplierShortName
                                                     }
                                                   </div>
                                                 )}
@@ -606,7 +662,7 @@ const InsertSupplierInformation = () => {
                                                   ? supplierData?.address
                                                   : detail?.address
                                               }
-                                              rows="3"
+                                              rows="4"
                                               style={{
                                                 border: "1px solid #2DDC1B",
                                                 padding: "5px",
@@ -646,8 +702,8 @@ const InsertSupplierInformation = () => {
                                                 )}
                                           </div>
                                         </div>
-                                      </div>
-                                      <div className="col-md-12">
+                                      </div> 
+                                      <div className="col-md-12 mt-3">
                                         <div className="d-flex justify-content-center">
                                           <button
                                             type="submit"

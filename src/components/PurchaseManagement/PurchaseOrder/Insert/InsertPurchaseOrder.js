@@ -1,7 +1,11 @@
-import { faPlus, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowAltCircleLeft,
+  faPlus,
+  faXmarkCircle,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, FieldArray, Form, Formik } from "formik";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import Select from "react-select";
 import {
@@ -20,6 +24,11 @@ import SupplierInsertModal from "../../../Common/CommonModal/SupplierInsertModal
 import { useGetAllPaymentInformationQuery } from "../../../../redux/features/paymnetinformation/paymentInfoApi";
 import { useGetAllBankInformationQuery } from "../../../../redux/features/bankinformation/bankInfoAPi";
 import { useInsertPurchaseOrderInformationMutation } from "../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
+import {
+  useCreateSerialNoMutation,
+  useGetSerialNoQuery,
+} from "../../../../redux/api/apiSlice";
+import { useNavigate } from "react-router-dom";
 const InsertPurchaseOrder = () => {
   const ArrayHelperRef = useRef();
   const [activeSupplierModal, setActiveSupplierModal] = useState(false);
@@ -34,11 +43,21 @@ const InsertPurchaseOrder = () => {
   const { data: itemInfo } = useGetAllRMItemInformationQuery(undefined);
   const { data: paymentTypeInfo } = useGetAllPaymentInformationQuery(undefined);
   const { data: bankInfo } = useGetAllBankInformationQuery(undefined);
-  const [totalGrandQuantity, setTotalGrandQuantity] = useState("");
-  const [totalGrandTotalAmount, setTotalGrandTotalAmount] = useState("");
+  const [totalGrandQuantity, setTotalGrandQuantity] = useState(0);
+  const [totalGrandTotalAmount, setTotalGrandTotalAmount] = useState(0);
+  const [serialValue, setSerialValue] = useState([]);
+  const { data: serialNo } = useGetSerialNoQuery(undefined);
+  const [createSerialNo] = useCreateSerialNoMutation();
   const [insertPurchaseOrderInfo] = useInsertPurchaseOrderInformationMutation();
+  const navigate = useNavigate();
+  console.log(serialValue);
+  console.log(totalGrandTotalAmount, totalGrandQuantity);
+  const getUser = localStorage.getItem("user");
+  const getUserParse = JSON.parse(getUser);
+  const makebyUser = getUserParse[0].username;
 
   const initialValues = {
+    poNo: "",
     supplierId: "",
     currencyId: "",
     paymentId: "",
@@ -46,7 +65,10 @@ const InsertPurchaseOrder = () => {
     deliveryDate: "",
     grandTotalAmount: totalGrandTotalAmount,
     grandTotalQuantity: totalGrandQuantity,
-    makeBy: "",
+    approveStatus: false,
+    approveBy: "n/a",
+    approveDate: "n/a",
+    makeBy: makebyUser,
     updateBy: null,
     makeDate: new Date(),
     updateDate: null,
@@ -55,7 +77,6 @@ const InsertPurchaseOrder = () => {
         itemId: "",
         itemDescription: "",
         quantity: "",
-        challanNo: "",
         unitPrice: "",
         totalAmount: "",
       },
@@ -80,8 +101,52 @@ const InsertPurchaseOrder = () => {
       label: "DOLLAR",
     },
   ];
-  const handleSubmit = (e, values, resetForm) => {
+  console.log(initialValues);
+
+  useEffect(() => {
+    if (serialNo && serialNo.length > 0) {
+      const maxSerialNoObject = serialNo.reduce((max, current) => {
+        if (current.type === "po") {
+          // If max is undefined or current serialNo is greater, return current
+          return max && current.serialNo > max.serialNo
+            ? current
+            : max || current;
+        }
+        return max;
+      }, undefined);
+      if (maxSerialNoObject) {
+        setSerialValue(maxSerialNoObject);
+      }
+    }
+  }, [serialNo]);
+
+  const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
+    console.log(JSON.stringify(values));
+    const serialData = {
+      serialNo: serialNo?.serialNo,
+      type: "po",
+      year: new Date().toLocaleDateString("en-CA"),
+      makeby: makebyUser,
+      updateby: "",
+    };
+    try {
+      const response = await insertPurchaseOrderInfo(values);
+      console.log(response?.data?.status);
+      const responseSerial = await createSerialNo(serialData);
+      if (
+        response?.data?.status === 200 &&
+        responseSerial.data.status === 201
+      ) {
+        swal("Done", "Data Save Successfully", "success");
+        resetForm();
+      } else if (response?.error?.status === 400) {
+        swal("Not Possible!", response?.error?.data?.message, "error");
+      }
+    } catch (err) {
+      console.error(err);
+      swal("Error", "An error occurred while creating the data", "error");
+    }
   };
 
   return (
@@ -103,7 +168,6 @@ const InsertPurchaseOrder = () => {
                     itemId: Yup.string().required("Required"),
                     itemDescription: Yup.string().required("Required"),
                     quantity: Yup.string().required("Required"),
-                    challanNo: Yup.string().required("Required"),
                     unitPrice: Yup.string().required("Required"),
                     totalAmount: Yup.string().required("Required"),
                   })
@@ -125,7 +189,7 @@ const InsertPurchaseOrder = () => {
                 dirty,
               }) => (
                 <Form
-                  id="clientcreation-form"
+                  id="pocreation-form"
                   onSubmit={(e) => {
                     handleSubmit(e, values, resetForm);
                   }}
@@ -145,292 +209,54 @@ const InsertPurchaseOrder = () => {
                       return (
                         <div className=" flex-1 items-center d-flex-nowrap mt-3 shadow-lg py-2 px-5">
                           <div>
-                            <h2
-                              style={{ fontSize: "24px", fontWeight: "bold" }}
-                            >
-                              Purchase Order Form
-                            </h2>
-                            <div class="container">
-                              <div class="row row-cols-2 row-cols-lg-3">
-                                <div class="col-6 col-lg-4">
-                                  <label htmlFor="supplierId">
-                                    Supplier Name
-                                  </label>
-                                  <div className="w-75 d-flex justify-content-between mt-2">
-                                    <div className="w-100">
-                                      <Select
-                                        class="form-select"
-                                        className="w-100 mb-3"
-                                        aria-label="Default select example"
-                                        name="sizeinfo"
-                                        options={supplierOptions}
-                                        defaultValue={{
-                                          label: "Select Size",
-                                          value: 0,
-                                        }}
-                                        value={supplierOptions.filter(function (
-                                          option
-                                        ) {
-                                          return (
-                                            option.value === values.supplierId
-                                          );
-                                        })}
-                                        styles={{
-                                          control: (baseStyles, state) => ({
-                                            ...baseStyles,
-                                            width: "100%",
-                                            borderColor: state.isFocused
-                                              ? "#fff"
-                                              : "#fff",
-                                            border: "1px solid #2DDC1B",
-                                          }),
-                                          menu: (provided) => ({
-                                            ...provided,
-                                            zIndex: 9999,
-                                            height: "auto",
-                                            // overflowY: "scroll",
-                                          }),
-                                        }}
-                                        theme={(theme) => ({
-                                          ...theme,
-                                          colors: {
-                                            ...theme.colors,
-                                            primary25: "#B8FEB3",
-                                            primary: "#2DDC1B",
-                                          },
-                                        })}
-                                        onChange={(e) => {
-                                          setFieldValue("supplierId", e.value);
-                                        }}
-                                      ></Select>
-
-                                      {touched.supplierId &&
-                                        errors.supplierId && (
-                                          <div className="text-danger">
-                                            {errors.supplierId}
-                                          </div>
-                                        )}
-                                    </div>
-                                    <div className="ms-2 mt-2">
-                                      <FontAwesomeIcon
-                                        className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
-                                        style={{
-                                          background: "#2DDC1B",
-                                        }}
-                                        icon={faPlus}
-                                        data-toggle="modal"
-                                        data-target="#commonInsertModalCenter"
-                                        onClick={() => {
-                                          setActiveSupplierModal(true);
-                                          setAcivePaymentModal(false);
-                                          setActiveItemInfoModal(false);
-                                          setAciveBankInfoModal(false);
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="col-6 col-lg-4">
-                                  <label htmlFor="paymentId">Payment</label>
-                                  <div className="w-75 d-flex justify-content-between mt-2">
-                                    <div className="w-100">
-                                      <Select
-                                        class="form-select"
-                                        className="w-100 mb-3"
-                                        aria-label="Default select example"
-                                        name="sizeinfo"
-                                        options={paymentTypeOptions}
-                                        defaultValue={{
-                                          label: "Select Size",
-                                          value: 0,
-                                        }}
-                                        value={paymentTypeOptions.filter(
-                                          function (option) {
-                                            return (
-                                              option.value === values.paymentId
-                                            );
-                                          }
-                                        )}
-                                        styles={{
-                                          control: (baseStyles, state) => ({
-                                            ...baseStyles,
-                                            width: "100%",
-                                            borderColor: state.isFocused
-                                              ? "#fff"
-                                              : "#fff",
-                                            border: "1px solid #2DDC1B",
-                                          }),
-                                          menu: (provided) => ({
-                                            ...provided,
-                                            zIndex: 9999,
-                                            height: "auto",
-                                            // overflowY: "scroll",
-                                          }),
-                                        }}
-                                        theme={(theme) => ({
-                                          ...theme,
-                                          colors: {
-                                            ...theme.colors,
-                                            primary25: "#B8FEB3",
-                                            primary: "#2DDC1B",
-                                          },
-                                        })}
-                                        onChange={(e) => {
-                                          setFieldValue("paymentId", e.value);
-                                        }}
-                                      ></Select>
-
-                                      {touched.supplierId &&
-                                        errors.supplierId && (
-                                          <div className="text-danger">
-                                            {errors.supplierId}
-                                          </div>
-                                        )}
-                                    </div>
-                                    <div className="ms-2 mt-2">
-                                      <FontAwesomeIcon
-                                        className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
-                                        style={{
-                                          background: "#2DDC1B",
-                                        }}
-                                        icon={faPlus}
-                                        data-toggle="modal"
-                                        data-target="#commonInsertModalCenter"
-                                        onClick={() => {
-                                          setAcivePaymentModal(true);
-                                          setActiveItemInfoModal(false);
-                                          setActiveSupplierModal(false);
-                                          setAciveBankInfoModal(false);
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="col-6 col-lg-4">
-                                  <label htmlFor="bankId">
-                                    Bank Information
-                                  </label>
-                                  <div className="w-75 d-flex justify-content-between mt-2">
-                                    <div className="w-100">
-                                      <Select
-                                        class="form-select"
-                                        className="w-100 mb-3"
-                                        aria-label="Default select example"
-                                        name="bankInformation"
-                                        options={bankInfoOptions}
-                                        defaultValue={{
-                                          label: "Select Size",
-                                          value: 0,
-                                        }}
-                                        value={bankInfoOptions.filter(function (
-                                          option
-                                        ) {
-                                          return option.value === values.bankId;
-                                        })}
-                                        styles={{
-                                          control: (baseStyles, state) => ({
-                                            ...baseStyles,
-                                            width: "100%",
-                                            borderColor: state.isFocused
-                                              ? "#fff"
-                                              : "#fff",
-                                            border: "1px solid #2DDC1B",
-                                          }),
-                                          menu: (provided) => ({
-                                            ...provided,
-                                            zIndex: 9999,
-                                            height: "auto",
-                                            // overflowY: "scroll",
-                                          }),
-                                        }}
-                                        theme={(theme) => ({
-                                          ...theme,
-                                          colors: {
-                                            ...theme.colors,
-                                            primary25: "#B8FEB3",
-                                            primary: "#2DDC1B",
-                                          },
-                                        })}
-                                        onChange={(e) => {
-                                          setFieldValue("bankId", e.value);
-                                        }}
-                                      ></Select>
-
-                                      {touched.bankId && errors.bankId && (
-                                        <div className="text-danger">
-                                          {errors.bankId}
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div className="ms-2 mt-2">
-                                      <FontAwesomeIcon
-                                        className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
-                                        style={{
-                                          background: "#2DDC1B",
-                                        }}
-                                        icon={faPlus}
-                                        data-toggle="modal"
-                                        data-target="#commonInsertModalCenter"
-                                        onClick={() => {
-                                          setAciveBankInfoModal(true);
-                                          setAcivePaymentModal(false);
-                                          setActiveItemInfoModal(false);
-                                          setActiveSupplierModal(false);
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div class="col-6 col-lg-4">
-                                  <label htmlFor="">Delivery Date</label>
-                                  <br />
-                                  <DatePicker
-                                    dateFormat="y-MM-dd"
-                                    className="text-center custom-datepicker"
-                                    //   value={isEdit ? updateOpeningStore?.OpeningDate : startDate}
-                                    calendarClassName="custom-calendar"
-                                    selected={startDate}
-                                    required
-                                    onChange={(startDate) => {
-                                      if (startDate > new Date()) {
-                                        swal({
-                                          title: "Select Valid Date",
-                                          text: "Date should be equal or earlier than today",
-                                          icon: "warning",
-                                          button: "OK",
-                                        });
-                                      } else {
-                                        setStartDate(
-                                          startDate.toLocaleDateString("en-CA")
-                                        );
-                                        setFieldValue(
-                                          "deliveryDate",
-                                          startDate.toLocaleDateString("en-CA")
-                                        );
-                                      }
-                                    }}
-                                  />
-                                </div>
-                                <div class="col-6 col-lg-4">
-                                  <label htmlFor="Currency">Currency</label>
-                                  <br />
-                                  <div className="w-75">
+                            <div className="d-flex justify-content-between align-items-center">
+                              <h2
+                                style={{ fontSize: "24px", fontWeight: "bold" }}
+                              >
+                                Purchase Order Form
+                              </h2>
+                            <div >
+                            <button
+                                style={{
+                                  backgroundColor: "#E55566",
+                                  outline: "none",
+                                  border: "none",
+                                  color: "white",
+                                  height: "25px",
+                                }}
+                                onClick={() => {
+                                  navigate("/main-view/purchase-order-list");
+                                }}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faArrowAltCircleLeft}
+                                ></FontAwesomeIcon>
+                                Back to ItemList
+                              </button>
+                            </div>
+                            </div>
+                            <div class="row row-cols-2 row-cols-lg-3">
+                              <div class="col-6 col-lg-4">
+                                <label htmlFor="supplierId">
+                                  Supplier Name
+                                </label>
+                                <div className="w-75 d-flex justify-content-between mt-2">
+                                  <div className="w-100">
                                     <Select
                                       class="form-select"
                                       className="w-100 mb-3"
                                       aria-label="Default select example"
-                                      name="bankInformation"
-                                      options={currencyOptions}
+                                      name="sizeinfo"
+                                      options={supplierOptions}
                                       defaultValue={{
                                         label: "Select Size",
                                         value: 0,
                                       }}
-                                      value={currencyOptions.filter(function (
+                                      value={supplierOptions.filter(function (
                                         option
                                       ) {
                                         return (
-                                          option.value === values.currencyId
+                                          option.value === values.supplierId
                                         );
                                       })}
                                       styles={{
@@ -458,44 +284,317 @@ const InsertPurchaseOrder = () => {
                                         },
                                       })}
                                       onChange={(e) => {
-                                        setFieldValue("currencyId", e.value);
+                                        setFieldValue("supplierId", e.value);
+                                        console.log(e);
+                                        const shortName = e.sortName;
+                                        console.log(shortName, e.sortName);
+
+                                        const poDate =
+                                          new Date().toLocaleDateString(
+                                            "en-CA"
+                                          );
+                                        const createPODate = setFieldValue(
+                                          "poNo",
+                                          `PO-MEB-${
+                                            e.sortName
+                                          }-${new Date().toLocaleDateString(
+                                            "en-CA"
+                                          )}-${
+                                            serialValue?.serialNo == undefined
+                                              ? "1"
+                                              : serialValue?.serialNo
+                                          }`
+                                        );
                                       }}
                                     ></Select>
+
+                                    {touched.supplierId &&
+                                      errors.supplierId && (
+                                        <div className="text-danger">
+                                          {errors.supplierId}
+                                        </div>
+                                      )}
                                   </div>
-                                  <br />
-                                  {touched.currencyId && errors.currencyId && (
-                                    <div className="text-danger">
-                                      {errors.currencyId}
-                                    </div>
-                                  )}
+                                  <div className="ms-2 mt-2">
+                                    <FontAwesomeIcon
+                                      className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
+                                      style={{
+                                        background: "#2DDC1B",
+                                      }}
+                                      icon={faPlus}
+                                      data-toggle="modal"
+                                      data-target="#commonInsertModalCenter"
+                                      onClick={() => {
+                                        setActiveSupplierModal(true);
+                                        setAcivePaymentModal(false);
+                                        setActiveItemInfoModal(false);
+                                        setAciveBankInfoModal(false);
+                                      }}
+                                    />
+                                  </div>
                                 </div>
-                                <div class="col-6 col-lg-4">
-                                  <label htmlFor="remarks">Remarks</label>
-                                  <br />
-                                  <textarea
-                                    type="textarea"
-                                    name={`remarks`}
-                                    placeholder="Remarks"
-                                    value={values.remarks}
-                                    rows="2"
-                                    style={{
-                                      border: "1px solid #2DDC1B",
-                                      padding: "5px",
-                                      width: "73%",
-                                      borderRadius: "5px",
-                                    }}
-                                    onChange={(e) => {
-                                      setFieldValue(`remarks`, e.target.value);
-                                    }}
-                                  />
-                                  {touched.remarks && errors.remarks && (
-                                    <div className="text-danger">
-                                      {errors.remarks}
-                                    </div>
-                                  )}
-                                </div>
-                                {/* <div class="col-6 col-lg-4"></div> */}
                               </div>
+                              <div class="col-6 col-lg-4">
+                                <label htmlFor="paymentId">Payment</label>
+                                <div className="w-75 d-flex justify-content-between mt-2">
+                                  <div className="w-100">
+                                    <Select
+                                      class="form-select"
+                                      className="w-100 mb-3"
+                                      aria-label="Default select example"
+                                      name="sizeinfo"
+                                      options={paymentTypeOptions}
+                                      defaultValue={{
+                                        label: "Select Size",
+                                        value: 0,
+                                      }}
+                                      value={paymentTypeOptions.filter(
+                                        function (option) {
+                                          return (
+                                            option.value === values.paymentId
+                                          );
+                                        }
+                                      )}
+                                      styles={{
+                                        control: (baseStyles, state) => ({
+                                          ...baseStyles,
+                                          width: "100%",
+                                          borderColor: state.isFocused
+                                            ? "#fff"
+                                            : "#fff",
+                                          border: "1px solid #2DDC1B",
+                                        }),
+                                        menu: (provided) => ({
+                                          ...provided,
+                                          zIndex: 9999,
+                                          height: "auto",
+                                          // overflowY: "scroll",
+                                        }),
+                                      }}
+                                      theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                          ...theme.colors,
+                                          primary25: "#B8FEB3",
+                                          primary: "#2DDC1B",
+                                        },
+                                      })}
+                                      onChange={(e) => {
+                                        setFieldValue("paymentId", e.value);
+                                      }}
+                                    ></Select>
+
+                                    {touched.supplierId &&
+                                      errors.supplierId && (
+                                        <div className="text-danger">
+                                          {errors.supplierId}
+                                        </div>
+                                      )}
+                                  </div>
+                                  <div className="ms-2 mt-2">
+                                    <FontAwesomeIcon
+                                      className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
+                                      style={{
+                                        background: "#2DDC1B",
+                                      }}
+                                      icon={faPlus}
+                                      data-toggle="modal"
+                                      data-target="#commonInsertModalCenter"
+                                      onClick={() => {
+                                        setAcivePaymentModal(true);
+                                        setActiveItemInfoModal(false);
+                                        setActiveSupplierModal(false);
+                                        setAciveBankInfoModal(false);
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-6 col-lg-4">
+                                <label htmlFor="bankId">Bank Information</label>
+                                <div className="w-100 d-flex justify-content-between mt-2">
+                                  <div className="w-100">
+                                    <Select
+                                      class="form-select"
+                                      className="w-100 mb-3"
+                                      aria-label="Default select example"
+                                      name="bankInformation"
+                                      options={bankInfoOptions}
+                                      defaultValue={{
+                                        label: "Select Size",
+                                        value: 0,
+                                      }}
+                                      value={bankInfoOptions.filter(function (
+                                        option
+                                      ) {
+                                        return option.value === values.bankId;
+                                      })}
+                                      styles={{
+                                        control: (baseStyles, state) => ({
+                                          ...baseStyles,
+                                          width: "100%",
+                                          borderColor: state.isFocused
+                                            ? "#fff"
+                                            : "#fff",
+                                          border: "1px solid #2DDC1B",
+                                        }),
+                                        menu: (provided) => ({
+                                          ...provided,
+                                          zIndex: 9999,
+                                          height: "auto",
+                                          // overflowY: "scroll",
+                                        }),
+                                      }}
+                                      theme={(theme) => ({
+                                        ...theme,
+                                        colors: {
+                                          ...theme.colors,
+                                          primary25: "#B8FEB3",
+                                          primary: "#2DDC1B",
+                                        },
+                                      })}
+                                      onChange={(e) => {
+                                        setFieldValue("bankId", e.value);
+                                      }}
+                                    ></Select>
+
+                                    {touched.bankId && errors.bankId && (
+                                      <div className="text-danger">
+                                        {errors.bankId}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="ms-2 mt-2">
+                                    <FontAwesomeIcon
+                                      className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
+                                      style={{
+                                        background: "#2DDC1B",
+                                      }}
+                                      icon={faPlus}
+                                      data-toggle="modal"
+                                      data-target="#commonInsertModalCenter"
+                                      onClick={() => {
+                                        setAciveBankInfoModal(true);
+                                        setAcivePaymentModal(false);
+                                        setActiveItemInfoModal(false);
+                                        setActiveSupplierModal(false);
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="col-6 col-lg-4">
+                                <label htmlFor="">Delivery Date</label>
+                                <br />
+                                <DatePicker
+                                  dateFormat="y-MM-dd"
+                                  className="text-center custom-datepicker"
+                                  //   value={isEdit ? updateOpeningStore?.OpeningDate : startDate}
+                                  calendarClassName="custom-calendar"
+                                  selected={startDate}
+                                  required
+                                  onChange={(startDate) => {
+                                    if (startDate > new Date()) {
+                                      swal({
+                                        title: "Select Valid Date",
+                                        text: "Date should be equal or earlier than today",
+                                        icon: "warning",
+                                        button: "OK",
+                                      });
+                                    } else {
+                                      setStartDate(
+                                        startDate.toLocaleDateString("en-CA")
+                                      );
+                                      setFieldValue(
+                                        "deliveryDate",
+                                        startDate.toLocaleDateString("en-CA")
+                                      );
+                                    }
+                                  }}
+                                />
+                              </div>
+                              <div class="col-6 col-lg-4">
+                                <label htmlFor="Currency">Currency</label>
+                                <br />
+                                <div className="w-75">
+                                  <Select
+                                    class="form-select"
+                                    className="w-100 mb-3"
+                                    aria-label="Default select example"
+                                    name="bankInformation"
+                                    options={currencyOptions}
+                                    defaultValue={{
+                                      label: "Select Size",
+                                      value: 0,
+                                    }}
+                                    value={currencyOptions.filter(function (
+                                      option
+                                    ) {
+                                      return option.value === values.currencyId;
+                                    })}
+                                    styles={{
+                                      control: (baseStyles, state) => ({
+                                        ...baseStyles,
+                                        width: "100%",
+                                        borderColor: state.isFocused
+                                          ? "#fff"
+                                          : "#fff",
+                                        border: "1px solid #2DDC1B",
+                                      }),
+                                      menu: (provided) => ({
+                                        ...provided,
+                                        zIndex: 9999,
+                                        height: "auto",
+                                        // overflowY: "scroll",
+                                      }),
+                                    }}
+                                    theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                        ...theme.colors,
+                                        primary25: "#B8FEB3",
+                                        primary: "#2DDC1B",
+                                      },
+                                    })}
+                                    onChange={(e) => {
+                                      setFieldValue("currencyId", e.value);
+                                    }}
+                                  ></Select>
+                                </div>
+                                <br />
+                                {touched.currencyId && errors.currencyId && (
+                                  <div className="text-danger">
+                                    {errors.currencyId}
+                                  </div>
+                                )}
+                              </div>
+                              <div class="col-6 col-lg-4">
+                                <label htmlFor="remarks">Remarks</label>
+                                <br />
+                                <textarea
+                                  type="textarea"
+                                  name={`remarks`}
+                                  placeholder="Remarks"
+                                  value={values.remarks}
+                                  rows="2"
+                                  style={{
+                                    border: "1px solid #2DDC1B",
+                                    padding: "5px",
+                                    width: "100%",
+                                    borderRadius: "5px",
+                                  }}
+                                  onChange={(e) => {
+                                    setFieldValue(`remarks`, e.target.value);
+                                  }}
+                                />
+                                {touched.remarks && errors.remarks && (
+                                  <div className="text-danger">
+                                    {errors.remarks}
+                                  </div>
+                                )}
+                              </div>
+                              {/* <div class="col-6 col-lg-4"></div> */}
                             </div>
                           </div>
 
@@ -509,7 +608,7 @@ const InsertPurchaseOrder = () => {
                               <div className="d-flex justify-content-between">
                                 <button
                                   type="submit"
-                                  form="itemcreation-form"
+                                  form="pocreation-form"
                                   className="border-0 "
                                   style={{
                                     backgroundColor:
@@ -528,8 +627,8 @@ const InsertPurchaseOrder = () => {
                                   className="border-0 "
                                   style={{
                                     // backgroundColor: "#00B987",
-                                    backgroundColor: "#2DDC1B",
-                                    color: "#fff",
+                                    backgroundColor: "#B8FEB3",
+                                    color: "#000",
                                     padding: "5px 10px",
                                     fontSize: "14px",
                                     borderRadius: "5px",
@@ -537,12 +636,10 @@ const InsertPurchaseOrder = () => {
                                     width: "100px",
                                   }}
                                   onClick={() => {
-                                    console.log("ArrayHelperRef ");
                                     ArrayHelperRef.current.push({
                                       itemId: "",
                                       itemDescription: "",
                                       quantity: "",
-                                      challanNo: "",
                                       unitPrice: "",
                                       totalAmount: "",
                                     });
@@ -630,12 +727,7 @@ const InsertPurchaseOrder = () => {
                                       *
                                     </span>
                                   </th>
-                                  <th className="bg-white text-center  align-items-center ">
-                                    Challan No
-                                    <span className="text-danger fw-bold fs-2">
-                                      *
-                                    </span>
-                                  </th>
+
                                   <th className="bg-white text-center  align-items-center ">
                                     Quantity
                                     <span className="text-danger fw-bold fs-2">
@@ -681,12 +773,9 @@ const InsertPurchaseOrder = () => {
                                             calGrandTotalQuantity * 100
                                           ) / 100;
                                         calTotalAmount += +singleTotalAmount;
-                                        console.log(calTotalAmount);
                                         getCalTotalAmount =
                                           Math.round(calTotalAmount * 100) /
                                           100;
-                                        console.log(getCalTotalAmount);
-
                                         setTotalGrandQuantity(
                                           getCalGrandTotalQuantity
                                         );
@@ -758,13 +847,6 @@ const InsertPurchaseOrder = () => {
                                                     );
                                                   }}
                                                 ></Select>
-
-                                                {touched.itemId &&
-                                                  errors.itemId && (
-                                                    <div className="text-danger">
-                                                      {errors.itemId}
-                                                    </div>
-                                                  )}
                                               </div>
                                               <div className="ms-2 mt-2">
                                                 <FontAwesomeIcon
@@ -838,39 +920,7 @@ const InsertPurchaseOrder = () => {
                                                 </div>
                                               )}
                                           </td>
-                                          <td className="text-center  align-items-center">
-                                            <Field
-                                              type="text"
-                                              name={`detailsData.${index}.challanNo`}
-                                              placeholder="Challan no"
-                                              value={detail?.challanNo}
-                                              style={{
-                                                border: "1px solid #2DDC1B",
-                                                padding: "5px",
-                                                width: "100%",
-                                                borderRadius: "5px",
-                                                height: "38px",
-                                                textAlign: "center",
-                                              }}
-                                              onChange={(e) => {
-                                                setFieldValue(
-                                                  `detailsData.${index}.challanNo`,
-                                                  e.target.value
-                                                );
-                                              }}
-                                            />
-                                            {touched.detailsData?.[index]
-                                              ?.challanNo &&
-                                              errors.detailsData?.[index]
-                                                ?.challanNo && (
-                                                <div className="text-danger">
-                                                  {
-                                                    errors.detailsData[index]
-                                                      .challanNo
-                                                  }
-                                                </div>
-                                              )}
-                                          </td>
+
                                           <td className="text-center  align-items-center">
                                             <Field
                                               type="number"
@@ -886,7 +936,8 @@ const InsertPurchaseOrder = () => {
                                                 marginBottom: "5px",
                                                 textAlign: "center",
                                               }}
-                                              onChange={(e) => {
+                                              onKeyUp={(e) => {
+                                                console.log(e.target.value);
                                                 setFieldValue(
                                                   `detailsData.${index}.quantity`,
                                                   e.target.value
@@ -898,6 +949,14 @@ const InsertPurchaseOrder = () => {
                                                 setFieldValue(
                                                   `detailsData.${index}.totalAmount`,
                                                   calculateTotalAmount
+                                                );
+                                                setFieldValue(
+                                                  "grandTotalQuantity",
+                                                  totalGrandQuantity
+                                                );
+                                                setFieldValue(
+                                                  "grandTotalAmount",
+                                                  totalGrandTotalAmount
                                                 );
                                               }}
                                             />
@@ -941,6 +1000,14 @@ const InsertPurchaseOrder = () => {
                                                 setFieldValue(
                                                   `detailsData.${index}.totalAmount`,
                                                   calculateTotalAmount
+                                                );
+                                                setFieldValue(
+                                                  "grandTotalAmount",
+                                                  totalGrandTotalAmount
+                                                );
+                                                setFieldValue(
+                                                  "grandTotalAmount",
+                                                  totalGrandTotalAmount
                                                 );
                                               }}
                                             />

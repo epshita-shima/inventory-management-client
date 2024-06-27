@@ -5,6 +5,7 @@ const supplierDropdown=(options)=>{
       result.push({
         value: option._id,
         label: option.supplierName,
+        sortName:option.supplierShortName
       });
     });
     return result;
@@ -24,7 +25,7 @@ const paymentInfoDropdown=(options)=>{
     options?.forEach((option) => {
       result.push({
         value: option._id,
-        label: option.paymentType,
+        label: option.paymentMode,
       });
     });
     return result;
