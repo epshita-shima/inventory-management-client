@@ -73,8 +73,8 @@ const ListHeading = ({
       setTotalInActiveTitle(`Total InActive ${searchItem[0]?.headerLabelName}`);
 
       if(searchItem[0]?.menuId == MenuIdCollection.purchaseorderlist){
-        setTotalActiveTitle(`Total Purchase in Cash`);
-      setTotalInActiveTitle(`Total Purchase in LC At Sight`);
+        setTotalActiveTitle(`Total Purchase Order in Cash`);
+      setTotalInActiveTitle(`Total Purchase Order in LC`);
       }
       console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList);
       if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {

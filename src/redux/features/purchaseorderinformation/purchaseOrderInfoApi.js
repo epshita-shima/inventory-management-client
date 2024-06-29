@@ -4,7 +4,7 @@ const purchaseOrderInfoApi= api.injectEndpoints({
   endpoints: (builder) => ({
     getAllPurchaseOrderInformation: builder.query({
         query: () => "/purchaseorderinfo",
-        providesTags: ["insertpurchaseorderinfo"],
+        providesTags: ["insertpurchaseorderinfo","updatepurchaseorderinfo","deletepurchaseorderinfo"],
         refetchOnReconnect: true,
         refetchOnFocus: true,
       }),
@@ -21,7 +21,43 @@ const purchaseOrderInfoApi= api.injectEndpoints({
         status: meta.response.status,
       }),
     }),
+    getSinglePurchaseOrderInformation: builder.query({
+      query: (id) => {
+        if (id) {
+          return `/purchaseorderinfo/${id}`;
+        } else {
+          throw new Error("User id is required");
+        }
+      },
+    }),
+    updatePurchaseOrderInformation: builder.mutation({
+      query: (payload) => ({
+        url: `/purchaseorderinfo/${payload._id}`,
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: ["updatepurchaseorderinfo"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
+      }),
+    }),
+
+    deletePurchaseOrderInformation: builder.mutation({
+      query: (id) => ({
+        url: `/purchaseorderinfo/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["deletepurchaseorderinfo"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status
+      })
+    }),
   }),
 });
 
-export const {useGetAllPurchaseOrderInformationQuery,useInsertPurchaseOrderInformationMutation}=purchaseOrderInfoApi
+export const {useGetAllPurchaseOrderInformationQuery,useInsertPurchaseOrderInformationMutation,
+  useGetSinglePurchaseOrderInformationQuery,
+  useUpdatePurchaseOrderInformationMutation,
+  useDeletePurchaseOrderInformationMutation}=purchaseOrderInfoApi

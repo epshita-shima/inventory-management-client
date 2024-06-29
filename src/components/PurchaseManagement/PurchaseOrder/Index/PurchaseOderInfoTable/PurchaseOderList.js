@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
-import { useGetAllPurchaseOrderInformationQuery } from "../../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
+import { useDeletePurchaseOrderInformationMutation, useGetAllPurchaseOrderInformationQuery } from "../../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
 import DataTable from "react-data-table-component";
 import ListHeading from "../../../../Common/ListHeading/ListHeading";
 import FilterComponent from "../../../../Common/ListDataSearchBoxDesign/FilterComponent";
@@ -23,12 +23,12 @@ const PurchaseOderList = ({ permission }) => {
   const {data:paymentData}=useGetAllPaymentInformationQuery(undefined)
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [filterText, setFilterText] = useState("");
-
+const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
   
+
   useEffect(()=>{
-    console.log(JSON.stringify(paymentData))
     const puchaseDataInCash=paymentData?.filter((x1)=>
-        purchaseInfoData.some((x2)=>x1._id==x2.paymentId))
+        purchaseInfoData?.some((x2)=>x1._id==x2.paymentId))
     // set(puchaseDataInCash)
     console.log(puchaseDataInCash)
     const matches = purchaseInfoData?.map(ref => {
@@ -45,6 +45,7 @@ const PurchaseOderList = ({ permission }) => {
   setPurchaseInCash(categorizedData?.cash)
   setPurchaseInInLCAtSight(categorizedData?.lcatsight)
   },[paymentData, purchaseInfoData])
+
   const columns = [
     {
       name: "Sl.",
@@ -53,7 +54,7 @@ const PurchaseOderList = ({ permission }) => {
       width: "60px",
     },
     {
-      name: "PO Makedate",
+      name: "PO Make Date",
       selector: (purchaseInfoData) =>
         new Date(purchaseInfoData?.makeDate).toLocaleDateString("en-CA"),
       sortable: true,
@@ -84,41 +85,18 @@ const PurchaseOderList = ({ permission }) => {
 
     {
       name: "Total Quantity",
-      selector: (purchaseInfoData) => purchaseInfoData?.grandTotalQuantity,
+      selector: (purchaseInfoData) => (purchaseInfoData?.grandTotalQuantity).toLocaleString(),
       sortable: true,
       center: true,
       filterable: true,
     },
     {
       name: "Total Amount",
-      selector: (purchaseInfoData) => purchaseInfoData?.grandTotalAmount,
+      selector: (purchaseInfoData) => (purchaseInfoData?.grandTotalAmount).toLocaleString(),
       sortable: true,
       center: true,
       filterable: true,
     },
-    // {
-    //   name: "Status",
-    //   button: true,
-    //   width: "200px",
-    //   grow: 2,
-    //   cell: (purchaseInfoData) => (
-    //     <div className="d-flex justify-content-between align-content-center">
-    //       <a
-    //         target="_blank"
-    //         className="action-icon"
-    //         style={{
-    //           textDecoration: "none",
-    //           color: "#000",
-    //           fontSize: "14px",
-    //           textAlign: "center",
-    //         }}
-    //         // href={`UpdateGroupName/${data?.GroupId}`}
-    //       >
-    //         {purchaseInfoData?.itemStatus == true ? <p className="text-success fw-bold">Active</p> : <p className="text-danger fw-bold">InActive</p>}
-    //       </a>
-    //     </div>
-    //   ),
-    // },
     {
       name: "Action",
       button: true,
@@ -147,8 +125,9 @@ const PurchaseOderList = ({ permission }) => {
                 marginLeft: "10px",
               }}
               onClick={() => {
+                console.log(console.log(purchaseInfoData?._id))
                 window.open(
-                  `update-items-raw-material/${purchaseInfoData?._id}`
+                  `update-purchaseinfo/${purchaseInfoData?._id}`
                 );
               }}
             >
@@ -180,25 +159,25 @@ const PurchaseOderList = ({ permission }) => {
                   buttons: true,
                   dangerMode: true,
                 }).then(async (willDelete) => {
-                  //   if (willDelete) {
-                  //     const response = await deleteRMItemInfo(
-                  //       purchaseInfoData?._id
-                  //     ).unwrap();
-                  //     console.log(response);
-                  //     if (response.status === 200) {
-                  //       swal("Deleted!", "Your selected item has been deleted!", {
-                  //         icon: "success",
-                  //       });
-                  //     } else {
-                  //       swal(
-                  //         "Error",
-                  //         "An error occurred while creating the data",
-                  //         "error"
-                  //       );
-                  //     }
-                  //   } else {
-                  //     swal(" Cancel! Your selected item is safe!");
-                  //   }
+                    if (willDelete) {
+                      const response = await deletePurchaseOrderInfo(
+                        purchaseInfoData?._id
+                      ).unwrap();
+                      console.log(response);
+                      if (response.status === 200) {
+                        swal("Deleted!", "Your selected item has been deleted!", {
+                          icon: "success",
+                        });
+                      } else {
+                        swal(
+                          "Error",
+                          "An error occurred while creating the data",
+                          "error"
+                        );
+                      }
+                    } else {
+                      swal(" Cancel! Your selected item is safe!");
+                    }
                 });
               }}
             >
@@ -269,6 +248,7 @@ const PurchaseOderList = ({ permission }) => {
       </div>
     );
   }, [filterText, resetPaginationToggle, refetch]);
+
   if (isPurchaseloading) {
     return (
       <div className="d-flex justify-content-center align-items-center">

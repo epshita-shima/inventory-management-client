@@ -26,6 +26,7 @@ import InsertClientInformation from "./components/ClientInformation/Insert/Inser
 import ClientInfoTableData from "./components/ClientInformation/Index/ClientInfoTableData";
 import InsertPurchaseOrder from "./components/PurchaseManagement/PurchaseOrder/Insert/InsertPurchaseOrder";
 import PurchaseOrderListTable from "./components/PurchaseManagement/PurchaseOrder/Index/PurchaseOrderListTable";
+import CommonPurchaseOrderInfo from "./components/PurchaseManagement/PurchaseOrder/Common/CommonPurchaseOrderInfo";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -173,8 +174,9 @@ function App() {
               ></Route>
               <Route
                 path="/main-view/create-purchase-order"
-                element={<InsertPurchaseOrder></InsertPurchaseOrder>}
+                element={<CommonPurchaseOrderInfo></CommonPurchaseOrderInfo>}
               ></Route>
+              <Route path="update-purchaseinfo/:id" element={<CommonPurchaseOrderInfo></CommonPurchaseOrderInfo>}></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={
