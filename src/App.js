@@ -27,6 +27,7 @@ import ClientInfoTableData from "./components/ClientInformation/Index/ClientInfo
 import InsertPurchaseOrder from "./components/PurchaseManagement/PurchaseOrder/Insert/InsertPurchaseOrder";
 import PurchaseOrderListTable from "./components/PurchaseManagement/PurchaseOrder/Index/PurchaseOrderListTable";
 import CommonPurchaseOrderInfo from "./components/PurchaseManagement/PurchaseOrder/Common/CommonPurchaseOrderInfo";
+import PurchaseOrderApproveForm from "./components/PurchaseManagement/PurchaseOrder/PurchaseOrderApprove/PurchaseOrderApproveForm";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -177,6 +178,7 @@ function App() {
                 element={<CommonPurchaseOrderInfo></CommonPurchaseOrderInfo>}
               ></Route>
               <Route path="update-purchaseinfo/:id" element={<CommonPurchaseOrderInfo></CommonPurchaseOrderInfo>}></Route>
+              <Route path="/main-view/po-approval" element={<PurchaseOrderApproveForm></PurchaseOrderApproveForm>}></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={

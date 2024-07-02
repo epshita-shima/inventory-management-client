@@ -1,11 +1,15 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useMemo, useState } from "react";
-import { useDeletePurchaseOrderInformationMutation, useGetAllPurchaseOrderInformationQuery } from "../../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
+import {
+  useDeletePurchaseOrderInformationMutation,
+  useGetAllPurchaseOrderInformationQuery,
+} from "../../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
 import DataTable from "react-data-table-component";
 import ListHeading from "../../../../Common/ListHeading/ListHeading";
 import FilterComponent from "../../../../Common/ListDataSearchBoxDesign/FilterComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faFilePdf,
   faPenToSquare,
   faRefresh,
   faTrash,
@@ -13,38 +17,69 @@ import {
 import swal from "sweetalert";
 import { useGetAllSupplierInformationQuery } from "../../../../../redux/features/supplierInformation/supplierInfoApi";
 import { useGetAllPaymentInformationQuery } from "../../../../../redux/features/paymnetinformation/paymentInfoApi";
+import { downloadPOPDF } from "../../../../ReportProperties/handlePurchaseOrderReport";
+import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
+import numberToWords from "number-to-words";
+import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/iteminformation/rmItemInfoApi";
 
 const PurchaseOderList = ({ permission }) => {
-    const [purchaseInCash,setPurchaseInCash]=useState([])
-    const [purchaseInLCAtSight,setPurchaseInInLCAtSight]=useState([])
-  const { data: purchaseInfoData,isPurchaseloading, refetch } =
-    useGetAllPurchaseOrderInformationQuery(undefined);
+  const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
+  const [purchaseInCash, setPurchaseInCash] = useState([]);
+  const [purchaseInLCAtSight, setPurchaseInInLCAtSight] = useState([]);
+  const [purchaseOrderList, setPurchaseOrderList] = useState(true);
+  const [purchaseOrderApproveData, setPurchaseOrderApproveData] = useState([]);
+  const [purchaseOrderUnApproveData, setPurchaseOrderUnApproveData] = useState(
+    []
+  );
+  const {
+    data: purchaseInfoData,
+    isPurchaseloading,
+    refetch,
+  } = useGetAllPurchaseOrderInformationQuery(undefined);
   const { data: supplierInfo } = useGetAllSupplierInformationQuery(undefined);
-  const {data:paymentData}=useGetAllPaymentInformationQuery(undefined)
+  const { data: rawMaterialItemInfo } =
+    useGetAllRMItemInformationQuery(undefined);
+  const { data: paymentData } = useGetAllPaymentInformationQuery(undefined);
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [filterText, setFilterText] = useState("");
-const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
-  
+  const [deletePurchaseOrderInfo] = useDeletePurchaseOrderInformationMutation();
+  const [downloadPurchaseOrderData, setDownloadPurchaseOrderData] = useState(
+    []
+  );
+  const reportTitle = "PURCHASE ORDER";
+  console.log( purchaseInfoData?.grandTotalAmount)
+  const number = purchaseInfoData?.grandTotalAmount;
+ 
+  const numberInWords = numberToWords.toWords(number);
 
-  useEffect(()=>{
-    const puchaseDataInCash=paymentData?.filter((x1)=>
-        purchaseInfoData?.some((x2)=>x1._id==x2.paymentId))
-    // set(puchaseDataInCash)
-    console.log(puchaseDataInCash)
-    const matches = purchaseInfoData?.map(ref => {
-        return paymentData?.find(payment => payment._id === ref.paymentId);
-      }).filter(match => match !== undefined);
-  
-      const categorizedData = matches?.reduce((acc, curr) => {
-        if (!acc[curr.paymentType]) {
-          acc[curr.paymentType] = [];
-        }
-        acc[curr.paymentType].push(curr);
-        return acc;
-      }, {});
-  setPurchaseInCash(categorizedData?.cash)
-  setPurchaseInInLCAtSight(categorizedData?.lcatsight)
-  },[paymentData, purchaseInfoData])
+  useEffect(() => {
+    const matches = purchaseInfoData
+      ?.map((ref) => {
+        return paymentData?.find((payment) => payment._id === ref.paymentId);
+      })
+      .filter((match) => match !== undefined);
+
+    const categorizedData = matches?.reduce((acc, curr) => {
+      if (!acc[curr.paymentType]) {
+        acc[curr.paymentType] = [];
+      }
+      acc[curr.paymentType].push(curr);
+      return acc;
+    }, {});
+    setPurchaseInCash(categorizedData?.cash);
+    setPurchaseInInLCAtSight(categorizedData?.lcatsight);
+
+    const approvePurchaseData = purchaseInfoData?.filter(
+      (x) => x.approveStatus == true
+    );
+
+    const unApprovePurchaseData = purchaseInfoData?.filter(
+      (x) => x.approveStatus == false
+    );
+
+    setPurchaseOrderApproveData(approvePurchaseData);
+    setPurchaseOrderUnApproveData(unApprovePurchaseData);
+  }, [paymentData, purchaseInfoData]);
 
   const columns = [
     {
@@ -70,6 +105,7 @@ const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
       filterable: true,
       width: "260px",
     },
+
     {
       name: "Supplier Name",
       selector: (purchaseInfoData) => {
@@ -81,21 +117,53 @@ const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
       sortable: true,
       center: true,
       filterable: true,
+      width: "200px",
     },
 
     {
       name: "Total Quantity",
-      selector: (purchaseInfoData) => (purchaseInfoData?.grandTotalQuantity).toLocaleString(),
+      selector: (purchaseInfoData) =>
+        (purchaseInfoData?.grandTotalQuantity).toLocaleString(),
       sortable: true,
       center: true,
       filterable: true,
+      width: "180px",
     },
     {
       name: "Total Amount",
-      selector: (purchaseInfoData) => (purchaseInfoData?.grandTotalAmount).toLocaleString(),
+      selector: (purchaseInfoData) =>
+        (purchaseInfoData?.grandTotalAmount).toLocaleString(),
       sortable: true,
       center: true,
       filterable: true,
+      width: "180px",
+    },
+    {
+      name: "PO Status",
+      button: true,
+      width: "180px",
+      grow: 2,
+      cell: (purchaseInfoData) => (
+        <div className="d-flex justify-content-between align-content-center">
+          <a
+            target="_blank"
+            className="action-icon"
+            style={{
+              textDecoration: "none",
+              color: "#000",
+              fontSize: "14px",
+              textAlign: "center",
+            }}
+            // href={`UpdateGroupName/${data?.GroupId}`}
+          >
+            {purchaseInfoData?.approveStatus == true ? (
+              <p className="text-success fw-bold">Approve</p>
+            ) : (
+              <p className="text-danger fw-bold">UnApprove</p>
+            )}
+          </a>
+        </div>
+      ),
     },
     {
       name: "Action",
@@ -104,6 +172,39 @@ const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
       grow: 2,
       cell: (purchaseInfoData) => (
         <div className="d-flex justify-content-between align-content-center">
+          {permission?.isPDF ? (
+            <a
+              target="_blank"
+              className={` action-icon `}
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Update item"
+              style={{
+                color: `${
+                  purchaseInfoData?.items?.length == 0 ? "gray" : "orange"
+                } `,
+                border: `${
+                  purchaseInfoData?.items?.length == 0
+                    ? "2px solid gray"
+                    : "2px solid orange"
+                }`,
+                padding: "3px",
+                borderRadius: "5px",
+              }}
+              onClick={() => {
+                console.log(console.log(purchaseInfoData?._id));
+                if (companyinfo?.length !== 0 || undefined) {
+                  downloadPOPDF(purchaseInfoData, { companyinfo }, reportTitle);
+                }
+                setDownloadPurchaseOrderData(purchaseInfoData);
+              }}
+            >
+              <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
+            </a>
+          ) : (
+            ""
+          )}
+
           {permission?.isUpdated ? (
             <a
               target="_blank"
@@ -125,10 +226,7 @@ const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
                 marginLeft: "10px",
               }}
               onClick={() => {
-                console.log(console.log(purchaseInfoData?._id))
-                window.open(
-                  `update-purchaseinfo/${purchaseInfoData?._id}`
-                );
+                window.open(`update-purchaseinfo/${purchaseInfoData?._id}`);
               }}
             >
               <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
@@ -159,25 +257,25 @@ const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
                   buttons: true,
                   dangerMode: true,
                 }).then(async (willDelete) => {
-                    if (willDelete) {
-                      const response = await deletePurchaseOrderInfo(
-                        purchaseInfoData?._id
-                      ).unwrap();
-                      console.log(response);
-                      if (response.status === 200) {
-                        swal("Deleted!", "Your selected item has been deleted!", {
-                          icon: "success",
-                        });
-                      } else {
-                        swal(
-                          "Error",
-                          "An error occurred while creating the data",
-                          "error"
-                        );
-                      }
+                  if (willDelete) {
+                    const response = await deletePurchaseOrderInfo(
+                      purchaseInfoData?._id
+                    ).unwrap();
+                    console.log(response);
+                    if (response.status === 200) {
+                      swal("Deleted!", "Your selected item has been deleted!", {
+                        icon: "success",
+                      });
                     } else {
-                      swal(" Cancel! Your selected item is safe!");
+                      swal(
+                        "Error",
+                        "An error occurred while creating the data",
+                        "error"
+                      );
                     }
+                  } else {
+                    swal(" Cancel! Your selected item is safe!");
+                  }
                 });
               }}
             >
@@ -190,7 +288,7 @@ const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
       ),
     },
   ];
- 
+
   const customStyles = {
     rows: {
       style: {
@@ -268,12 +366,17 @@ const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
       </div>
     );
   }
+
   return (
     <div className="row px-5 mx-4">
       <ListHeading
-      purchaseInCash={purchaseInCash}
-      purchaseInLCAtSight={purchaseInLCAtSight}
-      purchaseInfoData={purchaseInfoData}
+        purchaseInCash={purchaseInCash}
+        purchaseInLCAtSight={purchaseInLCAtSight}
+        purchaseOrderApproveData={purchaseOrderApproveData}
+        purchaseOrderUnApproveData={purchaseOrderUnApproveData}
+        purchaseInfoData={purchaseInfoData}
+        purchaseOrderList={purchaseOrderList}
+        setPurchaseOrderList={setPurchaseOrderList}
       ></ListHeading>
       <div
         className="col userlist-table mt-4"
@@ -295,6 +398,55 @@ const[deletePurchaseOrderInfo]=useDeletePurchaseOrderInformationMutation()
           />
         </div>
       </div>
+
+      <table id="my-tablePO" className="d-none">
+        <thead>
+          <tr>
+            <th>Sl.</th>
+            <th>Item Name</th>
+            <th>Item Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {downloadPurchaseOrderData?.detailsData?.map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>
+                {rawMaterialItemInfo
+                  ?.filter((rawItem) => rawItem._id === item.itemId)
+                  .map((filteredItem) => filteredItem.itemName)}
+              </td>
+              <td>{item.itemDescription}</td>
+              <td>{(item.quantity).toLocaleString()}</td>
+              <td>{(item.unitPrice).toLocaleString()}</td>
+              <td>{(item.totalAmount).toLocaleString()}</td>
+            </tr>
+          ))}
+          {downloadPurchaseOrderData?.detailsData && (
+            <>
+              <tr>
+                <td colspan="3" class="text-right">
+                  TOTAL
+                </td>
+                <td>{downloadPurchaseOrderData.grandTotalQuantity}</td>
+                <td></td>
+                <td>{downloadPurchaseOrderData.grandTotalAmount}</td>
+              </tr>
+              <tr>
+                <td colspan="6" class="d-flex justify-content-start">
+                  SAY IN BDT:
+                  {numberInWords.charAt(0).toUpperCase() +
+                    numberInWords.slice(1)}
+                  only
+                </td>
+              </tr>
+            </>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

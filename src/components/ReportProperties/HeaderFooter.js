@@ -116,7 +116,6 @@ const getBase64Image = (imgUrl, callback) => {
   img.src = imgUrl;
 };
 
-
 const downloadImage =async (data,companyinfo,reportTitle) => {
   console.log(data)
   const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');

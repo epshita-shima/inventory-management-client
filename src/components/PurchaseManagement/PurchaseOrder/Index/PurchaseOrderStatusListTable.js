@@ -1,11 +1,24 @@
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import PurchaseOderList from "./PurchaseOderInfoTable/PurchaseOderList";
-import { useNavigate } from "react-router-dom";
+import PurchaseOrderApproveList from "./PurchaseOrderApproveTable/PurchaseOrderApproveList";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useGetAllUserQuery } from "../../../../redux/features/user/userApi";
+import { useNavigate } from "react-router-dom";
+import PurchaseOrderUnapproveList from "./PurchaseOrderUnapproveTable/PurchaseOrderUnapproveList";
 
-const PurchaseOrderListTable = () => {
+const PurchaseOrderStatusListTable = ({
+  showPurchaseApproveListData,
+  purchaseFilterApproveAllData,
+  showPurchaseUnApproveListData,
+  purchaseFilterUnApproveAllData,
+  setPurchaseFilterUnApproveAllData,
+  purchaseInfoData,
+  handleApproveData,
+  fromDate,
+  toDate,
+  refetch
+
+}) => {
   const clickhandler = (name) => console.log("delete", name);
   const { data: user, isUserloading } = useGetAllUserQuery(undefined);
 
@@ -80,39 +93,30 @@ const PurchaseOrderListTable = () => {
 
   return (
     <div>
-      <PurchaseOderList
-        permission={permission}
-        click={clickhandler}
-      ></PurchaseOderList>
-      {permission?.isInserted ? (
-        <div
-          className={`position-absolute`}
-          style={{ right: "20%", bottom: "4%", zIndex: "9999" }}
-        >
-          <div className="">
-            <a
-              href="/main-view/create-purchase-order"
-              target="_blank"
-              className="text-white text-center d-flex justify-content-center align-items-center"
-              style={{
-                backgroundColor: "#2DDC1B",
-                height: "40px",
-                width: "40px",
-                borderRadius: "50px",
-              }}
-            >
-              <FontAwesomeIcon
-                className="text-white fs-4"
-                icon={faPlus}
-              ></FontAwesomeIcon>
-            </a>
-          </div>
-        </div>
-      ) : (
-        ""
+      {showPurchaseApproveListData && (
+        <PurchaseOrderApproveList
+          permission={permission}
+          click={clickhandler}
+          showPurchaseApproveListData={showPurchaseApproveListData}
+          purchaseFilterApproveAllData={purchaseFilterApproveAllData}
+        ></PurchaseOrderApproveList>
       )}
+      {showPurchaseUnApproveListData && (
+        <PurchaseOrderUnapproveList
+          permission={permission}
+          fromDate={fromDate}
+          toDate={toDate}
+          purchaseInfoData={purchaseInfoData}
+          showPurchaseUnApproveListData={showPurchaseUnApproveListData}
+          purchaseFilterUnApproveAllData={purchaseFilterUnApproveAllData}
+          setPurchaseFilterUnApproveAllData={setPurchaseFilterUnApproveAllData}
+          handleApproveData={handleApproveData}
+          refetch={refetch}
+        ></PurchaseOrderUnapproveList>
+      )}
+   
     </div>
   );
 };
 
-export default PurchaseOrderListTable;
+export default PurchaseOrderStatusListTable;

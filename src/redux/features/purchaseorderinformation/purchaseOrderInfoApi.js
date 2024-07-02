@@ -4,7 +4,7 @@ const purchaseOrderInfoApi= api.injectEndpoints({
   endpoints: (builder) => ({
     getAllPurchaseOrderInformation: builder.query({
         query: () => "/purchaseorderinfo",
-        providesTags: ["insertpurchaseorderinfo","updatepurchaseorderinfo","deletepurchaseorderinfo"],
+        providesTags: ["insertpurchaseorderinfo","updatepurchaseorderinfo","purchaseorderinfostatus","deletepurchaseorderinfo"],
         refetchOnReconnect: true,
         refetchOnFocus: true,
       }),
@@ -43,6 +43,19 @@ const purchaseOrderInfoApi= api.injectEndpoints({
       }),
     }),
 
+    updatePurchaseOrderInformationStatus: builder.mutation({
+      query: (dataToUpdate) => ({
+        url: "/purchaseorderinfo",
+        method: "PUT",
+        body: dataToUpdate,
+      }),
+      invalidatesTags: ["purchaseorderinfostatus"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
+      }),
+    }),
+
     deletePurchaseOrderInformation: builder.mutation({
       query: (id) => ({
         url: `/purchaseorderinfo/${id}`,
@@ -60,4 +73,5 @@ const purchaseOrderInfoApi= api.injectEndpoints({
 export const {useGetAllPurchaseOrderInformationQuery,useInsertPurchaseOrderInformationMutation,
   useGetSinglePurchaseOrderInformationQuery,
   useUpdatePurchaseOrderInformationMutation,
+  useUpdatePurchaseOrderInformationStatusMutation,
   useDeletePurchaseOrderInformationMutation}=purchaseOrderInfoApi
