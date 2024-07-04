@@ -78,12 +78,10 @@ const PurchaseOrderSingleInfo = ({
                 },
               })}
               onChange={(e) => {
-                // setFieldValue("supplierId", e.value);
-
                 const poDate = new Date().toLocaleDateString("en-CA");
-                const formatedDate = poDate.replaceAll("-", "");
+                const formatedDate = poDate?.replaceAll("-", "");
                 const poData = purchaseOrderAllInformation?.poNo;
-                const poSerialNo = poData.slice(-1);
+                const poSerialNo = poData?.slice(-1);
 
                 if (id) {
                   setPurchaseOrderAllInformation((prevData) => ({

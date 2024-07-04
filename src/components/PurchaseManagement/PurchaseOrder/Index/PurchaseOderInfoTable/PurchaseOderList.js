@@ -21,9 +21,11 @@ import { downloadPOPDF } from "../../../../ReportProperties/handlePurchaseOrderR
 import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
 import numberToWords from "number-to-words";
 import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/iteminformation/rmItemInfoApi";
+import { useGetAllBankInformationQuery } from "../../../../../redux/features/bankinformation/bankInfoAPi";
 
 const PurchaseOderList = ({ permission }) => {
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
+  const {data:bankInformation}=useGetAllBankInformationQuery(undefined)
   const [purchaseInCash, setPurchaseInCash] = useState([]);
   const [purchaseInLCAtSight, setPurchaseInInLCAtSight] = useState([]);
   const [purchaseOrderList, setPurchaseOrderList] = useState(true);
@@ -47,10 +49,7 @@ const PurchaseOderList = ({ permission }) => {
     []
   );
   const reportTitle = "PURCHASE ORDER";
-  console.log( purchaseInfoData?.grandTotalAmount)
-  const number = purchaseInfoData?.grandTotalAmount;
- 
-  const numberInWords = numberToWords.toWords(number);
+
 
   useEffect(() => {
     const matches = purchaseInfoData
@@ -79,7 +78,7 @@ const PurchaseOderList = ({ permission }) => {
 
     setPurchaseOrderApproveData(approvePurchaseData);
     setPurchaseOrderUnApproveData(unApprovePurchaseData);
-  }, [paymentData, purchaseInfoData]);
+  }, [paymentData, purchaseInfoData, downloadPurchaseOrderData]);
 
   const columns = [
     {
@@ -192,11 +191,7 @@ const PurchaseOderList = ({ permission }) => {
                 borderRadius: "5px",
               }}
               onClick={() => {
-                console.log(console.log(purchaseInfoData?._id));
-                if (companyinfo?.length !== 0 || undefined) {
-                  downloadPOPDF(purchaseInfoData, { companyinfo }, reportTitle);
-                }
-                setDownloadPurchaseOrderData(purchaseInfoData);
+                downloadPOPDF(purchaseInfoData, rawMaterialItemInfo, bankInformation,paymentData,{ companyinfo }, reportTitle);
               }}
             >
               <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
@@ -399,54 +394,6 @@ const PurchaseOderList = ({ permission }) => {
         </div>
       </div>
 
-      <table id="my-tablePO" className="d-none">
-        <thead>
-          <tr>
-            <th>Sl.</th>
-            <th>Item Name</th>
-            <th>Item Description</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {downloadPurchaseOrderData?.detailsData?.map((item, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>
-                {rawMaterialItemInfo
-                  ?.filter((rawItem) => rawItem._id === item.itemId)
-                  .map((filteredItem) => filteredItem.itemName)}
-              </td>
-              <td>{item.itemDescription}</td>
-              <td>{(item.quantity).toLocaleString()}</td>
-              <td>{(item.unitPrice).toLocaleString()}</td>
-              <td>{(item.totalAmount).toLocaleString()}</td>
-            </tr>
-          ))}
-          {downloadPurchaseOrderData?.detailsData && (
-            <>
-              <tr>
-                <td colspan="3" class="text-right">
-                  TOTAL
-                </td>
-                <td>{downloadPurchaseOrderData.grandTotalQuantity}</td>
-                <td></td>
-                <td>{downloadPurchaseOrderData.grandTotalAmount}</td>
-              </tr>
-              <tr>
-                <td colspan="6" class="d-flex justify-content-start">
-                  SAY IN BDT:
-                  {numberInWords.charAt(0).toUpperCase() +
-                    numberInWords.slice(1)}
-                  only
-                </td>
-              </tr>
-            </>
-          )}
-        </tbody>
-      </table>
     </div>
   );
 };

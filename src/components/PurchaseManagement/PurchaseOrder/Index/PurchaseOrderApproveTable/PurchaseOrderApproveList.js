@@ -5,54 +5,28 @@ import DataTable from "react-data-table-component";
 
 import FilterComponent from "../../../../Common/ListDataSearchBoxDesign/FilterComponent";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faFilePdf, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
 import { useGetAllSupplierInformationQuery } from "../../../../../redux/features/supplierInformation/supplierInfoApi";
 import { useGetAllPaymentInformationQuery } from "../../../../../redux/features/paymnetinformation/paymentInfoApi";
+import { downloadPOPDF } from "../../../../ReportProperties/handlePurchaseOrderReport";
+import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/iteminformation/rmItemInfoApi";
+import { useGetAllBankInformationQuery } from "../../../../../redux/features/bankinformation/bankInfoAPi";
+import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
 
 const PurchaseOrderApproveList = ({ permission, purchaseFilterApproveAllData }) => {
-  const [purchaseInCash, setPurchaseInCash] = useState([]);
-  const [purchaseInLCAtSight, setPurchaseInInLCAtSight] = useState([]);
-  const [purchaseOrderList, setPurchaseOrderList] = useState(true);
-  const [purchaseOrderApproveData, setPurchaseOrderApproveData] = useState([]);
-  const [purchaseOrderUnApproveData, setPurchaseOrderUnApproveData] = useState(
-    []
-  );
 
+  const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
+  const {data:bankInformation}=useGetAllBankInformationQuery(undefined)
+  const { data: rawMaterialItemInfo } =
+    useGetAllRMItemInformationQuery(undefined);
+ 
   const { data: supplierInfo } = useGetAllSupplierInformationQuery(undefined);
   const { data: paymentData } = useGetAllPaymentInformationQuery(undefined);
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [filterText, setFilterText] = useState("");
-  const [deletePurchaseOrderInfo] = useDeletePurchaseOrderInformationMutation();
 
-  useEffect(() => {
-    const matches = purchaseFilterApproveAllData
-      ?.map((ref) => {
-        return paymentData?.find((payment) => payment._id === ref.paymentId);
-      })
-      .filter((match) => match !== undefined);
-
-    const categorizedData = matches?.reduce((acc, curr) => {
-      if (!acc[curr.paymentType]) {
-        acc[curr.paymentType] = [];
-      }
-      acc[curr.paymentType].push(curr);
-      return acc;
-    }, {});
-    setPurchaseInCash(categorizedData?.cash);
-    setPurchaseInInLCAtSight(categorizedData?.lcatsight);
-
-    const approvePurchaseData = purchaseFilterApproveAllData?.filter(
-      (x) => x.approveStatus == true
-    );
-
-    const unApprovePurchaseData = purchaseFilterApproveAllData?.filter(
-      (x) => x.approveStatus == false
-    );
-
-    setPurchaseOrderApproveData(approvePurchaseData);
-    setPurchaseOrderUnApproveData(unApprovePurchaseData);
-  }, [paymentData, purchaseFilterApproveAllData]);
+  const reportTitle = "PURCHASE ORDER";
 
   const columns = [
     {
@@ -115,7 +89,8 @@ const PurchaseOrderApproveList = ({ permission, purchaseFilterApproveAllData }) 
       grow: 2,
       cell: (purchaseFilterApproveAllData) => (
         <div className="d-flex justify-content-between align-content-center">
-          {permission?.isUpdated ? (
+
+           {permission?.isPDF ? (
             <a
               target="_blank"
               className={` action-icon `}
@@ -124,27 +99,21 @@ const PurchaseOrderApproveList = ({ permission, purchaseFilterApproveAllData }) 
               title="Update item"
               style={{
                 color: `${
-                  purchaseFilterApproveAllData?.items?.length == 0
-                    ? "gray"
-                    : "#2DDC1B"
+                  purchaseFilterApproveAllData?.items?.length == 0 ? "gray" : "orange"
                 } `,
                 border: `${
                   purchaseFilterApproveAllData?.items?.length == 0
                     ? "2px solid gray"
-                    : "2px solid #2DDC1B"
+                    : "2px solid orange"
                 }`,
                 padding: "3px",
                 borderRadius: "5px",
-                marginLeft: "10px",
               }}
               onClick={() => {
-                console.log(console.log(purchaseFilterApproveAllData?._id));
-                window.open(
-                  `update-purchaseinfo/${purchaseFilterApproveAllData?._id}`
-                );
+                downloadPOPDF(purchaseFilterApproveAllData, rawMaterialItemInfo, bankInformation,paymentData,{ companyinfo }, reportTitle);
               }}
             >
-              <FontAwesomeIcon icon={faPenToSquare}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
             </a>
           ) : (
             ""

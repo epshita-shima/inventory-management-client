@@ -324,9 +324,15 @@ const UpdatePurchaseOrderInfo = ({
                                 const temp__details = [...prev.detailsData];
                                 if (temp__details.length > 1)
                                   temp__details.splice(index, 1);
+                                const totalGrandQuantitys = temp__details.reduce((total, item) => total + parseFloat(item.quantity), 0);
+                                const totalGrandTotalAmounts = temp__details.reduce((total, item) => total + item.totalAmount, 0);
                                 return {
                                   ...prev,
                                   detailsData: [...temp__details],
+                                  updateBy: makebyUser,
+                                  updateDate: new Date(),
+                                  grandTotalQuantity: totalGrandQuantitys,
+                                  grandTotalAmount: totalGrandTotalAmounts,
                                 };
                               })}
                             }

@@ -5,6 +5,7 @@ import FilterComponent from "../../../../Common/ListDataSearchBoxDesign/FilterCo
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckToSlot,
+  faFilePdf,
   faPenToSquare,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
@@ -15,6 +16,10 @@ import {
   useDeletePurchaseOrderInformationMutation,
   useUpdatePurchaseOrderInformationStatusMutation,
 } from "../../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
+import { downloadPOPDF } from "../../../../ReportProperties/handlePurchaseOrderReport";
+import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
+import { useGetAllBankInformationQuery } from "../../../../../redux/features/bankinformation/bankInfoAPi";
+import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/iteminformation/rmItemInfoApi";
 
 const PurchaseOrderUnapproveList = ({
   permission,
@@ -26,12 +31,17 @@ const PurchaseOrderUnapproveList = ({
   toDate,
   refetch,
 }) => {
+  const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
+  const {data:bankInformation}=useGetAllBankInformationQuery(undefined)
+  const { data: rawMaterialItemInfo } =
+    useGetAllRMItemInformationQuery(undefined);
+  const { data: paymentData } = useGetAllPaymentInformationQuery(undefined);
   const [deletePurchaseOrderInfo] = useDeletePurchaseOrderInformationMutation();
   const { data: supplierInfo } = useGetAllSupplierInformationQuery(undefined);
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [filterText, setFilterText] = useState("");
+  const reportTitle = "PURCHASE ORDER";
 
-  console.log(purchaseFilterUnApproveAllData);
   // useEffect(()=>{
   //   const unApprovePurchaseData = purchaseInfoData?.filter((item) => {
   //     const makeDate = new Date(item.makeDate).toLocaleDateString("en-CA");
@@ -107,7 +117,7 @@ const PurchaseOrderUnapproveList = ({
     {
       name: "Action",
       button: true,
-      width: "140px",
+      width: "200px",
       grow: 2,
       cell: (purchaseFilterUnApproveAllData) => (
         <div className="d-flex justify-content-between align-items-center">
@@ -138,6 +148,35 @@ const PurchaseOrderUnapproveList = ({
             <FontAwesomeIcon icon={faCheckToSlot}></FontAwesomeIcon>
           </a>
 
+          {permission?.isPDF ? (
+            <a
+              target="_blank"
+              className={` action-icon `}
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Update item"
+              style={{
+                color: `${
+                  purchaseInfoData?.items?.length == 0 ? "gray" : "orange"
+                } `,
+                border: `${
+                  purchaseInfoData?.items?.length == 0
+                    ? "2px solid gray"
+                    : "2px solid orange"
+                }`,
+                padding: "3px",
+                borderRadius: "5px",
+                marginLeft:'10px'
+              }}
+              onClick={() => {
+                downloadPOPDF(purchaseFilterUnApproveAllData, rawMaterialItemInfo, bankInformation,paymentData,{ companyinfo }, reportTitle);
+              }}
+            >
+              <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
+            </a>
+          ) : (
+            ""
+          )}
           {permission?.isUpdated ? (
             <a
               target="_blank"

@@ -34,7 +34,7 @@ const PurchaseOrderListTable = () => {
               if (subMenu?.label === subMenu?.label) {
                 // Find the "User List" sub-item
                 const userListSubMenu = subMenu?.items?.find(
-                  (subItem) => subItem?.label === "Purchase Order List"
+                  (subItem) => subItem?.label === "PO List"
                 );
                 console.log(userListSubMenu);
                 if (userListSubMenu) {
@@ -91,7 +91,7 @@ const PurchaseOrderListTable = () => {
         >
           <div className="">
             <a
-              href="/main-view/create-purchase-order"
+              href="/main-view/create-po"
               target="_blank"
               className="text-white text-center d-flex justify-content-center align-items-center"
               style={{

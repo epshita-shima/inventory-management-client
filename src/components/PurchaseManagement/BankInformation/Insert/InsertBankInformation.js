@@ -21,6 +21,7 @@ const InsertBankInformation = () => {
         bankName: "",
         branchName: "",
         city: "",
+        address:"",
         routingNumber: "",
         swiftCode: "",
         makeBy: makebyUser,
@@ -70,6 +71,7 @@ const InsertBankInformation = () => {
                     bankName: Yup.string().required("Required"),
                     branchName: Yup.string().required("Required"),
                     city: Yup.string().required("Required"),
+                    address: Yup.string().required("Required"),
                     routingNumber: Yup.string().required("Required"),
                     swiftCode: Yup.string().required("Required"),
                   })
@@ -130,6 +132,7 @@ const InsertBankInformation = () => {
                           bankName: "",
                           branchName: "",
                           city: "",
+                          address:"",
                           routingNumber: "",
                           swiftCode: "",
                           makeBy: makebyUser,
@@ -192,6 +195,12 @@ const InsertBankInformation = () => {
                                   </th>
                                   <th className="bg-white text-center align-middle ">
                                     City
+                                    <span className="text-danger fw-bold fs-2">
+                                      *
+                                    </span>
+                                  </th>
+                                  <th className="bg-white text-center align-middle ">
+                                  Address
                                     <span className="text-danger fw-bold fs-2">
                                       *
                                     </span>
@@ -379,6 +388,38 @@ const InsertBankInformation = () => {
                                                   {
                                                     errors.detailsData[index]
                                                       .city
+                                                  }
+                                                </div>
+                                              )}
+                                          </td>
+                                          <td className="text-center align-middle">
+                                            <Field
+                                              type="text"
+                                              name={`detailsData.${index}.address`}
+                                              placeholder="Address"
+                                              value={detail?.address}
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                              }}
+                                              onClick={(e) => {
+                                                setFieldValue(
+                                                  `detailsData.${index}.address`,
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                            <br />
+                                            {touched.detailsData?.[index]
+                                              ?.address &&
+                                              errors.detailsData?.[index]
+                                                ?.address && (
+                                                <div className="text-danger">
+                                                  {
+                                                    errors.detailsData[index]
+                                                      .address
                                                   }
                                                 </div>
                                               )}

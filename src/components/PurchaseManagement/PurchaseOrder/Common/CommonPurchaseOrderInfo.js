@@ -166,7 +166,7 @@ const CommonPurchaseOrderInfo = () => {
         );
         console.log(response);
         if (response?.data?.status === 200) {
-          navigate("/main-view/purchase-order-list");
+          navigate("/main-view/po-list");
           swal("Done", "Data Save Successfully", "success");
           resetForm();
         } else if (response?.error?.status === 400) {
@@ -257,7 +257,7 @@ const CommonPurchaseOrderInfo = () => {
                                     height: "25px",
                                   }}
                                   onClick={() => {
-                                    navigate("/main-view/purchase-order-list");
+                                    navigate("/main-view/po-list");
                                   }}
                                 >
                                   <FontAwesomeIcon

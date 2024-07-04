@@ -62,7 +62,7 @@ const ListHeading = ({
   };
 
   const mainData = traverse(getMenuListFromLOcalUser);
-console.log(purchaseInfoData)
+
   useEffect(() => {
     const searchItem = mainData?.filter((x) => x.url === pathname);
     // const wordsURL = pathname.split("/");

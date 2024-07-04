@@ -170,11 +170,11 @@ function App() {
               ></Route>
 
               <Route
-                path="/main-view/purchase-order-list"
+                path="/main-view/po-list"
                 element={<PurchaseOrderListTable></PurchaseOrderListTable>}
               ></Route>
               <Route
-                path="/main-view/create-purchase-order"
+                path="/main-view/create-po"
                 element={<CommonPurchaseOrderInfo></CommonPurchaseOrderInfo>}
               ></Route>
               <Route path="update-purchaseinfo/:id" element={<CommonPurchaseOrderInfo></CommonPurchaseOrderInfo>}></Route>
