@@ -26,7 +26,7 @@ const InsertClientInformation = () => {
   const getUserParse = JSON.parse(getUser);
   const makebyUser = getUserParse[0].username;
   const updatebyUser = getUserParse[0].username;
-console.log(clientData)
+
   const initialValues = {
     detailsData: [
       {

@@ -49,8 +49,6 @@ const RMItemInfoList = ({ permission }) => {
   const [rmItemInActiveStatus, setItemInActiveStatus] = useState([]);
   var reportTitle = "All Raw Material Item List";
 
-  console.log(categoryInfoData);
-
   useEffect(() => {
     const rmItemActiveStatus = rmItemInfoData?.filter(
       (item) => item.itemStatus == true

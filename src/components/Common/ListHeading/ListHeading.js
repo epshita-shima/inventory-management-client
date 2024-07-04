@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
+import React, { useEffect,useState } from "react";
 import MenuIdCollection from "../MenuIdCollection/MenuIdCollection";
 
 const ListHeading = ({
@@ -24,6 +23,13 @@ const ListHeading = ({
   clientInfoData,
   clientInfoActiveStatus,
   clientInfoInActiveStatus,
+  purchaseInfoData,
+  purchaseInCash,
+  purchaseInLCAtSight,
+  purchaseOrderList,
+  setPurchaseOrderList,
+  purchaseOrderApproveData,
+  purchaseOrderUnApproveData,
 }) => {
   const [totalTitle, setTotalTitle] = useState("");
   const [totalActiveTitle, setTotalActiveTitle] = useState("");
@@ -31,7 +37,6 @@ const ListHeading = ({
   const [grandTotal, setGrandTotal] = useState("");
   const [totalActive, setTotalActive] = useState("");
   const [totalInActive, setTotalInActive] = useState("");
-  // const [urls, setUrls] = useState([]);
   const currentUrl = window.location.href;
   const pathname = new URL(currentUrl).pathname;
   const getUserFromLocal = localStorage.getItem("user");
@@ -59,45 +64,59 @@ const ListHeading = ({
   const mainData = traverse(getMenuListFromLOcalUser);
 
   useEffect(() => {
-    const searchItem = mainData?.filter((x) => x.url == pathname);
-    const wordsURL = pathname.split("/");
-    const repStr = wordsURL[2].replaceAll("-", " ");
+    const searchItem = mainData?.filter((x) => x.url === pathname);
+    // const wordsURL = pathname.split("/");
+    // const repStr = wordsURL[2].replaceAll("-", " ");
     let grandTotal, totalActive, totalInActive;
 
     if (searchItem) {
       setTotalTitle(`Total ${searchItem[0]?.headerLabelName}`);
       setTotalActiveTitle(`Total Active ${searchItem[0]?.headerLabelName}`);
       setTotalInActiveTitle(`Total InActive ${searchItem[0]?.headerLabelName}`);
-      console.log(searchItem[0]?.menuId == MenuIdCollection.rmItemList);
-      if (searchItem[0]?.menuId == MenuIdCollection.fgItemList) {
+
+      if (searchItem[0]?.menuId === MenuIdCollection.purchaseorderlist || searchItem[0]?.menuId === MenuIdCollection.purchaseorderapprove) {
+        setTotalTitle(`Total PO`);
+        setTotalActiveTitle(`Total PO in Cash`);
+        setTotalInActiveTitle(`Total PO in LC`);
+      }
+      console.log(searchItem[0]?.menuId === MenuIdCollection.rmItemList);
+      if (searchItem[0]?.menuId === MenuIdCollection.fgItemList) {
         console.log("fg");
         grandTotal = finishGoodInItemInfoData?.length;
         totalActive = finishGoodActiveStatus?.length;
         totalInActive = finishGoodInActiveStatus?.length;
-      } else if (searchItem[0]?.menuId == MenuIdCollection.userSeting) {
+      } else if (searchItem[0]?.menuId === MenuIdCollection.userSeting) {
         console.log("fg");
         grandTotal = user?.length;
         totalActive = activeUser?.length;
         totalInActive = inActiveUser?.length;
-      } else if (searchItem[0]?.menuId == MenuIdCollection.rmItemList) {
+      } else if (searchItem[0]?.menuId === MenuIdCollection.rmItemList) {
         console.log("rm");
         grandTotal = rmItemInfoData?.length;
         totalActive = rmItemActiveStatus?.length;
         totalInActive = rmItemInActiveStatus?.length;
-      } else if (searchItem[0]?.menuId == MenuIdCollection.cftinfolist) {
+      } else if (searchItem[0]?.menuId === MenuIdCollection.cftinfolist) {
         console.log("rm");
         grandTotal = cftInfosData?.length;
         totalActive = cftInfoActiveStatus?.length;
         totalInActive = cftInfoInActiveStatus?.length;
-      } else if (searchItem[0]?.menuId == MenuIdCollection.supplierinfolist) {
+      } else if (searchItem[0]?.menuId === MenuIdCollection.supplierinfolist) {
         grandTotal = supplierInfoData?.length;
         totalActive = supplierInfoActiveStatus?.length;
         totalInActive = supplierInfoInActiveStatus?.length;
-      }
-       else if (searchItem[0]?.menuId == MenuIdCollection.clientinfolistId) {
+      } else if (searchItem[0]?.menuId === MenuIdCollection.clientinfolistId) {
         grandTotal = clientInfoData?.length;
         totalActive = clientInfoActiveStatus?.length;
         totalInActive = clientInfoInActiveStatus?.length;
+      } else if (searchItem[0]?.menuId === MenuIdCollection.purchaseorderlist) {
+        grandTotal = purchaseInfoData?.length;
+        totalActive = purchaseInCash?.length;
+        totalInActive = purchaseInLCAtSight?.length;
+      }
+      else if (searchItem[0]?.menuId === MenuIdCollection.purchaseorderapprove) {
+        grandTotal = purchaseInfoData?.length;
+        totalActive = purchaseInCash?.length;
+        totalInActive = purchaseInLCAtSight?.length;
       }
 
       setGrandTotal(grandTotal);
@@ -124,16 +143,23 @@ const ListHeading = ({
     supplierInfoInActiveStatus,
     clientInfoData,
     clientInfoActiveStatus,
-    clientInfoInActiveStatus
+    clientInfoInActiveStatus,
+    purchaseInfoData,
+    purchaseInCash,
+    purchaseInLCAtSight,
   ]);
 
   return (
     <div>
       <div class="row">
-        <div class="col-sm-3">
+        <div class={purchaseOrderList ? "col" : "col-md-3"}>
           <div
             class="cardbox shadow-lg"
-            style={{ borderLeft: "12px solid #2DDC1B", borderRadius: "10px" }}
+            style={{
+              borderLeft: "12px solid #2DDC1B",
+              borderRadius: "10px",
+              height: "80px",
+            }}
           >
             <div
               class="card-body"
@@ -159,12 +185,13 @@ const ListHeading = ({
             </div>
           </div>
         </div>
-        <div class="col-sm-3 mt-4 mt-sm-0">
+        <div class={purchaseOrderList ? "col" : "col-md-3 mt-4 mt-sm-0"}>
           <div
             class="cardbox shadow-lg"
             style={{
               borderLeft: "12px solid  #B8FEB3",
               borderRadius: "10px",
+              height: "80px",
             }}
           >
             <div
@@ -172,7 +199,12 @@ const ListHeading = ({
               data-toggle="modal"
               data-target="#exampleModalCenter"
               onClick={() => {
-                setActiveDataModal(true);
+                const searchItem = mainData?.filter((x) => x.url == pathname);
+                if (
+                  searchItem[0]?.menuId !== MenuIdCollection.purchaseorderlist
+                ) {
+                  setActiveDataModal(true);
+                }
               }}
             >
               <p
@@ -194,17 +226,26 @@ const ListHeading = ({
             </div>
           </div>
         </div>
-        <div class="col-sm-3 mt-4 mt-sm-0">
+        <div class={purchaseOrderList ? "col" : "col-md-3 mt-4 mt-sm-0"}>
           <div
             class="cardbox shadow-lg"
-            style={{ borderLeft: "12px solid red", borderRadius: "10px" }}
+            style={{
+              borderLeft: "12px solid red",
+              borderRadius: "10px",
+              height: "80px",
+            }}
           >
             <div
               class="card-body"
               data-toggle="modal"
               data-target="#exampleModalCenter"
               onClick={() => {
-                setInActiveDataModal(true);
+                const searchItem = mainData?.filter((x) => x.url == pathname);
+                if (
+                  searchItem[0]?.menuId !== MenuIdCollection.purchaseorderlist
+                ) {
+                  setInActiveDataModal(true);
+                }
               }}
             >
               <p
@@ -226,6 +267,92 @@ const ListHeading = ({
             </div>
           </div>
         </div>
+        {purchaseOrderList ? (
+          <>
+            <div class="col mt-4 mt-sm-0">
+              <div
+                class="cardbox shadow-lg"
+                style={{
+                  borderLeft: "12px solid #2DDC1B",
+                  borderRadius: "10px",
+                  height: "80px",
+                }}
+              >
+                <div
+                  class="card-body"
+                  data-toggle="modal"
+                  data-target="#exampleModalCenter"
+                  onClick={() => {}}
+                >
+                  <p
+                    class="card-title"
+                    style={{
+                      color: "#8091a5",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Total Approved PO
+                  </p>
+                  <h5
+                    class="card-text"
+                    style={{
+                      color: "#000",
+                      fontSize: "30px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    {purchaseOrderApproveData?.length}
+                  </h5>
+                </div>
+              </div>
+            </div>
+            <div class="col mt-4 mt-sm-0">
+              <div
+                class="cardbox shadow-lg"
+                style={{
+                  borderLeft: "12px solid  #B8FEB3",
+                  borderRadius: "10px",
+                  height: "80px",
+                  wordWrap: "break-word",
+                }}
+              >
+                <div
+                  class="card-body"
+                  data-toggle="modal"
+                  data-target="#exampleModalCenter"
+                  onClick={() => {
+                    // const searchItem = mainData?.filter((x) => x.url == pathname);
+                    // if (searchItem[0]?.menuId !== MenuIdCollection.purchaseorderlist) {
+                    //   setInActiveDataModal(true);
+                    // }
+                  }}
+                >
+                  <p
+                    class="card-title"
+                    style={{
+                      color: "#8091a5",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Total UnApproved PO
+                  </p>
+                  <h5
+                    class="card-text"
+                    style={{
+                      color: "#000",
+                      fontSize: "30px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    {purchaseOrderUnApproveData?.length}
+                  </h5>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   );

@@ -1,0 +1,16 @@
+.modal-body table th,
+.modal-body table td {
+  min-width: 200px;
+  white-space: nowrap;
+}
+.modal-body table th:first-child,
+.modal-body table td:first-child,
+.modal-body table th:last-child,
+.modal-body table td:last-child {
+  min-width: 50px; /* Set smaller width for the first column */
+}
+.modal-body table th:not(:first-child):not(:last-child),
+.modal-body table td:not(:first-child):not(:last-child) {
+  min-width: 200px; /* Set your desired minimum width for other columns */
+  white-space: nowrap; /* Prevent text from wrapping */
+}

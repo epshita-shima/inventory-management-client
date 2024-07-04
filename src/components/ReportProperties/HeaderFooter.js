@@ -116,7 +116,6 @@ const getBase64Image = (imgUrl, callback) => {
   img.src = imgUrl;
 };
 
-
 const downloadImage =async (data,companyinfo,reportTitle) => {
   console.log(data)
   const fileName=reportTitle.toLowerCase().replace(/\s+/g,'');
@@ -271,8 +270,7 @@ const downloadAllImage =async (data,companyinfo,reportTitle) => {
 };
 
 const addFooter = (doc, companyinfo,reportTitle) => {
-    console.log(companyinfo)
-    console.log(companyinfo?.companyinfo[0].companyName)
+
     const pageCount = doc.internal.getNumberOfPages(); // Get the total number of pages
     const logoWidthPercentage = 0.15; // 15% of page width for the logo
     const detailsWidthPercentage = 0.8;
@@ -287,8 +285,6 @@ const addFooter = (doc, companyinfo,reportTitle) => {
       const contentStartY = headerHeight + spaceBetween;
       const pageWidth = doc.internal.pageSize.width;
       const pageHeight = doc.internal.pageSize.height;
-      console.log(pageHeight);
-      const lineHeight = 7; // Adjust this value for line height
       const headerY = 10;
       const footerY = pageHeight - 10;
 
