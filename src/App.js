@@ -28,6 +28,7 @@ import InsertPurchaseOrder from "./components/PurchaseManagement/PurchaseOrder/I
 import PurchaseOrderListTable from "./components/PurchaseManagement/PurchaseOrder/Index/PurchaseOrderListTable";
 import CommonPurchaseOrderInfo from "./components/PurchaseManagement/PurchaseOrder/Common/CommonPurchaseOrderInfo";
 import PurchaseOrderApproveForm from "./components/PurchaseManagement/PurchaseOrder/PurchaseOrderApprove/PurchaseOrderApproveForm";
+import InsertGRNInfo from "./components/GoodsReceiveNoteInformation/Insert/InsertGRNInfo";
 
 function App() {
   const [singleUserData, setSingleUserData] = useState([]);
@@ -179,6 +180,8 @@ function App() {
               ></Route>
               <Route path="update-purchaseinfo/:id" element={<CommonPurchaseOrderInfo></CommonPurchaseOrderInfo>}></Route>
               <Route path="/main-view/po-approval" element={<PurchaseOrderApproveForm></PurchaseOrderApproveForm>}></Route>
+
+              <Route path="/main-view/grn-list" element={<InsertGRNInfo></InsertGRNInfo>}></Route>
               {/* <Route
                 path="/main-view/user-list"
                 element={

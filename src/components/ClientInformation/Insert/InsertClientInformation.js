@@ -40,14 +40,14 @@ const InsertClientInformation = () => {
         remarks: "",
         isActive: true,
         clientApproveStatus: false,
-        clientApproveDate: '',
+        clientApproveDate: "",
         isAccountPostingStatus: false,
-        vocuherNo: '',
-        voucherDate:'',
+        vocuherNo: "",
+        voucherDate: "",
         makeBy: makebyUser,
-        updateBy: '',
+        updateBy: "",
         makeDate: new Date(),
-        updateDate: '',
+        updateDate: "",
       },
     ],
   };
@@ -199,7 +199,7 @@ const InsertClientInformation = () => {
                     render={(arrayHelpers) => {
                       ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
-                      console.log(values,!(isValid && dirty))
+                      console.log(values, !(isValid && dirty));
                       return (
                         <div className="row shadow-lg pt-5 pb-3 w-75 d-flex justify-content-center mx-auto">
                           <div className="col-md-12">
@@ -467,14 +467,12 @@ const InsertClientInformation = () => {
                                                   </div>
                                                 )}
                                           </div>
-                                          
                                         </div>
 
                                         <div className="col-md-6">
-                                         
                                           <div className="mb-2 mt-2">
                                             <label htmlFor="tradeLicenceNo">
-                                            Trade Licence Number
+                                              Trade Licence Number
                                             </label>
                                             <Field
                                               type="text"
@@ -496,7 +494,8 @@ const InsertClientInformation = () => {
                                                 if (id) {
                                                   setClientData((prevData) => ({
                                                     ...prevData,
-                                                    tradeLicenceNo: e.target.value,
+                                                    tradeLicenceNo:
+                                                      e.target.value,
                                                     updateBy: updatebyUser,
                                                     updateDate: new Date(),
                                                   }));
@@ -679,7 +678,6 @@ const InsertClientInformation = () => {
                                                 )}
                                           </div>
                                         </div>
-
                                       </div>
                                       <div className="col-md-12">
                                         <div className="d-flex justify-content-center">
