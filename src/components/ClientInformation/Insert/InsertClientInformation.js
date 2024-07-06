@@ -40,11 +40,14 @@ const InsertClientInformation = () => {
         remarks: "",
         isActive: true,
         clientApproveStatus: false,
-        clientApproveDate: null,
+        clientApproveDate: '',
+        isAccountPostingStatus: false,
+        vocuherNo: '',
+        voucherDate:'',
         makeBy: makebyUser,
-        updateBy: null,
+        updateBy: '',
         makeDate: new Date(),
-        updateDate: null,
+        updateDate: '',
       },
     ],
   };
@@ -196,6 +199,7 @@ const InsertClientInformation = () => {
                     render={(arrayHelpers) => {
                       ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
+                      console.log(values,!(isValid && dirty))
                       return (
                         <div className="row shadow-lg pt-5 pb-3 w-75 d-flex justify-content-center mx-auto">
                           <div className="col-md-12">
@@ -360,61 +364,6 @@ const InsertClientInformation = () => {
                                                 )}
                                           </div>
                                           <div className="mb-2">
-                                            {" "}
-                                            <label htmlFor="remarks">
-                                              Remarks
-                                            </label>
-                                            <textarea
-                                              type="textarea"
-                                              name={`detailsData.${index}.remarks`}
-                                              placeholder="Remarks"
-                                              value={
-                                                id
-                                                  ? clientData?.remarks
-                                                  : detail?.remarks
-                                              }
-                                              rows="3"
-                                              style={{
-                                                border: "1px solid #2DDC1B",
-                                                padding: "5px",
-                                                width: "100%",
-                                                borderRadius: "5px",
-                                              }}
-                                              onChange={(e) => {
-                                                if (id) {
-                                                  setClientData((prevData) => ({
-                                                    ...prevData,
-                                                    remarks: e.target.value,
-                                                    updateBy: updatebyUser,
-                                                    updateDate: new Date(),
-                                                  }));
-                                                } else {
-                                                  setFieldValue(
-                                                    `detailsData.${index}.remarks`,
-                                                    e.target.value
-                                                  );
-                                                }
-                                              }}
-                                            />
-                                            {id
-                                              ? ""
-                                              : touched.detailsData?.[index]
-                                                  ?.remarks &&
-                                                errors.detailsData?.[index]
-                                                  ?.remarks && (
-                                                  <div className="text-danger">
-                                                    {
-                                                      errors.detailsData[index]
-                                                        .remarks
-                                                    }
-                                                  </div>
-                                                )}
-                                          </div>
-                                          
-                                        </div>
-
-                                        <div className="col-md-6">
-                                        <div className="mb-2">
                                             <label htmlFor="conatctPerson">
                                               Contact Person
                                             </label>
@@ -514,6 +463,62 @@ const InsertClientInformation = () => {
                                                     {
                                                       errors.detailsData[index]
                                                         .binNo
+                                                    }
+                                                  </div>
+                                                )}
+                                          </div>
+                                          
+                                        </div>
+
+                                        <div className="col-md-6">
+                                         
+                                          <div className="mb-2 mt-2">
+                                            <label htmlFor="tradeLicenceNo">
+                                            Trade Licence Number
+                                            </label>
+                                            <Field
+                                              type="text"
+                                              name={`detailsData.${index}.tradeLicenceNo`}
+                                              placeholder="Trade Licence Number"
+                                              value={
+                                                id
+                                                  ? clientData?.tradeLicenceNo
+                                                  : detail?.tradeLicenceNo
+                                              }
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                                height: "38px",
+                                              }}
+                                              onChange={(e) => {
+                                                if (id) {
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    tradeLicenceNo: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
+                                                } else {
+                                                  setFieldValue(
+                                                    `detailsData.${index}.tradeLicenceNo`,
+                                                    e.target.value
+                                                  );
+                                                }
+                                              }}
+                                            />
+                                            <br />
+                                            {id
+                                              ? ""
+                                              : touched.detailsData?.[index]
+                                                  ?.tradeLicenceNo &&
+                                                errors.detailsData?.[index]
+                                                  ?.tradeLicenceNo && (
+                                                  <div className="text-danger">
+                                                    {
+                                                      errors.detailsData[index]
+                                                        .tradeLicenceNo
                                                     }
                                                   </div>
                                                 )}
@@ -622,8 +627,59 @@ const InsertClientInformation = () => {
                                                   </div>
                                                 )}
                                           </div>
-                                         
+                                          <div>
+                                            {" "}
+                                            <label htmlFor="remarks">
+                                              Remarks
+                                            </label>
+                                            <textarea
+                                              type="textarea"
+                                              name={`detailsData.${index}.remarks`}
+                                              placeholder="Remarks"
+                                              value={
+                                                id
+                                                  ? clientData?.remarks
+                                                  : detail?.remarks
+                                              }
+                                              rows="3"
+                                              style={{
+                                                border: "1px solid #2DDC1B",
+                                                padding: "5px",
+                                                width: "100%",
+                                                borderRadius: "5px",
+                                              }}
+                                              onChange={(e) => {
+                                                if (id) {
+                                                  setClientData((prevData) => ({
+                                                    ...prevData,
+                                                    remarks: e.target.value,
+                                                    updateBy: updatebyUser,
+                                                    updateDate: new Date(),
+                                                  }));
+                                                } else {
+                                                  setFieldValue(
+                                                    `detailsData.${index}.remarks`,
+                                                    e.target.value
+                                                  );
+                                                }
+                                              }}
+                                            />
+                                            {id
+                                              ? ""
+                                              : touched.detailsData?.[index]
+                                                  ?.remarks &&
+                                                errors.detailsData?.[index]
+                                                  ?.remarks && (
+                                                  <div className="text-danger">
+                                                    {
+                                                      errors.detailsData[index]
+                                                        .remarks
+                                                    }
+                                                  </div>
+                                                )}
+                                          </div>
                                         </div>
+
                                       </div>
                                       <div className="col-md-12">
                                         <div className="d-flex justify-content-center">

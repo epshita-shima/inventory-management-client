@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useMemo } from "react";
-import { useDeleteMenuDataMutation } from "../../../../redux/features/menus/menuApi";
+import { useDeleteMenuDataMutation, useGetAllMenuItemsQuery } from "../../../../redux/features/menus/menuApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPenToSquare,
@@ -12,10 +12,11 @@ import DataTable from "react-data-table-component";
 
 import './MenuList.css'
 import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
-const MenuList = ({permission, menuItems,refetch}) => {
+const MenuList = ({permission}) => {
 const [deleteMenu]=useDeleteMenuDataMutation()
 const [filterText, setFilterText] = React.useState("");
 const [resetPaginationToggle, setResetPaginationToggle] =React.useState(false);
+const { data: menuItems, isMenuloading,refetch } = useGetAllMenuItemsQuery(undefined);
 
   const flattenOptions = (options) => {
     const flattenRecursive = (options, parentLabel) => {

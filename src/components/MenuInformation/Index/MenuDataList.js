@@ -9,7 +9,7 @@ import { useGetAllMenuItemsQuery } from "../../../redux/features/menus/menuApi";
 const MenuDataList = () => {
   const clickhandler = (name) => console.log("delete", name);
   const { data: user } = useGetAllUserQuery(undefined);
-  const { data: menuItems, isMenuloading,refetch } = useGetAllMenuItemsQuery(undefined);
+ 
   const [permission, setPermission] = useState();
   const navigate = useNavigate();
 
@@ -60,32 +60,30 @@ const MenuDataList = () => {
     }
   }, [user, navigate]);
 
-  if (isMenuloading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center">
-        <button
-          class="btn"
-          style={{ backgroundColor: "#2DDC1B", color: "white" }}
-          type="button"
-          disabled
-        >
-          <span
-            class="spinner-grow spinner-grow-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
-          Loading...
-        </button>
-      </div>
-    );
-  }
+  // if (isMenuloading) {
+  //   return (
+  //     <div className="d-flex justify-content-center align-items-center">
+  //       <button
+  //         class="btn"
+  //         style={{ backgroundColor: "#2DDC1B", color: "white" }}
+  //         type="button"
+  //         disabled
+  //       >
+  //         <span
+  //           class="spinner-grow spinner-grow-sm"
+  //           role="status"
+  //           aria-hidden="true"
+  //         ></span>
+  //         Loading...
+  //       </button>
+  //     </div>
+  //   );
+  // }
   
   return (
     <div>
       <MenuList
         permission={permission}
-        menuItems={menuItems}
-        refetch={refetch}
         click={clickhandler}
       />
       {permission?.isInserted ? (

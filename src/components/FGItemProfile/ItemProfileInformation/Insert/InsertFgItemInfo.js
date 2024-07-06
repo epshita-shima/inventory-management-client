@@ -66,10 +66,13 @@ const InsertFgItemInfo = () => {
         sizeId: "",
         unitId: "",
         openingStock: "",
-        itemStatus: false,
+        itemStatus: true,
         openingDate: startDate,
         ladgerApproveStatus: false,
         ladgerApproveDate: null,
+        isAccountPostingStatus: false,
+        vocuherNo: null,
+        voucherDate: null,
         makeBy: makebyUser,
         updateBy: null,
         makeDate: new Date(),
@@ -77,6 +80,7 @@ const InsertFgItemInfo = () => {
       },
     ],
   };
+  console.log()
 
   const handleChange = (setFieldValue, index, newValue) => {
     setFieldValue(`detailsData.${index}.sizeId`, newValue);
@@ -84,46 +88,34 @@ const InsertFgItemInfo = () => {
   const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
     console.log(values.detailsData);
-    resetForm({
-      values: {
-        detailsData: [
-          {
-            itemName: "",
-            sizeId: "",
-            unitId: "",
-            openingStock: "",
+    resetForm();
+    try {
+      const response = await insertIteminfo(values.detailsData);
+      if (response.data.status === 200) {
+        swal("Done", "Data Save Successfully", "success");
+        resetForm({
+          values: {
+            detailsData: [
+              {
+                itemName: "",
+                sizeId: "",
+                unitId: "",
+                openingStock: "",
+              },
+            ],
           },
-        ],
-      },
-    });
-    // try {
-    //   const response = await insertIteminfo(values.detailsData);
-    //   console.log(response.data.status);
-    //   if (response.data.status === 200) {
-    //     swal("Done", "Data Save Successfully", "success");
-    //     resetForm({
-    //       values: {
-    //         detailsData: [
-    //           {
-    //             itemName: "",
-    //             sizeId: "",
-    //             unitId: "",
-    //             openingStock: "",
-    //           },
-    //         ],
-    //       },
-    //     });
-    //   } else {
-    //     swal(
-    //       "Not Possible!",
-    //       "An problem occurred while creating the data",
-    //       "error"
-    //     );
-    //   }
-    // } catch (err) {
-    //   console.error(err);
-    //   swal("Relax!", "An problem occurred while creating the data", "error");
-    // }
+        });
+      } else {
+        swal(
+          "Not Possible!",
+          "An problem occurred while creating the data",
+          "error"
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      swal("Relax!", "An problem occurred while creating the data", "error");
+    }
   };
   return (
     <div
@@ -275,9 +267,11 @@ const InsertFgItemInfo = () => {
                             unitId: "",
                             openingStock: "",
                             openingDate: startDate,
-                            itemStatus: false,
+                            itemStatus: true,
                             ladgerApproveStatus: false,
                             ladgerApproveDate: null,
+                            vocuherNo: null,
+                            voucherDate: null,
                             makeBy: makebyUser,
                             updateBy: null,
                             makeDate: new Date(),
@@ -295,6 +289,7 @@ const InsertFgItemInfo = () => {
                     render={(arrayHelpers) => {
                       ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
+                      console.log(values)
                       return (
                         <div
                           className=" flex-1 items-center d-flex-nowrap"
@@ -331,12 +326,12 @@ const InsertFgItemInfo = () => {
                                     *
                                   </span>
                                 </th>
-                                <th className="bg-white text-center align-middle ">
+                                {/* <th className="bg-white text-center align-middle ">
                                   Item Status
                                   <span className="text-danger fw-bold fs-2">
                                     *
                                   </span>
-                                </th>
+                                </th> */}
                                 <th className="bg-white text-center align-middle ">
                                   Action
                                 </th>
@@ -424,8 +419,8 @@ const InsertFgItemInfo = () => {
                                                   menu: (provided) => ({
                                                     ...provided,
                                                     zIndex: 9999,
-                                                    height:'200px',
-                                                     overflowY:'scroll'
+                                                    // height:'200px',
+                                                    //  overflowY:'scroll'
                                                   }),
                                                 }}
                                                 theme={(theme) => ({
@@ -504,8 +499,8 @@ const InsertFgItemInfo = () => {
                                                   menu: (provided) => ({
                                                     ...provided,
                                                     zIndex: 9999,
-                                                    height:'200px',
-                                                     overflowY:'scroll'
+                                                    // height:'200px',
+                                                    //  overflowY:'scroll'
                                                   }),
                                                 }}
                                                 theme={(theme) => ({
@@ -565,7 +560,7 @@ const InsertFgItemInfo = () => {
                                             />
                                           </span>
                                         </td>
-                                        <td className="text-center align-middle">
+                                        {/* <td className="text-center align-middle">
                                           <div class="form-check">
                                             <input
                                               type="checkbox"
@@ -580,7 +575,7 @@ const InsertFgItemInfo = () => {
                                               }}
                                             />
                                           </div>
-                                        </td>
+                                        </td> */}
                                         <td className="text-center align-middle">
                                           <button
                                             type="button"

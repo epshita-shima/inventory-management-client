@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import {
   useGetAllMenuItemsQuery,
-  useGetSingleChangeParentMenuQuery,
   useGetSingleMenuQuery,
   useUpdateNestedMenuMutation,
   useUpdateSingleProtionMenuMutation,
@@ -20,32 +19,13 @@ const UpdateMenu = () => {
   const navigate = useNavigate();
   const [singleMenuData, setSingleMenuData] = useState([]);
   const [isUpdateAsChangeParent, setIsUpdateAsChangeParent] = useState(false);
-  const [changingParentId, setChangingParentId] = useState("");
-  const [changeParentData, setChangeParentData] = useState([]);
-  const [singleMatchingItemData, setSingleMatchingItemData] = useState([]);
   const [masterMenuData, setMasterMenuData] = useState([]);
-  const { data: singleMenu, isLoading: singleMenuLoading } =
-    useGetSingleMenuQuery(id);
-  const { data: changeParent } =
-    useGetSingleChangeParentMenuQuery(changingParentId);
+  const { data: singleMenu } = useGetSingleMenuQuery(id);
   const [updateSingleMenus] = useUpdateNestedMenuMutation();
   const [updateSingleMenu] = useUpdateSingleProtionMenuMutation();
   const [isToggled, setIsToggled] = useState(false);
+  const { data: menuItems } = useGetAllMenuItemsQuery();
 
-  console.log(changeParent);
-  console.log(changeParentData);
-  console.log(singleMatchingItemData);
-  console.log(JSON.stringify(singleMenu));
-  console.log(singleMenuData);
-  console.log(masterMenuData);
-
-  const {
-    data: menuItems,
-    isError: menuItemsIsError,
-    isLoading: menuItemsIsLoading,
-  } = useGetAllMenuItemsQuery();
-
-  console.log(menuItems);
   const parentMenuFunction = (options) => {
     const parentMenuRecursive = (options, parentLabel) => {
       let result = [];
@@ -68,12 +48,12 @@ const UpdateMenu = () => {
   };
 
   const parentMenuOptions = parentMenuFunction(menuItems);
-  console.log(parentMenuOptions);
 
   const menuTypeOptions = [
     { value: "child", label: "Child" },
     { value: "parent", label: "Parent" },
   ];
+
   useEffect(() => {
     const updatedSingleData = (data) => {
       const matchedData = data?.items?.find((items) => {
@@ -100,60 +80,8 @@ const UpdateMenu = () => {
   }, [id, singleMenu]);
 
   useEffect(() => {
-    //     const parentMenuOptionsData = (options) => {
-    //       const parentMenuRecursive = (options, parentLabel) => {
-    //         let result = [];
-    //         options?.forEach((option) => {
-    //           if (option.isParent == true) {
-    //             result.push({
-    //               _id: option._id,
-    //               label: option.label,
-    //               trackId: option.trackId,
-    //               items: option.items,
-    //               isParent: option.isParent,
-    //               url: option.url,
-    //               permissions: option.permissions,
-    //               createdAt: option.createdAt,
-    //               updatedAt: option.updatedAt,
-    //             });
-    //           } else {
-    //           }
-    //           if (option.items && option.items.length > 0) {
-    //             result = result.concat(
-    //               parentMenuRecursive(option.items, option.label)
-    //             );
-    //           }
-    //         });
-    //         return result;
-    //       };
-    //       return parentMenuRecursive(options);
-    //     };
-    //     const parentMenusOptionsData = parentMenuOptionsData(menuItems);
-    // console.log(parentMenusOptionsData)
-
-    // const matchingData = parentMenusOptionsData?.find(
-    //   (x) => x._id == changingParentId
-    // );
-    // console.log(matchingData)
-    //     function separateItem(data, id) {
-    //       console.log(data);
-    //       const isExisting = data?.items?.find((item) => item?._id === id);
-    //       return isExisting;
-    //     }
-
-    //     // Example usage: Separating the "PI Report" item
-    //     const piReportItem = separateItem(singleMenu, id);
-    // console.log(piReportItem)
-    //     function searchParentWithItem(data) {
-    //       console.log("test", id);
-    //       return {
-    //         ...data,
-    //         items: data?.items.filter((item) => item._id === id || item.isParent),
-    //       };
-    //     }
-
     setMasterMenuData(singleMenu);
-  }, [singleMenu, id, changingParentId, menuItems]);
+  }, [singleMenu]);
 
   useEffect(() => {
     setMasterMenuData((prevMasterData) => {
@@ -208,9 +136,8 @@ const UpdateMenu = () => {
         swal("Error", "An error occurred while creating the data", "error");
       }
     } else {
-      console.log(masterMenuData);
+console.log(masterMenuData)
       const response = await updateSingleMenu(masterMenuData);
-      console.log(response);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", {
           icon: "success",
@@ -267,7 +194,7 @@ const UpdateMenu = () => {
                   name="itemType"
                   options={parentMenuOptions}
                   value={parentMenuOptions?.find(
-                    (x) => x.value == singleMenuData?._id
+                    (x) => x.value === singleMenuData?._id
                   )}
                   styles={{
                     control: (baseStyles, state) => ({
@@ -286,7 +213,7 @@ const UpdateMenu = () => {
                   })}
                   onChange={(e) => {
                     console.log(e);
-                    if (e.value == singleMenu._id) {
+                    if (e.value === singleMenu._id) {
                       setIsUpdateAsChangeParent(false);
                     } else {
                       setIsUpdateAsChangeParent(true);
@@ -324,8 +251,10 @@ const UpdateMenu = () => {
                   isDisabled={singleMenuData?.items?.length > 0 ? true : false}
                   value={menuTypeOptions?.find(
                     (x) =>
-                      x.value ==
-                      `${singleMenuData?.isParent == true ? "parent" : "child"}`
+                      x.value ===
+                      `${
+                        singleMenuData?.isParent === true ? "parent" : "child"
+                      }`
                   )}
                   styles={{
                     control: (baseStyles, state) => ({
@@ -344,7 +273,7 @@ const UpdateMenu = () => {
                   })}
                   onChange={(e) => {
                     console.log(e);
-                    if (e.value == "child") {
+                    if (e.value === "child") {
                       setSingleMenuData((prev) => ({
                         ...prev, // Copy previous state
                         isParent: false, // Update _id property with new value
@@ -469,7 +398,6 @@ const UpdateMenu = () => {
                               </thead>
 
                               {singleMenuData?.items?.map((detail, index) => {
-                                console.log(detail);
                                 return (
                                   <tbody>
                                     <tr key={index}>

@@ -67,6 +67,8 @@ console.log(categoryInfoConvertedOptions)
         openingDate: startDate,
         ladgerApproveStatus: false,
         ladgerApproveDate: null,
+        vocuherNo: null,
+        voucherDate: null,
         makeBy: makebyUser,
         updateBy: null,
         makeDate: new Date(),
@@ -252,6 +254,9 @@ console.log(categoryInfoConvertedOptions)
                             openingDate: startDate,
                             ladgerApproveStatus: false,
                             ladgerApproveDate: null,
+                            isAccountPostingStatus: false,
+                            vocuherNo: null,
+                            voucherDate: null,
                             makeBy: makebyUser,
                             updateBy: null,
                             makeDate: new Date(),
@@ -345,7 +350,7 @@ console.log(categoryInfoConvertedOptions)
                                                 }
                                                 value={categoryInfoConvertedOptions.filter(
                                                   (x) =>
-                                                    x.value == detail.categoryId
+                                                    x.value === detail.categoryId
                                                 )}
                                                 styles={{
                                                   control: (
@@ -451,7 +456,7 @@ console.log(categoryInfoConvertedOptions)
                                                 }
                                                 value={itemUnitConvertedOptions.filter(
                                                   (x) =>
-                                                    x.value == detail.unitId
+                                                    x.value === detail.unitId
                                                 )}
                                                 styles={{
                                                   control: (
