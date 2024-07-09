@@ -1,4 +1,4 @@
-.custom-datepicker {
+.custom-datepicker3 {
     border: 1px solid #2DDC1B;
     padding: 5px;
     border-radius: 5px;
@@ -13,35 +13,35 @@
     outline: #2DDC1B;
     width:250px;
   }
-.custom-calendar .react-datepicker__current-month,
-.custom-calendar .react-datepicker__day,
-.custom-calendar .react-datepicker__day-name,
-.custom-calendar .react-datepicker__time-container {
+.custom-calendar3 .react-datepicker__current-month,
+.custom-calendar3 .react-datepicker__day,
+.custom-calendar3 .react-datepicker__day-name,
+.custom-calendar3 .react-datepicker__time-container {
   font-size: 14px; /* Desired text size */
 }
 
-.custom-calendar .react-datepicker__header {
+.custom-calendar3 .react-datepicker__header {
   font-size: 18px; /* Change the header text size */
 }
 
-.custom-calendar .react-datepicker__day--selected,
-.custom-calendar .react-datepicker__day--keyboard-selected {
+.custom-calendar3 .react-datepicker__day--selected,
+.custom-calendar3 .react-datepicker__day--keyboard-selected {
   font-size: 14px; /* Change the selected day text size */
 }
-  .custom-calendar {
+  .custom-calendar3 {
     background-color: #B8FEB3;
     width: 250px;
   }
-  .custom-calendar .react-datepicker__month-container {
+  .custom-calendar3 .react-datepicker__month-container {
     width: 100%; /* Ensure the month container takes the full width */
 
   }
-  .custom-calendar .react-datepicker__header {
+  .custom-calendar3 .react-datepicker__header {
     width: 100%;
   }
   
-  .custom-calendar .react-datepicker__day,
-.custom-calendar .react-datepicker__day-name {
+  .custom-calendar3 .react-datepicker__day,
+.custom-calendar3 .react-datepicker__day-name {
   width: 13.28%; /* Each day takes 1/7th of the width */
   display: inline-block;
   text-align: center;

@@ -13,6 +13,7 @@ import { downloadPOPDF } from "../../../../ReportProperties/handlePurchaseOrderR
 import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/iteminformation/rmItemInfoApi";
 import { useGetAllBankInformationQuery } from "../../../../../redux/features/bankinformation/bankInfoAPi";
 import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
+import { useGetAllGRNInformationQuery } from "../../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
 
 const PurchaseOrderApproveList = ({ permission, purchaseFilterApproveAllData }) => {
 
@@ -25,6 +26,7 @@ const PurchaseOrderApproveList = ({ permission, purchaseFilterApproveAllData }) 
   const { data: paymentData } = useGetAllPaymentInformationQuery(undefined);
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [filterText, setFilterText] = useState("");
+  const {data:grnDataInfo}=useGetAllGRNInformationQuery(undefined)
 
   const reportTitle = "PURCHASE ORDER";
 
@@ -80,6 +82,32 @@ const PurchaseOrderApproveList = ({ permission, purchaseFilterApproveAllData }) 
       center: true,
       filterable: true,
       width: "180px",
+    },
+    {
+      name: "Total Received Quantity",
+      selector: (purchaseInfoData) =>{
+        const totalReceiveQuantity =grnDataInfo
+        ?.filter((x) => x.supplierPoNo === purchaseInfoData?.poNo)
+        .reduce((acc, cur) => acc + parseInt(cur.grandTotalReceivedQuantity, 10), 0);
+        return totalReceiveQuantity;
+      },
+      sortable: true,
+      center: true,
+      filterable: true,
+      width: "220px",
+    },
+    {
+      name: "Total Received Amount",
+      selector: (purchaseInfoData) =>{
+        const totalReceiveAmount =grnDataInfo
+        ?.filter((x) => x.supplierPoNo === purchaseInfoData?.poNo)
+        .reduce((acc, cur) => acc + parseInt(cur.grandTotalAmount, 10), 0);
+        return totalReceiveAmount;
+      },
+      sortable: true,
+      center: true,
+      filterable: true,
+      width: "220px",
     },
 
     {

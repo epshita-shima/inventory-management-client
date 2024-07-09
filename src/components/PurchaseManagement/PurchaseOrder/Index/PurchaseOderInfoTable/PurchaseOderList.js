@@ -22,10 +22,11 @@ import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinf
 import numberToWords from "number-to-words";
 import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/iteminformation/rmItemInfoApi";
 import { useGetAllBankInformationQuery } from "../../../../../redux/features/bankinformation/bankInfoAPi";
+import { useGetAllGRNInformationQuery } from "../../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
 
 const PurchaseOderList = ({ permission }) => {
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
-  const {data:bankInformation}=useGetAllBankInformationQuery(undefined)
+  const { data: bankInformation } = useGetAllBankInformationQuery(undefined);
   const [purchaseInCash, setPurchaseInCash] = useState([]);
   const [purchaseInLCAtSight, setPurchaseInInLCAtSight] = useState([]);
   const [purchaseOrderList, setPurchaseOrderList] = useState(true);
@@ -45,11 +46,8 @@ const PurchaseOderList = ({ permission }) => {
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [filterText, setFilterText] = useState("");
   const [deletePurchaseOrderInfo] = useDeletePurchaseOrderInformationMutation();
-  const [downloadPurchaseOrderData, setDownloadPurchaseOrderData] = useState(
-    []
-  );
+  const {data:grnDataInfo,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefined)
   const reportTitle = "PURCHASE ORDER";
-
 
   useEffect(() => {
     const matches = purchaseInfoData
@@ -78,7 +76,9 @@ const PurchaseOderList = ({ permission }) => {
 
     setPurchaseOrderApproveData(approvePurchaseData);
     setPurchaseOrderUnApproveData(unApprovePurchaseData);
-  }, [paymentData, purchaseInfoData, downloadPurchaseOrderData]);
+  }, [paymentData, purchaseInfoData]);
+
+
 
   const columns = [
     {
@@ -138,6 +138,33 @@ const PurchaseOderList = ({ permission }) => {
       width: "180px",
     },
     {
+      name: "Total Received Quantity",
+      selector: (purchaseInfoData) =>{
+        const totalReceiveQuantity =grnDataInfo
+        ?.filter((x) => x.supplierPoNo === purchaseInfoData?.poNo)
+        .reduce((acc, cur) => acc + parseInt(cur.grandTotalReceivedQuantity, 10), 0);
+        return totalReceiveQuantity;
+      },
+      sortable: true,
+      center: true,
+      filterable: true,
+      width: "220px",
+    },
+    {
+      name: "Total Received Amount",
+      selector: (purchaseInfoData) =>{
+        const totalReceiveAmount =grnDataInfo
+        ?.filter((x) => x.supplierPoNo === purchaseInfoData?.poNo)
+        .reduce((acc, cur) => acc + parseInt(cur.grandTotalAmount, 10), 0);
+        return totalReceiveAmount;
+      },
+      sortable: true,
+      center: true,
+      filterable: true,
+      width: "220px",
+    },
+    
+    {
       name: "PO Status",
       button: true,
       width: "180px",
@@ -191,7 +218,14 @@ const PurchaseOderList = ({ permission }) => {
                 borderRadius: "5px",
               }}
               onClick={() => {
-                downloadPOPDF(purchaseInfoData, rawMaterialItemInfo, bankInformation,paymentData,{ companyinfo }, reportTitle);
+                downloadPOPDF(
+                  purchaseInfoData,
+                  rawMaterialItemInfo,
+                  bankInformation,
+                  paymentData,
+                  { companyinfo },
+                  reportTitle
+                );
               }}
             >
               <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
@@ -326,7 +360,10 @@ const PurchaseOderList = ({ permission }) => {
           <FontAwesomeIcon
             style={{ fontSize: "24px", color: "#2DDC1B", fontWeight: "bold" }}
             icon={faRefresh}
-            onClick={() => refetch()}
+            onClick={() => {
+              refetch()
+              grnRefetch()
+            }}
           ></FontAwesomeIcon>
           &nbsp;
         </div>
@@ -393,7 +430,6 @@ const PurchaseOderList = ({ permission }) => {
           />
         </div>
       </div>
-
     </div>
   );
 };

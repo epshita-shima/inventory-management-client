@@ -1,7 +1,7 @@
 import { faArrowAltCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field, FieldArray, Form, Formik } from "formik";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import Select from "react-select";
@@ -17,38 +17,45 @@ import "./InsertGRNInfo.css";
 import {
   useInsertGRNInformationMutation,
   useGetSingleGRNInformationQuery,
+  useUpdateGRNInformationMutation,
 } from "../../../redux/features/goodsreceivenoteinfo/grninfoApi";
 import UpdateGRNInfo from "./../Update/UpdateGRNInfo";
+import { useGetSerialNoQuery } from "../../../redux/api/apiSlice";
 
 const InsertGRNInfo = () => {
   const navigate = useNavigate();
+  const ArrayHelperRef = useRef();
   const getUser = localStorage.getItem("user");
   const getUserParse = JSON.parse(getUser);
   const makebyUser = getUserParse[0].username;
   const { data: supplierInfo } = useGetAllSupplierInformationQuery(undefined);
-  const { data: purchaseOrderInfo } =
+  const { data: purchaseOrderInfo, isLoading } =
     useGetAllPurchaseOrderInformationQuery(undefined);
   const { data: rmItemInfo } = useGetAllRMItemInformationQuery(undefined);
   const [pOOptionsData, setPOOptionsData] = useState([]);
+  const [serialValue, setSerialValue] = useState([]);
   const [totalGrandQuantity, setTotalGrandQuantity] = useState(0);
   const [totalGrandAmount, setTotalGrandAmount] = useState(0);
+  const [pOGrandTotalQuantity, setPOGrandTotalQuantity] = useState("");
   const [startDate, setStartDate] = useState(
     new Date().toLocaleDateString("en-CA")
   );
   const [grnSingleData, setGRNSingleData] = useState([]);
   const [insertGRNINfo] = useInsertGRNInformationMutation();
-
+  const [updateGRNInfo] = useUpdateGRNInformationMutation();
   const { id } = useParams();
   const { data: singleGRNInfo } = useGetSingleGRNInformationQuery(id);
-  console.log(singleGRNInfo);
+  const { data: serialNo } = useGetSerialNoQuery(undefined);
 
   const initialValues = {
     pOSingleId: "",
+    grnSerialNo: "",
     supplierId: "",
     supplierPoNo: "",
     receiveDate: startDate,
     challanNo: "",
     grandTotalQuantity: "",
+    grandTotalReceivedQuantity: "",
     grandTotalAmount: totalGrandAmount,
     detailsData: [],
     isAccountPostingStatus: false,
@@ -60,36 +67,97 @@ const InsertGRNInfo = () => {
     updateDate: null,
   };
   const supplierOptions = supplierDropdown(supplierInfo);
+
   useEffect(() => {
-    const matchPoNo = purchaseOrderInfo?.filter(
-      (item) => item.supplierId == grnSingleData?.supplierId
+    if (
+      purchaseOrderInfo &&
+      Array.isArray(purchaseOrderInfo) &&
+      purchaseOrderInfo.length > 0
+    ) {
+      setPOGrandTotalQuantity(purchaseOrderInfo[0]?.grandTotalQuantity);
+      console.log(purchaseOrderInfo[0]?.grandTotalQuantity);
+    } else {
+      console.log(
+        "purchaseOrderInfo is not defined or is not an array or is empty"
+      );
+    }
+
+    if (id) {
+      setGRNSingleData(singleGRNInfo);
+    }
+  }, [id, singleGRNInfo, purchaseOrderInfo]);
+
+  useEffect(() => {
+    if (serialNo && serialNo.length > 0) {
+      const maxSerialNoObject = serialNo.reduce((max, current) => {
+        if (current.type === "grn") {
+          return max && current.serialNo > max.serialNo
+            ? current
+            : max || current;
+        }
+        return max;
+      }, undefined);
+      if (maxSerialNoObject) {
+        setSerialValue(maxSerialNoObject);
+      }
+    }
+  }, [serialNo]);
+
+  const areFieldsEmpty = () => {
+    if (!grnSingleData?.receiveDate || !grnSingleData?.challanNo) {
+      return true;
+    }
+
+    // Check if any of the fields in detailsData are missing
+    return grnSingleData?.detailsData?.some(
+      (field) => !field.itemId || !field.quantity || !field.unitPrice
     );
-    const createPODropdown = (options) => {
-      let result = [];
-      options?.forEach((option) => {
-        result.push({
-          value: option.poNo,
-          label: option.poNo,
+  };
+
+  const handleSelectSupplier = (e, setFieldValue) => {
+    const matchPoNo = purchaseOrderInfo?.filter(
+      (item) => item.supplierId === e.value 
+    );
+    console.log(matchPoNo.length);
+    if (matchPoNo[0]?.approveStatus==false|| matchPoNo.length ==0 ) {
+      swal({
+        title: "Sorry!",
+        text: "PO not available, Please contact with the Head Office.",
+        icon: "warning",
+        button: "OK",
+      })
+    } else {
+      const createPODropdown = (options) => {
+        let result = [];
+        options?.forEach((option) => {
+          result.push({
+            value: option.poNo,
+            label: option.poNo,
+          });
         });
-      });
-      return result;
-    };
-    const poOptions = createPODropdown(matchPoNo);
-    setPOOptionsData(poOptions);
-    setGRNSingleData(singleGRNInfo);
-  }, [singleGRNInfo, grnSingleData, purchaseOrderInfo]);
-
-  console.log(grnSingleData);
-
+        return result;
+      };
+      const poOptions = createPODropdown(matchPoNo);
+      setPOOptionsData(poOptions);
+      setFieldValue("supplierId", e.value);
+    }
+  };
   const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
     const modelData = {
       pOSingleId: values.pOSingleId,
       supplierId: values.supplierId,
+      grnSerialNo: `GRN-${
+        serialValue?.serialNo === undefined ? "1" : serialValue?.serialNo
+      }`,
       supplierPoNo: values.supplierPoNo,
       receiveDate: values.receiveDate,
       challanNo: values.challanNo,
-      grandTotalQuantity: values.grandTotalQuantity,
+      grandTotalQuantity:
+        pOGrandTotalQuantity !== undefined
+          ? pOGrandTotalQuantity
+          : pOGrandTotalQuantity,
+      grandTotalReceivedQuantity: values.grandTotalQuantity,
       grandTotalAmount: values.grandTotalAmount,
       detailsData: [],
       isAccountPostingStatus: values.isAccountPostingStatus,
@@ -110,31 +178,51 @@ const InsertGRNInfo = () => {
       });
     });
     console.log(modelData);
-
-    try {
-      const response = await insertGRNINfo(modelData);
-      console.log(response);
-      if (response.data.status === 200) {
-        swal("Done", "Data Save Successfully", "success");
-        resetForm();
-      } else {
-        swal(
-          "Not Possible!",
-          "An problem occurred while creating the data",
-          "error"
-        );
+    if (id) {
+      try {
+        const response = await updateGRNInfo(grnSingleData);
+        console.log(response);
+        if (response.data.status === 200) {
+          swal("Done", "Data Update Successfully", "success");
+          navigate("/main-view/grn-list");
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while updating the data",
+            "error"
+          );
+        }
+      } catch (err) {
+        console.error(err);
+        swal("Relax!", "An problem occurred while creating the data", "error");
       }
-    } catch (err) {
-      console.error(err);
-      swal("Relax!", "An problem occurred while creating the data", "error");
+    } else {
+      try {
+        const response = await insertGRNINfo(modelData);
+        console.log(response);
+        if (response.data.status === 200) {
+          swal("Done", "Data Save Successfully", "success");
+          resetForm();
+        } else {
+          swal(
+            "Not Possible!",
+            "An problem occurred while creating the data",
+            "error"
+          );
+        }
+      } catch (err) {
+        console.error(err);
+        swal("Relax!", "An problem occurred while creating the data", "error");
+      }
+      resetForm();
     }
-    resetForm();
   };
-  
 
-  const supplier = supplierInfo?.find((x) => x._id === grnSingleData?.supplierId);
+  const supplier = supplierInfo?.find(
+    (x) => x._id === grnSingleData?.supplierId
+  );
   const supplierName = supplier ? supplier.supplierName : "N/A";
-  
+
   return (
     <div
       className=" row  mx-4"
@@ -152,10 +240,8 @@ const InsertGRNInfo = () => {
                 detailsData: Yup.array().of(
                   Yup.object().shape({
                     itemId: Yup.string().required("Required"),
-                    itemDescription: Yup.string().required("Required"),
                     quantity: Yup.string().required("Required"),
                     unitPrice: Yup.string().required("Required"),
-                    totalAmount: Yup.string().required("Required"),
                   })
                 ),
               })}
@@ -175,14 +261,15 @@ const InsertGRNInfo = () => {
                 dirty,
               }) => (
                 <Form
-                  id="pocreation-form"
+                  id="poupdate-form"
                   onSubmit={(e) => {
                     handleSubmit(e, values, resetForm);
                   }}
                 >
                   <FieldArray
                     name="detailsData"
-                    render={() => {
+                    render={(arrayHelpers) => {
+                      ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
                       console.log(values);
                       return (
@@ -192,7 +279,9 @@ const InsertGRNInfo = () => {
                               <h2
                                 style={{ fontSize: "24px", fontWeight: "bold" }}
                               >
-                                Goods Receive Note Form
+                                {id
+                                  ? "Goods Receive Note (GRN) Form"
+                                  : "Goods Receive Note (GRN) Form"}
                               </h2>
                               <div>
                                 <button
@@ -216,8 +305,107 @@ const InsertGRNInfo = () => {
                             </div>
 
                             <div class="row row-cols-2 row-cols-lg-4">
-                              <div class="col-6 col-lg-4">
-                                <label htmlFor="supplierId">
+                              <div class="col-6 col-lg-3 mt-2">
+                                <label htmlFor="">Received Date</label>
+                                <br />
+                                <DatePicker
+                                  dateFormat="y-MM-dd"
+                                  className="text-center custom-datepicker "
+                                  value={
+                                    id ? grnSingleData?.receiveDate : startDate
+                                  }
+                                  calendarClassName="custom-calendar"
+                                  selected={startDate}
+                                  required
+                                  onChange={(startDate) => {
+                                    if (startDate > new Date()) {
+                                      swal({
+                                        title: "Select Valid Date",
+                                        text: "Date should be equal or earlier than today",
+                                        icon: "warning",
+                                        button: "OK",
+                                      });
+                                    } else {
+                                      if (id) {
+                                        setGRNSingleData((prevData) => ({
+                                          ...prevData,
+                                          receiveDate:
+                                            startDate.toLocaleDateString(
+                                              "en-CA"
+                                            ),
+                                          updateBy: makebyUser,
+                                          updateDate: new Date(),
+                                        }));
+                                      } else {
+                                        setStartDate(
+                                          startDate.toLocaleDateString("en-CA")
+                                        );
+                                        setFieldValue(
+                                          "receiveDate",
+                                          startDate.toLocaleDateString("en-CA")
+                                        );
+                                      }
+                                    }
+                                  }}
+                                />
+                              </div>
+
+                              <div class="col-6 col-lg-3 mt-2">
+                                <label
+                                  htmlFor="challanNo"
+                                  style={{
+                                    marginLeft: "10px",
+                                  }}
+                                >
+                                  Challan No
+                                </label>
+                                <br />
+                                <Field
+                                  type="text"
+                                  name={`challanNo`}
+                                  placeholder="Challan No"
+                                  value={
+                                    id
+                                      ? grnSingleData?.challanNo
+                                      : values.challanNo
+                                  }
+                                  style={{
+                                    border: "1px solid #2DDC1B",
+                                    padding: "5px",
+                                    width: "100%",
+                                    borderRadius: "5px",
+                                    textAlign: "center",
+                                    marginLeft: "10px",
+                                    height: "38px",
+                                  }}
+                                  onChange={(e) => {
+                                    if (id) {
+                                      setGRNSingleData((prevData) => ({
+                                        ...prevData,
+                                        challanNo: e.target.value,
+                                        updateBy: makebyUser,
+                                        updateDate: new Date(),
+                                      }));
+                                    } else {
+                                      setFieldValue(
+                                        "challanNo",
+                                        e.target.value
+                                      );
+                                    }
+                                  }}
+                                />
+                                {id
+                                  ? ""
+                                  : touched.challanNo &&
+                                    errors.challanNo && (
+                                      <div className="text-danger">
+                                        {errors.challanNo}
+                                      </div>
+                                    )}
+                              </div>
+
+                              <div class="col-6 col-lg-3 mt-2">
+                                <label htmlFor="supplierId" className="ms-3">
                                   Supplier Name
                                 </label>
                                 {id ? (
@@ -230,7 +418,7 @@ const InsertGRNInfo = () => {
                                     style={{
                                       border: "1px solid #2DDC1B",
                                       padding: "5px",
-                                      width: "85%",
+                                      width: "100%",
                                       borderRadius: "5px",
                                       textAlign: "center",
                                       marginLeft: "10px",
@@ -238,7 +426,7 @@ const InsertGRNInfo = () => {
                                     }}
                                   />
                                 ) : (
-                                  <div className="w-75 d-flex justify-content-between mt-2">
+                                  <div className="w-100 d-flex justify-content-between mt-2">
                                     <div className="w-100">
                                       <Select
                                         class="form-select"
@@ -282,216 +470,137 @@ const InsertGRNInfo = () => {
                                           },
                                         })}
                                         onChange={(e) => {
-                                          const matchPoNo =
-                                            purchaseOrderInfo.filter(
-                                              (item) =>
-                                                item.supplierId == e.value
-                                            );
-                                          const createPODropdown = (
-                                            options
-                                          ) => {
-                                            let result = [];
-                                            options?.forEach((option) => {
-                                              result.push({
-                                                value: option.poNo,
-                                                label: option.poNo,
-                                              });
-                                            });
-                                            return result;
-                                          };
-                                          const poOptions =
-                                            createPODropdown(matchPoNo);
-                                          setPOOptionsData(poOptions);
-                                          setFieldValue("supplierId", e.value);
+                                          handleSelectSupplier(
+                                            e,
+                                            setFieldValue
+                                          );
                                         }}
                                       ></Select>
 
-                                      {touched.supplierId &&
-                                        errors.supplierId && (
-                                          <div className="text-danger">
-                                            {errors.supplierId}
-                                          </div>
-                                        )}
+                                      {id
+                                        ? ""
+                                        : touched.supplierId &&
+                                          errors.supplierId && (
+                                            <div className="text-danger">
+                                              {errors.supplierId}
+                                            </div>
+                                          )}
                                     </div>
                                   </div>
                                 )}
                               </div>
-                              <div class="col-6 col-lg-4">
-                                <label htmlFor="supplierId">
+                              <div class="col-6 col-lg-3 mt-1">
+                                <label htmlFor="supplierId" className="ms-3">
                                   Supplier PO Number
                                 </label>
-                                {
-                                  id? <Field
-                                  type="text"
-                                  name={`supplierPoNo`}
-                                  placeholder="Supplier Po No"
-                                  value={grnSingleData?.supplierPoNo}
-                                  disabled
-                                  style={{
-                                    border: "1px solid #2DDC1B",
-                                    padding: "5px",
-                                    width: "85%",
-                                    borderRadius: "5px",
-                                    textAlign: "center",
-                                    marginLeft: "10px",
-                                    height: "38px",
-                                  }}
-                                /> : ( <div className="w-75 d-flex justify-content-between mt-2">
-                                  <div className="w-100">
-                                    <Select
-                                      class="form-select"
-                                      className="w-100 mb-3"
-                                      aria-label="Default select example"
-                                      name="supplierpono"
-                                      options={pOOptionsData}
-                                      isDisabled={
-                                        pOOptionsData.length === 0 ||
-                                        pOOptionsData.length === undefined
-                                          ? true
-                                          : false
-                                      }
-                                      defaultValue={{
-                                        label: "Select Po No",
-                                        value: 0,
-                                      }}
-                                      value={
-                                        id
-                                          ? pOOptionsData.filter(function (
-                                              option
-                                            ) {
-                                              return (
-                                                option.value ===
-                                                grnSingleData.supplierPoNo
-                                              );
-                                            })
-                                          : pOOptionsData.filter(function (
-                                              option
-                                            ) {
-                                              return (
-                                                option.value ===
-                                                values.supplierPoNo
-                                              );
-                                            })
-                                      }
-                                      styles={{
-                                        control: (baseStyles, state) => ({
-                                          ...baseStyles,
-                                          width: "100%",
-                                          borderColor: state.isFocused
-                                            ? "#fff"
-                                            : "#fff",
-                                          border: "1px solid #2DDC1B",
-                                        }),
-                                        menu: (provided) => ({
-                                          ...provided,
-                                          zIndex: 9999,
-                                          height: "auto",
-                                          // overflowY: "scroll",
-                                        }),
-                                      }}
-                                      theme={(theme) => ({
-                                        ...theme,
-                                        colors: {
-                                          ...theme.colors,
-                                          primary25: "#B8FEB3",
-                                          primary: "#2DDC1B",
-                                        },
-                                      })}
-                                      onChange={(e) => {
-                                        const matchPoNo =
-                                          purchaseOrderInfo.filter(
-                                            (item) => item.poNo === e.value
+                                {id ? (
+                                  <Field
+                                    type="text"
+                                    name={`supplierPoNo`}
+                                    placeholder="Supplier Po No"
+                                    value={grnSingleData?.supplierPoNo}
+                                    disabled
+                                    style={{
+                                      border: "1px solid #2DDC1B",
+                                      padding: "5px",
+                                      width: "92%",
+                                      borderRadius: "5px",
+                                      textAlign: "center",
+                                      marginLeft: "10px",
+                                      height: "38px",
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-100 d-flex justify-content-between mt-2">
+                                    <div className="w-100">
+                                      <Select
+                                        class="form-select"
+                                        className="w-100 mb-3"
+                                        aria-label="Default select example"
+                                        name="supplierpono"
+                                        options={pOOptionsData}
+                                        isDisabled={
+                                          pOOptionsData?.length === 0 ||
+                                          pOOptionsData?.length === undefined
+                                            ? true
+                                            : false
+                                        }
+                                        defaultValue={{
+                                          label: "Select Po No",
+                                          value: 0,
+                                        }}
+                                        value={
+                                          id
+                                            ? pOOptionsData?.filter(function (
+                                                option
+                                              ) {
+                                                return (
+                                                  option.value ===
+                                                  grnSingleData?.supplierPoNo
+                                                );
+                                              })
+                                            : pOOptionsData?.filter(function (
+                                                option
+                                              ) {
+                                                return (
+                                                  option?.value ===
+                                                  values.supplierPoNo
+                                                );
+                                              })
+                                        }
+                                        styles={{
+                                          control: (baseStyles, state) => ({
+                                            ...baseStyles,
+                                            width: "100%",
+                                            borderColor: state.isFocused
+                                              ? "#fff"
+                                              : "#fff",
+                                            border: "1px solid #2DDC1B",
+                                          }),
+                                          menu: (provided) => ({
+                                            ...provided,
+                                            zIndex: 9999,
+                                            height: "auto",
+                                            // overflowY: "scroll",
+                                          }),
+                                        }}
+                                        theme={(theme) => ({
+                                          ...theme,
+                                          colors: {
+                                            ...theme.colors,
+                                            primary25: "#B8FEB3",
+                                            primary: "#2DDC1B",
+                                          },
+                                        })}
+                                        onChange={(e) => {
+                                          const matchPoNo =
+                                            purchaseOrderInfo.filter(
+                                              (item) => item.poNo === e.value
+                                            );
+                                          setFieldValue(
+                                            "detailsData",
+                                            matchPoNo[0]?.detailsData
                                           );
-                                        setFieldValue(
-                                          "detailsData",
-                                          matchPoNo[0]?.detailsData
-                                        );
-                                        setFieldValue(
-                                          "pOSingleId",
-                                          matchPoNo[0]?._id
-                                        );
-                                        setFieldValue("supplierPoNo", e.value);
-                                      }}
-                                    ></Select>
+                                          setFieldValue(
+                                            "pOSingleId",
+                                            matchPoNo[0]?._id
+                                          );
+                                          setFieldValue(
+                                            "supplierPoNo",
+                                            e.value
+                                          );
+                                        }}
+                                      ></Select>
 
-                                    {touched.supplierId &&
-                                      errors.supplierId && (
-                                        <div className="text-danger">
-                                          {errors.supplierId}
-                                        </div>
-                                      )}
-                                  </div>
-                                </div>)
-                                }
-                               
-                              </div>
-
-                              <div class="col-6 col-lg-2">
-                                <label htmlFor="">Received Date</label>
-                                <br />
-                                <DatePicker
-                                  dateFormat="y-MM-dd"
-                                  className="text-center custom-datepicker "
-                                  value={startDate}
-                                  calendarClassName="custom-calendar"
-                                  selected={startDate}
-                                  required
-                                  onChange={(startDate) => {
-                                    if (startDate > new Date()) {
-                                      swal({
-                                        title: "Select Valid Date",
-                                        text: "Date should be equal or earlier than today",
-                                        icon: "warning",
-                                        button: "OK",
-                                      });
-                                    } else {
-                                      setStartDate(
-                                        startDate.toLocaleDateString("en-CA")
-                                      );
-                                      setFieldValue(
-                                        "receiveDate",
-                                        startDate.toLocaleDateString("en-CA")
-                                      );
-                                    }
-                                  }}
-                                />
-                              </div>
-
-                              <div class="col-6 col-lg-2">
-                                <label
-                                  htmlFor="challanNo"
-                                  style={{
-                                    marginLeft: "10px",
-                                  }}
-                                >
-                                  Challan No
-                                </label>
-                                <br />
-                                <Field
-                                  type="text"
-                                  name={`challanNo`}
-                                  placeholder="Challan No"
-                                  value={
-                                    id
-                                      ? grnSingleData?.challanNo
-                                      : values.challanNo
-                                  }
-                                  style={{
-                                    border: "1px solid #2DDC1B",
-                                    padding: "5px",
-                                    width: "85%",
-                                    borderRadius: "5px",
-                                    textAlign: "center",
-                                    marginLeft: "10px",
-                                    height: "38px",
-                                  }}
-                                  onChange={(e) => {
-                                    setFieldValue("challanNo", e.target.value);
-                                  }}
-                                />
-                                {touched.challanNo && errors.challanNo && (
-                                  <div className="text-danger">
-                                    {errors.challanNo}
+                                      {id
+                                        ? ""
+                                        : touched.supplierId &&
+                                          errors.supplierId && (
+                                            <div className="text-danger">
+                                              {errors.supplierId}
+                                            </div>
+                                          )}
+                                    </div>
                                   </div>
                                 )}
                               </div>
@@ -512,20 +621,21 @@ const InsertGRNInfo = () => {
                                   <div className="d-flex justify-content-between">
                                     <button
                                       type="submit"
-                                      form="pocreation-form"
+                                      form="poupdate-form"
                                       className="border-0 "
                                       style={{
-                                        backgroundColor:
-                                          isValid && dirty ? "#2DDC1B" : "gray",
+                                        backgroundColor: areFieldsEmpty()
+                                          ? "gray"
+                                          : "#2DDC1B",
                                         color: "white",
                                         padding: "5px 10px",
                                         fontSize: "14px",
                                         borderRadius: "5px",
                                         width: "100px",
                                       }}
-                                      disabled={!(isValid && dirty)}
+                                      disabled={areFieldsEmpty() ? true : false}
                                     >
-                                      {id ? "Update" : "Save"}
+                                      Update
                                     </button>
                                   </div>
                                   <div className="d-flex justify-content-between align-items-center">
@@ -543,7 +653,7 @@ const InsertGRNInfo = () => {
                                         disabled
                                         value={
                                           id
-                                            ? grnSingleData?.grandTotalQuantity
+                                            ? grnSingleData?.grandTotalReceivedQuantity
                                             : totalGrandQuantity
                                         }
                                         style={{
@@ -557,7 +667,7 @@ const InsertGRNInfo = () => {
                                         }}
                                       />
                                     </div>
-                                    <div>
+                                    <div style={{ display: "none" }}>
                                       <label
                                         htmlFor="grandTotalAmount"
                                         style={{ fontSize: "16px" }}
@@ -599,7 +709,8 @@ const InsertGRNInfo = () => {
                                 makebyUser={makebyUser}
                               ></UpdateGRNInfo>
                             </>
-                          ) : details.length === 0 ? null : (
+                          ) : details.length === 0 ||
+                            pOOptionsData?.length === 0 ? null : (
                             <>
                               <div>
                                 <h2
@@ -614,7 +725,7 @@ const InsertGRNInfo = () => {
                                   <div className="d-flex justify-content-between">
                                     <button
                                       type="submit"
-                                      form="pocreation-form"
+                                      form="poupdate-form"
                                       className="border-0 "
                                       style={{
                                         backgroundColor:
@@ -627,7 +738,7 @@ const InsertGRNInfo = () => {
                                       }}
                                       disabled={!(isValid && dirty)}
                                     >
-                                      {id ? "Update" : "Save"}
+                                      Save
                                     </button>
                                   </div>
                                   <div className="d-flex justify-content-between align-items-center">
@@ -643,7 +754,11 @@ const InsertGRNInfo = () => {
                                         name={`grandTotalQuantity`}
                                         placeholder="Grand Total Quantity"
                                         disabled
-                                        value={totalGrandQuantity}
+                                        value={
+                                          id
+                                            ? grnSingleData?.grandTotalQuantity
+                                            : totalGrandQuantity
+                                        }
                                         style={{
                                           border: "1px solid #2DDC1B",
                                           padding: "5px",
@@ -655,7 +770,7 @@ const InsertGRNInfo = () => {
                                         }}
                                       />
                                     </div>
-                                    <div>
+                                    <div style={{ display: "none" }}>
                                       <label
                                         htmlFor="grandTotalAmount"
                                         style={{ fontSize: "16px" }}
@@ -667,7 +782,11 @@ const InsertGRNInfo = () => {
                                         name={`grandTotalAmount`}
                                         placeholder="Grand Total Amount"
                                         disabled
-                                        value={totalGrandAmount}
+                                        value={
+                                          id
+                                            ? grnSingleData?.grandTotalAmount
+                                            : totalGrandAmount
+                                        }
                                         style={{
                                           border: "1px solid #2DDC1B",
                                           padding: "5px",
@@ -693,6 +812,7 @@ const InsertGRNInfo = () => {
                                 errors={errors}
                                 totalGrandAmount={totalGrandAmount}
                                 totalGrandQuantity={totalGrandQuantity}
+                                arrayHelpers={arrayHelpers}
                               ></InsertGRNDetailsInfo>
                             </>
                           )}

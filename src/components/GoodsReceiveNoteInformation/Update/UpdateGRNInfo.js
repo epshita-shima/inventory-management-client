@@ -1,3 +1,5 @@
+import { faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field } from "formik";
 import React, { useEffect } from "react";
 
@@ -14,45 +16,46 @@ const UpdateGRNInfo = ({
   totalGrandAmount,
   totalGrandQuantity,
 }) => {
-console.log(grnSingleData)
-const handleKeyUp = (e, index, detail) => {
+  console.log(grnSingleData);
+  const handleKeyUp = (e, index, detail) => {
     const inputValue = e.target.value;
-  
-    // Parse the input value as an integer
+
     const parsedValue = parseInt(inputValue, 10);
-    if (isNaN(parsedValue)) {
-      // Handle case where input is not a valid number
-      return;
-    }
-  
-    // Calculate the total amount
+    // if (isNaN(parsedValue)) {
+    //   return;
+    // }
+
     const calculateTotalAmount = parsedValue * detail.unitPrice;
-  
-    // Update the state with the new values
+
     setGRNSingleData((prev) => {
       const temp_details = [...prev.detailsData];
       const newDetail = { ...temp_details[index] };
-  
+
       newDetail["quantity"] = parsedValue;
       newDetail["amount"] = calculateTotalAmount;
-  
+
       temp_details[index] = newDetail;
-  
-      // Calculate the grand total quantities and amounts
-      const totalGrandQuantities = temp_details.reduce((total, item) => total + (parseFloat(item.quantity) || 0), 0);
-      const totalGrandTotalAmounts = temp_details.reduce((total, item) => total + (item.amount || 0), 0);
-  
+
+      const totalGrandQuantities = temp_details.reduce(
+        (total, item) => total + (parseFloat(item.quantity) || 0),
+        0
+      );
+      const totalGrandTotalAmounts = temp_details.reduce(
+        (total, item) => total + (item.amount || 0),
+        0
+      );
+
       return {
         ...prev,
         detailsData: [...temp_details],
         updateBy: makebyUser,
         updateDate: new Date(),
-        grandTotalQuantity: totalGrandQuantities,
+        grandTotalReceivedQuantity: totalGrandQuantities,
         grandTotalAmount: totalGrandTotalAmounts,
       };
     });
-  }
-  
+  };
+
   return (
     <div
       className="shadow-lg p-4"
@@ -70,8 +73,11 @@ const handleKeyUp = (e, index, detail) => {
               Quantity
             </th>
 
-            <th className="bg-white text-center  align-items-center ">
+            <th className="bg-white text-center  align-items-center d-none">
               Amount
+            </th>
+            <th className="bg-white text-center  align-items-center d-none">
+              Action
             </th>
           </tr>
         </thead>
@@ -85,9 +91,7 @@ const handleKeyUp = (e, index, detail) => {
 
                 return (
                   <tr key={index}>
-                    <td className="text-center  align-items-center">
-                      {index + 1}
-                    </td>
+                    <td className="text-center  align-middle">{index + 1}</td>
                     <td className="text-center  align-items-center">
                       <Field
                         type="text"
@@ -103,21 +107,9 @@ const handleKeyUp = (e, index, detail) => {
                           height: "38px",
                           marginBottom: "5px",
                           textAlign: "center",
-                        }}
-                        onKeyUp={(e) => {
-                          setFieldValue(
-                            `detailsData.${index}.itemId`,
-                            e.target.value
-                          );
+                          background: "#F1F5F9",
                         }}
                       />
-                      <br />
-                      {touched.detailsData?.[index]?.itemId &&
-                        errors.detailsData?.[index]?.itemId && (
-                          <div className="text-danger">
-                            {errors.detailsData[index].itemId}
-                          </div>
-                        )}
                     </td>
                     <td className="text-center  align-items-center">
                       <Field
@@ -134,7 +126,9 @@ const handleKeyUp = (e, index, detail) => {
                           marginBottom: "5px",
                           textAlign: "center",
                         }}
-                        onChange={(e) => {handleKeyUp(e,index,detail)}}
+                        onChange={(e) => {
+                          handleKeyUp(e, index, detail);
+                        }}
                       />
                       <br />
                       {touched.detailsData?.[index]?.quantity &&
@@ -144,7 +138,7 @@ const handleKeyUp = (e, index, detail) => {
                           </div>
                         )}
                     </td>
-                    <td className="text-center  align-items-center">
+                    <td className="text-center  align-items-center d-none">
                       <Field
                         type="text"
                         name={`detailsData.${index}.amount`}
@@ -168,13 +162,41 @@ const handleKeyUp = (e, index, detail) => {
                           );
                         }}
                       />
-                      <br />
-                      {touched.detailsData?.[index]?.totalAmount &&
-                        errors.detailsData?.[index]?.totalAmount && (
-                          <div className="text-danger">
-                            {errors.detailsData[index].totalAmount}
-                          </div>
-                        )}
+                    </td>
+                    <td className="text-center  align-middle">
+                      <button
+                        type="button"
+                        className=" border-0 rounded  bg-transparent"
+                        onClick={() => {
+                          setGRNSingleData((prev) => {
+                            const temp__details = [...prev.detailsData];
+                            if (temp__details.length > 1)
+                              temp__details.splice(index, 1);
+                            const totalGrandQuantitys = temp__details.reduce(
+                              (total, item) =>
+                                total + parseFloat(item.quantity),
+                              0
+                            );
+                            const totalGrandTotalAmounts = temp__details.reduce(
+                              (total, item) => total + item.amount,
+                              0
+                            );
+                            return {
+                              ...prev,
+                              detailsData: [...temp__details],
+                              updateBy: makebyUser,
+                              updateDate: new Date(),
+                              grandTotalReceivedQuantity: totalGrandQuantitys,
+                              grandTotalAmount: totalGrandTotalAmounts,
+                            };
+                          });
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faXmarkCircle}
+                          className="text-danger fs-1"
+                        ></FontAwesomeIcon>
+                      </button>
                     </td>
                   </tr>
                 );

@@ -5,7 +5,7 @@ const grninfoApi= api.injectEndpoints({
     
     getAllGRNInformation: builder.query({
         query: () => "/grninfo",
-        providesTags: ["insertgrninfo","updategrninfo"],
+        providesTags: ["insertgrninfo","updategrninfo,deletegrninfo"],
         refetchOnReconnect: true,
         refetchOnFocus: true,
       }),
@@ -45,7 +45,19 @@ const grninfoApi= api.injectEndpoints({
         status: meta.response.status,
       }),
     }),
+
+    deleteGRNInformation: builder.mutation({
+      query: (id) => ({
+        url: `/grninfo/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["deletegrninfo"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status
+      })
+    }),
   }),
 });
 
-export const {useGetAllGRNInformationQuery,useInsertGRNInformationMutation,useGetSingleGRNInformationQuery,useUpdateGRNInformationMutation}=grninfoApi
+export const {useGetAllGRNInformationQuery,useInsertGRNInformationMutation,useGetSingleGRNInformationQuery,useUpdateGRNInformationMutation,useDeleteGRNInformationMutation}=grninfoApi

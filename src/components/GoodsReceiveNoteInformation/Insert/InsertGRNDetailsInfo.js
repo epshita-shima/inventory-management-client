@@ -1,3 +1,5 @@
+import { faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field } from "formik";
 import React, { useEffect } from "react";
 
@@ -11,6 +13,7 @@ const InsertGRNDetailsInfo = ({
   errors,
   totalGrandAmount,
   totalGrandQuantity,
+  arrayHelpers
 }) => {
   useEffect(() => {
     // Calculate the grand totals when details change
@@ -36,21 +39,19 @@ const InsertGRNDetailsInfo = ({
       <table className="table w-full table-bordered">
         <thead className="w-100">
           <tr>
-            <th className="bg-white text-center  align-items-center  ">Sl</th>
-
+            <th className="bg-white text-center  align-items-center">Sl</th>
             <th
               className="bg-white text-center  align-items-center"
-           
             >
               Item Name
             </th>
             <th className="bg-white text-center  align-items-center ">
               Quantity
             </th>
-
             <th className="bg-white text-center  align-items-center ">
-              Amount
+            Action
             </th>
+
           </tr>
         </thead>
 
@@ -63,7 +64,7 @@ const InsertGRNDetailsInfo = ({
 
                 return (
                   <tr key={index}>
-                    <td className="text-center  align-items-center">
+                    <td className="text-center  align-middle">
                       {index + 1}
                     </td>
                     <td className="text-center  align-items-center">
@@ -81,6 +82,7 @@ const InsertGRNDetailsInfo = ({
                           height: "38px",
                           marginBottom: "5px",
                           textAlign: "center",
+                          background:'#F1F5F9'
                         }}
                         onKeyUp={(e) => {
                           console.log(e.target.value);
@@ -140,37 +142,19 @@ const InsertGRNDetailsInfo = ({
                           </div>
                         )}
                     </td>
-                    <td className="text-center  align-items-center">
-                      <Field
-                        type="text"
-                        name={`detailsData.${index}.totalAmount`}
-                        placeholder="Amount"
-                        value={detail.totalAmount}
-                        disabled
-                        style={{
-                          border: "1px solid #2DDC1B",
-                          padding: "5px",
-                          width: "100%",
-                          borderRadius: "5px",
-                          height: "38px",
-                          marginBottom: "5px",
-                          textAlign: "center",
-                        }}
-                        onChange={(e) => {
-                          console.log(e.target.value);
-                          setFieldValue(
-                            `detailsData.${index}.totalAmount`,
-                            e.target.value
-                          );
-                        }}
-                      />
-                      <br />
-                      {touched.detailsData?.[index]?.totalAmount &&
-                        errors.detailsData?.[index]?.totalAmount && (
-                          <div className="text-danger">
-                            {errors.detailsData[index].totalAmount}
-                          </div>
-                        )}
+                    <td className="text-center  align-middle">
+                    <button
+                                            type="button"
+                                            className=" border-0 rounded  bg-transparent"
+                                            onClick={() => {
+                                              arrayHelpers.remove(index, 1);
+                                            }}
+                                          >
+                                            <FontAwesomeIcon
+                                              icon={faXmarkCircle}
+                                              className="text-danger fs-1"
+                                            ></FontAwesomeIcon>
+                                          </button>
                     </td>
                   </tr>
                 );

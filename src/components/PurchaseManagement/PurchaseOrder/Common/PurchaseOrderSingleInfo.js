@@ -96,7 +96,7 @@ const PurchaseOrderSingleInfo = ({
                   setFieldValue(
                     "poNo",
                     `PO-MEB-${e.sortName}-${formatedDate}-${
-                      serialValue?.serialNo == undefined
+                      serialValue?.serialNo === undefined
                         ? "1"
                         : serialValue?.serialNo
                     }`
@@ -299,19 +299,12 @@ const PurchaseOrderSingleInfo = ({
         <DatePicker
           dateFormat="y-MM-dd"
           className="text-center custom-datepicker"
-          value={id ? purchaseOrderAllInformation?.deliveryDate : startDate}
+          value={id ?new Date(purchaseOrderAllInformation?.deliveryDate).toLocaleDateString("en-CA")  : startDate}
           calendarClassName="custom-calendar"
           selected={startDate}
           required
           onChange={(startDate) => {
-            if (startDate > new Date()) {
-              swal({
-                title: "Select Valid Date",
-                text: "Date should be equal or earlier than today",
-                icon: "warning",
-                button: "OK",
-              });
-            } else {
+         
               if (id) {
                 setPurchaseOrderAllInformation((prevData) => ({
                   ...prevData,
@@ -320,13 +313,13 @@ const PurchaseOrderSingleInfo = ({
                   updateDate: new Date(),
                 }));
               } else {
-                setStartDate(startDate.toLocaleDateString("en-CA"));
+              
                 setFieldValue(
                   "deliveryDate",
                   startDate.toLocaleDateString("en-CA")
                 );
               }
-            }
+            
           }}
         />
       </div>

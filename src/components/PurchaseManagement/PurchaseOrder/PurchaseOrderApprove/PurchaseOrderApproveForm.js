@@ -11,6 +11,7 @@ import {
 import PurchaseOrderStatusListTable from "../Index/PurchaseOrderStatusListTable";
 import ListHeading from "../../../Common/ListHeading/ListHeading";
 import { useGetAllPaymentInformationQuery } from "../../../../redux/features/paymnetinformation/paymentInfoApi";
+import { useGetAllGRNInformationQuery } from "../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
 
 const PurchaseOrderApproveForm = () => {
   const [approveStatus, setApproveStatus] = useState("");
@@ -34,7 +35,7 @@ const PurchaseOrderApproveForm = () => {
   const [toDate, setToDate] = useState(new Date().toLocaleDateString("en-CA"));
   const { data: purchaseInfoData, refetch } =
     useGetAllPurchaseOrderInformationQuery(undefined);
-
+const {data:grnInfoData,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefined)
   const { data: paymentData } = useGetAllPaymentInformationQuery(undefined);
   const [updatePOApproveStatus] =
     useUpdatePurchaseOrderInformationStatusMutation();
@@ -85,6 +86,14 @@ const PurchaseOrderApproveForm = () => {
         );
       });
       setPurchaseFilterApproveAllData(approvePurchaseData);
+      if(approvePurchaseData.length === 0){
+        swal({
+          title: "Sorry!",
+          text: "No Data Available.",
+          icon: "warning",
+          button: "OK",
+        });
+      }
     } else if (approveStatus === "unapprove" && toDate && fromDate) {
       setShowPurchaseOrderUnApproveListData(true);
       setShowPurchaseOrderApproveListData(false);
@@ -98,7 +107,16 @@ const PurchaseOrderApproveForm = () => {
         );
       });
       setPurchaseFilterUnApproveAllData(unApprovePurchaseData);
+      if(unApprovePurchaseData.length === 0){
+        swal({
+          title: "Sorry!",
+          text: "No Data Available.",
+          icon: "warning",
+          button: "OK",
+        });
+      }
     }
+ grnRefetch()
   });
   
   const handleApproveData = async (data) => {
@@ -186,9 +204,9 @@ const PurchaseOrderApproveForm = () => {
               <br />
               <DatePicker
                 dateFormat="y-MM-dd"
-                className="text-center custom-datepicker"
+                className="text-center custom-datepicker3"
                 //   value={id ? purchaseOrderAllInformation?.deliveryDate : fromDate}
-                calendarClassName="custom-calendar"
+                calendarClassName="custom-calendar3"
                 selected={fromDate}
                 required
                 onChange={(fromDate) => {
@@ -210,9 +228,9 @@ const PurchaseOrderApproveForm = () => {
               <br />
               <DatePicker
                 dateFormat="y-MM-dd"
-                className="text-center custom-datepicker"
+                className="text-center custom-datepicker3"
                 //   value={id ? purchaseOrderAllInformation?.deliveryDate : fromDate}
-                calendarClassName="custom-calendar"
+                calendarClassName="custom-calendar3"
                 selected={toDate}
                 required
                 onChange={(toDate) => {

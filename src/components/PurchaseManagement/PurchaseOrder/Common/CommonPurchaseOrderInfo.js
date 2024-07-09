@@ -8,7 +8,6 @@ import {
   useGetSerialNoQuery,
 } from "../../../../redux/api/apiSlice";
 import {
-  useGetAllPurchaseOrderInformationQuery,
   useGetSinglePurchaseOrderInformationQuery,
   useInsertPurchaseOrderInformationMutation,
   useUpdatePurchaseOrderInformationMutation,
@@ -113,7 +112,6 @@ const CommonPurchaseOrderInfo = () => {
     },
   ];
 
-  console.log(purchaseOderInfo);
 
   useEffect(() => {
     if (serialNo && serialNo.length > 0) {
@@ -135,6 +133,7 @@ const CommonPurchaseOrderInfo = () => {
       setPurchaseOrderAllInformation(purchaseOderInfo);
     }
   }, [id, serialNo, purchaseOderInfo]);
+  
   if (isPurchaseLoading) {
     return <p>loading</p>;
   }
@@ -148,7 +147,7 @@ const CommonPurchaseOrderInfo = () => {
         !field.totalAmount
     );
   };
-  console.log(areFieldsEmpty());
+
 
   const handleSubmit = async (e, values, resetForm) => {
     e.preventDefault();
