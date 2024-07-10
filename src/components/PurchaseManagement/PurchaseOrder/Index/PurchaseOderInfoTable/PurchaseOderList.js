@@ -46,9 +46,10 @@ const PurchaseOderList = ({ permission }) => {
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [filterText, setFilterText] = useState("");
   const [deletePurchaseOrderInfo] = useDeletePurchaseOrderInformationMutation();
-  const {data:grnDataInfo,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefined)
+  const { data: grnDataInfo, refetch: grnRefetch } =
+    useGetAllGRNInformationQuery(undefined);
   const reportTitle = "PURCHASE ORDER";
-
+  console.log(grnDataInfo);
   useEffect(() => {
     const matches = purchaseInfoData
       ?.map((ref) => {
@@ -77,8 +78,6 @@ const PurchaseOderList = ({ permission }) => {
     setPurchaseOrderApproveData(approvePurchaseData);
     setPurchaseOrderUnApproveData(unApprovePurchaseData);
   }, [paymentData, purchaseInfoData]);
-
-
 
   const columns = [
     {
@@ -139,10 +138,13 @@ const PurchaseOderList = ({ permission }) => {
     },
     {
       name: "Total Received Quantity",
-      selector: (purchaseInfoData) =>{
-        const totalReceiveQuantity =grnDataInfo
-        ?.filter((x) => x.supplierPoNo === purchaseInfoData?.poNo)
-        .reduce((acc, cur) => acc + parseInt(cur.grandTotalReceivedQuantity, 10), 0);
+      selector: (purchaseInfoData) => {
+        const totalReceiveQuantity = grnDataInfo
+          ?.filter((x) => x.supplierPoNo === purchaseInfoData?.poNo)
+          .reduce(
+            (acc, cur) => acc + parseInt(cur.grandTotalReceivedQuantity, 10),
+            0
+          );
         return totalReceiveQuantity;
       },
       sortable: true,
@@ -152,10 +154,10 @@ const PurchaseOderList = ({ permission }) => {
     },
     {
       name: "Total Received Amount",
-      selector: (purchaseInfoData) =>{
-        const totalReceiveAmount =grnDataInfo
-        ?.filter((x) => x.supplierPoNo === purchaseInfoData?.poNo)
-        .reduce((acc, cur) => acc + parseInt(cur.grandTotalAmount, 10), 0);
+      selector: (purchaseInfoData) => {
+        const totalReceiveAmount = grnDataInfo
+          ?.filter((x) => x.supplierPoNo === purchaseInfoData?.poNo)
+          .reduce((acc, cur) => acc + parseInt(cur.grandTotalAmount, 10), 0);
         return totalReceiveAmount;
       },
       sortable: true,
@@ -163,7 +165,7 @@ const PurchaseOderList = ({ permission }) => {
       filterable: true,
       width: "220px",
     },
-    
+
     {
       name: "PO Status",
       button: true,
@@ -361,8 +363,8 @@ const PurchaseOderList = ({ permission }) => {
             style={{ fontSize: "24px", color: "#2DDC1B", fontWeight: "bold" }}
             icon={faRefresh}
             onClick={() => {
-              refetch()
-              grnRefetch()
+              refetch();
+              grnRefetch();
             }}
           ></FontAwesomeIcon>
           &nbsp;

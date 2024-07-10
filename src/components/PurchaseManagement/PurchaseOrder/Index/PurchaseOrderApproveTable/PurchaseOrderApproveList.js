@@ -26,7 +26,7 @@ const PurchaseOrderApproveList = ({ permission, purchaseFilterApproveAllData }) 
   const { data: paymentData } = useGetAllPaymentInformationQuery(undefined);
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
   const [filterText, setFilterText] = useState("");
-  const {data:grnDataInfo}=useGetAllGRNInformationQuery(undefined)
+  const {data:grnDataInfo,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefined)
 
   const reportTitle = "PURCHASE ORDER";
 

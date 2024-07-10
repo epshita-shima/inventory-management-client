@@ -2,19 +2,25 @@ import { faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field } from "formik";
 import React, { useEffect } from "react";
+import { useGetAllGRNInformationQuery } from "../../../redux/features/goodsreceivenoteinfo/grninfoApi";
 
 const InsertGRNDetailsInfo = ({
   details,
+  values,
   rmItemInfo,
   setTotalGrandQuantity,
   setTotalGrandAmount,
   setFieldValue,
   touched,
   errors,
+  purchaseOrderInfo,
   totalGrandAmount,
   totalGrandQuantity,
-  arrayHelpers
+  arrayHelpers,
 }) => {
+  const { data: grnInfoData } = useGetAllGRNInformationQuery(undefined);
+
+  console.log(purchaseOrderInfo);
   useEffect(() => {
     // Calculate the grand totals when details change
     let calGrandTotalQuantity = 0;
@@ -31,6 +37,7 @@ const InsertGRNDetailsInfo = ({
     setFieldValue("grandTotalQuantity", calGrandTotalQuantity);
     setFieldValue("grandTotalAmount", calTotalAmount);
   }, [details, setFieldValue]);
+
   return (
     <div
       className="shadow-lg p-4"
@@ -40,18 +47,18 @@ const InsertGRNDetailsInfo = ({
         <thead className="w-100">
           <tr>
             <th className="bg-white text-center  align-items-center">Sl</th>
-            <th
-              className="bg-white text-center  align-items-center"
-            >
+            <th className="bg-white text-center  align-items-center">
               Item Name
+            </th>
+            <th className="bg-white text-center  align-items-center">
+              Previous Received Quantity
             </th>
             <th className="bg-white text-center  align-items-center ">
               Quantity
             </th>
             <th className="bg-white text-center  align-items-center ">
-            Action
+              Action
             </th>
-
           </tr>
         </thead>
 
@@ -62,11 +69,29 @@ const InsertGRNDetailsInfo = ({
                   (item) => item._id === detail.itemId
                 );
 
+                const matchPONO = purchaseOrderInfo?.find(
+                  (item) => item.poNo === values.supplierPoNo
+                );
+
+                const itemIdToCalculate = matchingItem._id;
+                const totalQuantity = grnInfoData.reduce((acc, cur) => {
+                  const itemQuantity = cur.detailsData
+                    .filter(
+                      (item) =>
+                        item.itemId === itemIdToCalculate &&
+                        item.pOSingleId === matchPONO._id
+                    )
+                    .reduce(
+                      (itemAcc, itemCur) => itemAcc + itemCur.quantity,
+                      0
+                    );
+                  return acc + itemQuantity;
+                }, 0);
+
+                console.log(totalQuantity);
                 return (
                   <tr key={index}>
-                    <td className="text-center  align-middle">
-                      {index + 1}
-                    </td>
+                    <td className="text-center  align-middle">{index + 1}</td>
                     <td className="text-center  align-items-center">
                       <Field
                         type="text"
@@ -82,7 +107,40 @@ const InsertGRNDetailsInfo = ({
                           height: "38px",
                           marginBottom: "5px",
                           textAlign: "center",
-                          background:'#F1F5F9'
+                          background: "#F1F5F9",
+                        }}
+                        onKeyUp={(e) => {
+                          console.log(e.target.value);
+                          setFieldValue(
+                            `detailsData.${index}.itemId`,
+                            e.target.value
+                          );
+                        }}
+                      />
+                      <br />
+                      {touched.detailsData?.[index]?.itemId &&
+                        errors.detailsData?.[index]?.itemId && (
+                          <div className="text-danger">
+                            {errors.detailsData[index].itemId}
+                          </div>
+                        )}
+                    </td>
+                    <td className="text-center  align-items-center">
+                      <Field
+                        type="text"
+                        name={`detailsData.${index}.itemId`}
+                        disabled
+                        placeholder="Previous received quantity"
+                        value={totalQuantity}
+                        style={{
+                          border: "1px solid #2DDC1B",
+                          padding: "5px",
+                          width: "100%",
+                          borderRadius: "5px",
+                          height: "38px",
+                          marginBottom: "5px",
+                          textAlign: "center",
+                          background: "#F1F5F9",
                         }}
                         onKeyUp={(e) => {
                           console.log(e.target.value);
@@ -143,18 +201,18 @@ const InsertGRNDetailsInfo = ({
                         )}
                     </td>
                     <td className="text-center  align-middle">
-                    <button
-                                            type="button"
-                                            className=" border-0 rounded  bg-transparent"
-                                            onClick={() => {
-                                              arrayHelpers.remove(index, 1);
-                                            }}
-                                          >
-                                            <FontAwesomeIcon
-                                              icon={faXmarkCircle}
-                                              className="text-danger fs-1"
-                                            ></FontAwesomeIcon>
-                                          </button>
+                      <button
+                        type="button"
+                        className=" border-0 rounded  bg-transparent"
+                        onClick={() => {
+                          arrayHelpers.remove(index, 1);
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faXmarkCircle}
+                          className="text-danger fs-1"
+                        ></FontAwesomeIcon>
+                      </button>
                     </td>
                   </tr>
                 );

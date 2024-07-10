@@ -32,6 +32,7 @@ import InsertPurchaseOrder from "../Insert/InsertPurchaseOrder";
 import PurchaseOrderSingleInfo from "./PurchaseOrderSingleInfo";
 import "../Insert/InsertPurchaseOrder.css";
 import UpdatePurchaseOrderInfo from "../Update/UpdatePurchaseOrderInfo";
+import { useGetAllGRNInformationQuery } from "../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
 
 const CommonPurchaseOrderInfo = () => {
   const { id } = useParams();
@@ -58,6 +59,7 @@ const CommonPurchaseOrderInfo = () => {
   const [totalGrandTotalAmount, setTotalGrandTotalAmount] = useState(0);
   const [serialValue, setSerialValue] = useState([]);
   const { data: serialNo } = useGetSerialNoQuery(undefined);
+  const {data:grnInfoData}=useGetAllGRNInformationQuery(undefined);
   const [createSerialNo] = useCreateSerialNoMutation();
   const [insertPurchaseOrderInfo] = useInsertPurchaseOrderInformationMutation();
   const [updatePurchaseOrderInfo] = useUpdatePurchaseOrderInformationMutation();

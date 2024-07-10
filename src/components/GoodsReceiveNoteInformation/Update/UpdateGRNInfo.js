@@ -88,7 +88,8 @@ const UpdateGRNInfo = ({
                 const matchingItem = rmItemInfo?.find(
                   (item) => item._id === detail.itemId
                 );
-
+               
+    
                 return (
                   <tr key={index}>
                     <td className="text-center  align-middle">{index + 1}</td>
@@ -98,7 +99,7 @@ const UpdateGRNInfo = ({
                         name={`detailsData.${index}.itemId`}
                         disabled
                         placeholder="Item Name"
-                        value={matchingItem.itemName}
+                        value={matchingItem?.itemName}
                         style={{
                           border: "1px solid #2DDC1B",
                           padding: "5px",
@@ -111,6 +112,7 @@ const UpdateGRNInfo = ({
                         }}
                       />
                     </td>
+                   
                     <td className="text-center  align-items-center">
                       <Field
                         type="text"

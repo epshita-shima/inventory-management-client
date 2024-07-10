@@ -21,8 +21,6 @@ const UpdatePurchaseOrderInfo = ({
   totalGrandTotalAmount,
   makebyUser,
 }) => {
-  console.log(purchaseOrderAllInformation);
-  console.log('totalGrandQuantity',totalGrandQuantity,"totalGrandTotalAmount",totalGrandTotalAmount)
   const handleKeyUp=(e,index,detail)=>{
     const inputValue = e.target.value;
                             const parsedValue = parseInt(inputValue, 10); 

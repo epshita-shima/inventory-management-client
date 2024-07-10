@@ -21,14 +21,16 @@ import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterCompo
 import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
 import styles from "./GRNInfoList.css";
+import { useGetAllPurchaseOrderInformationQuery } from "../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
 
 const GRNInfoList = ({ permission }) => {
   const [filterText, setFilterText] = useState("");
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
-  const { data: grnAllInformation, refetch } =
+  const { data: grnAllInformation,isLoading:isGRNLoading, refetch } =
     useGetAllGRNInformationQuery(undefined);
   const { data: supplierInfo } = useGetAllSupplierInformationQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
+  const {data:purchaseInfoData}=useGetAllPurchaseOrderInformationQuery(undefined)
   const [deleteGRNInfo] = useDeleteGRNInformationMutation();
   const [selectSupplierPoNo, setSelectSupplierPoNo] = useState('');
   const [isTableDispaly, setIsTableDisplay] = useState(false);
@@ -40,26 +42,29 @@ const GRNInfoList = ({ permission }) => {
   const [filteredData, setFilteredData] = useState([]);
   const [isFetchAfterDeleteData,setIsFetchAfterDeleteData]=useState(false)
   const reportTitle = "Goods Receive Note";
- console.log(grnAllInformation)
+
   useEffect(() => {
-    if(isFetchAfterDeleteData){
-      handleFilter()
-    }
-    
     const createPODropdown = (options) => {
       let result = [];
       options?.forEach((option) => {
         result.push({
-          value: option.supplierPoNo,
-          label: option.supplierPoNo,
+          value: option.poNo,
+          label: option.poNo,
         });
       });
       return result;
     };
-    const poOptions = createPODropdown(grnAllInformation);
+    const poOptions = createPODropdown(purchaseInfoData);
     setPOOptionsData(poOptions);
+
+  }, [purchaseInfoData]);
+
+  useEffect(()=>{
+    if(isFetchAfterDeleteData){
+      handleFilter()
+    }
     setIsFetchAfterDeleteData(false)
-  }, [grnAllInformation]);
+  },[isFetchAfterDeleteData])
 
   const columns = [
     {
@@ -198,6 +203,7 @@ const GRNInfoList = ({ permission }) => {
                         icon: "success",
                       });
                       refetch();
+                      
                       setIsFetchAfterDeleteData(true)
                     } else {
                       swal(
@@ -318,46 +324,50 @@ const GRNInfoList = ({ permission }) => {
   }, [filterText, resetPaginationToggle, companyinfo, reportTitle]);
 
   const handleFilter = async () => {
-    let filtered = grnAllInformation
-    if (fromDate && toDate && selectSupplierPoNo !=='') {
-      // Filter by date range and supplier PO number
-      filtered = grnAllInformation.filter(item => {
-        const itemDate = new Date(item.receiveDate);
-        const isDateInRange =
-          itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
-        const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
-        return isDateInRange && isPonumberMatch;
-      });
-      setFilteredData(filtered);
-    } else if (fromDate && toDate) {
-      // Filter only by date range
-      filtered = grnAllInformation?.filter(item => {
-        const itemDate = new Date(item.receiveDate);
-        return (
-          itemDate >= new Date(fromDate) && itemDate <= new Date(toDate)
-        );
-      });
-      setFilteredData(filtered);
-    } else if (selectSupplierPoNo) {
-      // Filter only by supplier PO number
-      filtered = grnAllInformation.filter(item => item.supplierPoNo === selectSupplierPoNo);
-    }
+if(isGRNLoading) {
+  console.log('loading')
+}
+else{
+  let filtered = grnAllInformation
+  if (fromDate && toDate && selectSupplierPoNo !=='') {
+    // Filter by date range and supplier PO number
+    filtered = await grnAllInformation.filter(item => {
+      const itemDate = new Date(item.receiveDate);
+      const isDateInRange =
+        itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
+      const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
+      return isDateInRange && isPonumberMatch;
+    });
+    setFilteredData(filtered);
+  } else if (fromDate && toDate) {
+    filtered =await grnAllInformation?.filter(item => {
+      const itemDate = new Date(item.receiveDate);
+      return (
+        itemDate >= new Date(fromDate) && itemDate <= new Date(toDate)
+      );
+    });
+    setFilteredData(filtered);
+  } else if (selectSupplierPoNo) {
+    filtered = await grnAllInformation.filter(item => item.supplierPoNo === selectSupplierPoNo);
+  }
 
-    // setFilteredData(filtered);
-    if(filtered?.length !==0)
-    {
-      setIsTableDisplay(true)
-    }
-    else{
-      setIsTableDisplay(false)
-      swal({
-        title: "Sorry!",
-        text: "No Data Available.",
-        icon: "warning",
-        button: "OK",
-      });
-    }
-
+  // setFilteredData(filtered);
+  if(filtered?.length !==0)
+  {
+    setIsTableDisplay(true)
+  }
+  else{
+    setIsTableDisplay(false)
+    swal({
+      title: "Sorry!",
+      text: "No Data Available.",
+      icon: "warning",
+      button: "OK",
+    });
+  }
+  // setFilteredData(filtered);
+}
+ 
   };
 
   return (
