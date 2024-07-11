@@ -199,7 +199,7 @@ const ListHeading = ({
               data-toggle="modal"
               data-target="#exampleModalCenter"
               onClick={() => {
-                const searchItem = mainData?.filter((x) => x.url == pathname);
+                const searchItem = mainData?.filter((x) => x.url === pathname);
                 if (
                   searchItem[0]?.menuId !== MenuIdCollection.purchaseorderlist
                 ) {

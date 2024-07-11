@@ -35,7 +35,8 @@ const PurchaseOrderApproveForm = () => {
   const [toDate, setToDate] = useState(new Date().toLocaleDateString("en-CA"));
   const { data: purchaseInfoData, refetch } =
     useGetAllPurchaseOrderInformationQuery(undefined);
-const {data:grnInfoData,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefined)
+  const { data: grnInfoData, refetch: grnRefetch } =
+    useGetAllGRNInformationQuery(undefined);
   const { data: paymentData } = useGetAllPaymentInformationQuery(undefined);
   const [updatePOApproveStatus] =
     useUpdatePurchaseOrderInformationStatusMutation();
@@ -73,7 +74,7 @@ const {data:grnInfoData,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefin
     // setPurchaseOrderApproveWithToDate(approvePurchaseDataWithToDate);
   }, [purchaseInfoData, paymentData]);
 
-  const handleStatus =(async () => {
+  const handleStatus = async () => {
     if (approveStatus === "approve" && toDate && fromDate) {
       setShowPurchaseOrderApproveListData(true);
       setShowPurchaseOrderUnApproveListData(false);
@@ -86,7 +87,7 @@ const {data:grnInfoData,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefin
         );
       });
       setPurchaseFilterApproveAllData(approvePurchaseData);
-      if(approvePurchaseData.length === 0){
+      if (approvePurchaseData.length === 0) {
         swal({
           title: "Sorry!",
           text: "No Data Available.",
@@ -107,7 +108,7 @@ const {data:grnInfoData,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefin
         );
       });
       setPurchaseFilterUnApproveAllData(unApprovePurchaseData);
-      if(unApprovePurchaseData.length === 0){
+      if (unApprovePurchaseData.length === 0) {
         swal({
           title: "Sorry!",
           text: "No Data Available.",
@@ -116,15 +117,15 @@ const {data:grnInfoData,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefin
         });
       }
     }
- grnRefetch()
-  });
-  
+    grnRefetch();
+  };
+
   const handleApproveData = async (data) => {
     const response = await updatePOApproveStatus(data);
     if (response?.data?.status === 200) {
       swal("Done", "Data Save Successfully", "success");
       await refetch();
-      handleStatus()
+      handleStatus();
     } else if (response?.error?.status === 400) {
       swal("Not Possible!", response?.error?.data?.message, "error");
     }
@@ -218,7 +219,7 @@ const {data:grnInfoData,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefin
                       button: "OK",
                     });
                   } else {
-                    setFromDate(fromDate.toLocaleDateString("en-CA"));
+                    setFromDate(fromDate?.toLocaleDateString("en-CA"));
                   }
                 }}
               />
@@ -248,7 +249,7 @@ const {data:grnInfoData,refetch:grnRefetch}=useGetAllGRNInformationQuery(undefin
                       button: "OK",
                     });
                   } else {
-                    setToDate(toDate.toLocaleDateString("en-CA"));
+                    setToDate(toDate?.toLocaleDateString("en-CA"));
                   }
                 }}
               />

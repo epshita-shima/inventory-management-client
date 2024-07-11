@@ -20,15 +20,6 @@ const downloadPOPDF = async (
   );
   console.log(matchesPaymentType);
 
-  // const categorizedData = matches?.reduce((acc, curr) => {
-  //   if (!acc[curr.paymentType]) {
-  //     acc[curr.paymentType] = [];
-  //   }
-  //   acc[curr.paymentType].push(curr);
-  //   return acc;
-  // })
-  // console.log(categorizedData)
-  // Method 2: Using split and trim (if the format is consistent)
   const phoneNumber = companyContact.split(",")[0].split(": ")[1].trim();
   const contactEmail = companyEmail.split(",")[0].split(": ")[1].trim();
 const factoryConvertAddress=factoryAddress.replace('Factory Address:','');
