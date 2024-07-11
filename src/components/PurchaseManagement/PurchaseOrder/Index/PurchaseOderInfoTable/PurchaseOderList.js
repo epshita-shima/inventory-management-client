@@ -49,7 +49,7 @@ const PurchaseOderList = ({ permission }) => {
   const { data: grnDataInfo, refetch: grnRefetch } =
     useGetAllGRNInformationQuery(undefined);
   const reportTitle = "PURCHASE ORDER";
-  console.log(grnDataInfo);
+
   useEffect(() => {
     const matches = purchaseInfoData
       ?.map((ref) => {
@@ -281,33 +281,48 @@ const PurchaseOderList = ({ permission }) => {
                 marginLeft: "10px",
               }}
               onClick={() => {
-                swal({
-                  title: "Are you sure to delete this item?",
-                  text: "If once deleted, this item will not recovery.",
-                  icon: "warning",
-                  buttons: true,
-                  dangerMode: true,
-                }).then(async (willDelete) => {
-                  if (willDelete) {
-                    const response = await deletePurchaseOrderInfo(
-                      purchaseInfoData?._id
-                    ).unwrap();
-                    console.log(response);
-                    if (response.status === 200) {
-                      swal("Deleted!", "Your selected item has been deleted!", {
-                        icon: "success",
-                      });
+                const matchData = grnDataInfo.find(
+                  (item) => item.pOSingleId == purchaseInfoData._id
+                );
+                if(matchData && matchData.length !==0) {
+                  swal(
+                    "Can not Delete!",
+                    "Because already received the goods.",
+                    "error"
+                  );
+                } else {
+                  swal({
+                    title: "Are you sure to delete this item?",
+                    text: "If once deleted, this item will not recovery.",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                  }).then(async (willDelete) => {
+                    if (willDelete) {
+                      const response = await deletePurchaseOrderInfo(
+                        purchaseInfoData?._id
+                      ).unwrap();
+                      console.log(response);
+                      if (response.status === 200) {
+                        swal(
+                          "Deleted!",
+                          "Your selected item has been deleted!",
+                          {
+                            icon: "success",
+                          }
+                        );
+                      } else {
+                        swal(
+                          "Error",
+                          "An error occurred while creating the data",
+                          "error"
+                        );
+                      }
                     } else {
-                      swal(
-                        "Error",
-                        "An error occurred while creating the data",
-                        "error"
-                      );
+                      swal(" Cancel! Your selected item is safe!");
                     }
-                  } else {
-                    swal(" Cancel! Your selected item is safe!");
-                  }
-                });
+                  });
+                }
               }}
             >
               <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>

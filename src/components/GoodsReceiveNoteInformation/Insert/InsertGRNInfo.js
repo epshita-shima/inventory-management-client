@@ -50,7 +50,7 @@ const InsertGRNInfo = () => {
   const [updateGRNInfo] = useUpdateGRNInformationMutation();
   const { id } = useParams();
   const { data: singleGRNInfo } = useGetSingleGRNInformationQuery(id);
-  const { data: serialNo } = useGetSerialNoQuery(undefined);
+  const { data: serialNo ,refetch: serialRefresh} = useGetSerialNoQuery(undefined);
   const [createSerialNo] = useCreateSerialNoMutation();
   const { data: grnInfoData } = useGetAllGRNInformationQuery(undefined);
 
@@ -73,7 +73,6 @@ const InsertGRNInfo = () => {
     makeDate: new Date(),
     updateDate: null,
   };
-  // const supplierOptions = supplierDropdown(supplierInfo);
 
   useEffect(() => {
     const combinedData = purchaseOrderInfo?.map((po) => {
@@ -195,7 +194,7 @@ const InsertGRNInfo = () => {
         amount: item.totalAmount,
       });
     });
-    console.log(modelData);
+ 
     if (id) {
       try {
         const response = await updateGRNInfo(grnSingleData);
@@ -224,10 +223,10 @@ const InsertGRNInfo = () => {
           updateby: "",
         };
         const response = await insertGRNINfo(modelData);
-        console.log(response);
         if (response.data.status === 200) {
           swal("Done", "Data Save Successfully", "success");
           await createSerialNo(serialData);
+          serialRefresh()
           resetForm();
         } else {
           swal(

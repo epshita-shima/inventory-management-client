@@ -105,9 +105,12 @@ const PurchaseOrderSingleInfo = ({
               }}
             ></Select>
 
-            {id? "" :touched.supplierId && errors.supplierId && (
-              <div className="text-danger">{errors.supplierId}</div>
-            )}
+            {id
+              ? ""
+              : touched.supplierId &&
+                errors.supplierId && (
+                  <div className="text-danger">{errors.supplierId}</div>
+                )}
           </div>
           <div className="ms-2 mt-2">
             <FontAwesomeIcon
@@ -187,9 +190,12 @@ const PurchaseOrderSingleInfo = ({
               }}
             ></Select>
 
-            {id? "" : touched.supplierId && errors.supplierId && (
-              <div className="text-danger">{errors.supplierId}</div>
-            )}
+            {id
+              ? ""
+              : touched.supplierId &&
+                errors.supplierId && (
+                  <div className="text-danger">{errors.supplierId}</div>
+                )}
           </div>
           <div className="ms-2 mt-2">
             <FontAwesomeIcon
@@ -269,9 +275,12 @@ const PurchaseOrderSingleInfo = ({
               }}
             ></Select>
 
-            {id? "" :touched.bankId && errors.bankId && (
-              <div className="text-danger">{errors.bankId}</div>
-            )}
+            {id
+              ? ""
+              : touched.bankId &&
+                errors.bankId && (
+                  <div className="text-danger">{errors.bankId}</div>
+                )}
           </div>
           <div className="ms-2 mt-2">
             <FontAwesomeIcon
@@ -299,27 +308,31 @@ const PurchaseOrderSingleInfo = ({
         <DatePicker
           dateFormat="y-MM-dd"
           className="text-center custom-datepicker"
-          value={id ?new Date(purchaseOrderAllInformation?.deliveryDate).toLocaleDateString("en-CA")  : startDate}
+          value={
+            id
+              ? new Date(
+                  purchaseOrderAllInformation?.deliveryDate
+                ).toLocaleDateString("en-CA")
+              : startDate
+          }
           calendarClassName="custom-calendar"
           selected={startDate}
           required
           onChange={(startDate) => {
-         
-              if (id) {
-                setPurchaseOrderAllInformation((prevData) => ({
-                  ...prevData,
-                  deliveryDate: startDate.toLocaleDateString("en-CA"),
-                  updateBy: makebyUser,
-                  updateDate: new Date(),
-                }));
-              } else {
-              
-                setFieldValue(
-                  "deliveryDate",
-                  startDate.toLocaleDateString("en-CA")
-                );
-              }
-            
+            if (id) {
+              setPurchaseOrderAllInformation((prevData) => ({
+                ...prevData,
+                deliveryDate: startDate.toLocaleDateString("en-CA"),
+                updateBy: makebyUser,
+                updateDate: new Date(),
+              }));
+            } else {
+              setStartDate(startDate.toLocaleDateString("en-CA"));
+              setFieldValue(
+                "deliveryDate",
+                startDate.toLocaleDateString("en-CA")
+              );
+            }
           }}
         />
       </div>
@@ -383,9 +396,12 @@ const PurchaseOrderSingleInfo = ({
           ></Select>
         </div>
         <br />
-        {id? "" : touched.currencyId && errors.currencyId && (
-          <div className="text-danger">{errors.currencyId}</div>
-        )}
+        {id
+          ? ""
+          : touched.currencyId &&
+            errors.currencyId && (
+              <div className="text-danger">{errors.currencyId}</div>
+            )}
       </div>
       <div class="col-6 col-lg-4">
         <label htmlFor="remarks">Remarks</label>
@@ -413,9 +429,12 @@ const PurchaseOrderSingleInfo = ({
               : setFieldValue(`remarks`, e.target.value);
           }}
         />
-        {id? "" :touched.remarks && errors.remarks && (
-          <div className="text-danger">{errors.remarks}</div>
-        )}
+        {id
+          ? ""
+          : touched.remarks &&
+            errors.remarks && (
+              <div className="text-danger">{errors.remarks}</div>
+            )}
       </div>
     </div>
   );

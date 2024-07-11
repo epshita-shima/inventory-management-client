@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import PurchaseOrderApproveList from "./PurchaseOrderApproveTable/PurchaseOrderApproveList";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useGetAllUserQuery } from "../../../../redux/features/user/userApi";
 import { useNavigate } from "react-router-dom";
 import PurchaseOrderUnapproveList from "./PurchaseOrderUnapproveTable/PurchaseOrderUnapproveList";

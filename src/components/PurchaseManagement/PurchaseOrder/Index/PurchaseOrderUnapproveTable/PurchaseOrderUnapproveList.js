@@ -13,8 +13,7 @@ import { useGetAllSupplierInformationQuery } from "../../../../../redux/features
 import { useGetAllPaymentInformationQuery } from "../../../../../redux/features/paymnetinformation/paymentInfoApi";
 import swal from "sweetalert";
 import {
-  useDeletePurchaseOrderInformationMutation,
-  useUpdatePurchaseOrderInformationStatusMutation,
+  useDeletePurchaseOrderInformationMutation
 } from "../../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
 import { downloadPOPDF } from "../../../../ReportProperties/handlePurchaseOrderReport";
 import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
@@ -43,17 +42,6 @@ const PurchaseOrderUnapproveList = ({
   const [filterText, setFilterText] = useState("");
   const reportTitle = "PURCHASE ORDER";
   const {data:grnDataInfo}=useGetAllGRNInformationQuery(undefined)
-  // useEffect(()=>{
-  //   const unApprovePurchaseData = purchaseInfoData?.filter((item) => {
-  //     const makeDate = new Date(item.makeDate).toLocaleDateString("en-CA");
-  //     return (
-  //       item.approveStatus === false &&
-  //       makeDate >= fromDate &&
-  //       makeDate <= toDate
-  //     );
-  //   })
-  //   setPurchaseFilterUnApproveAllData(unApprovePurchaseData)
-  // },[purchaseInfoData,fromDate,toDate])
 
   const columns = [
     {

@@ -59,7 +59,7 @@ const CommonPurchaseOrderInfo = () => {
   const [totalGrandTotalAmount, setTotalGrandTotalAmount] = useState(0);
   const [serialValue, setSerialValue] = useState([]);
   const { data: serialNo } = useGetSerialNoQuery(undefined);
-  const {data:grnInfoData}=useGetAllGRNInformationQuery(undefined);
+
   const [createSerialNo] = useCreateSerialNoMutation();
   const [insertPurchaseOrderInfo] = useInsertPurchaseOrderInformationMutation();
   const [updatePurchaseOrderInfo] = useUpdatePurchaseOrderInformationMutation();
