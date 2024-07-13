@@ -23,6 +23,8 @@ import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/c
 import styles from "./GRNInfoList.css";
 import { useGetAllPurchaseOrderInformationQuery } from "../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
 import { downloadGRNPDF } from "../../../ReportProperties/handleGRNReport";
+import { useGetAllRMItemInformationQuery } from "../../../../redux/features/iteminformation/rmItemInfoApi";
+import { useGetAllItemInformationQuery } from "../../../../redux/features/iteminformation/iteminfoApi";
 
 const GRNInfoList = ({ permission }) => {
   const [filterText, setFilterText] = useState("");
@@ -34,8 +36,10 @@ const GRNInfoList = ({ permission }) => {
   } = useGetAllGRNInformationQuery(undefined);
   const { data: supplierInfo } = useGetAllSupplierInformationQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
+  const {data:rawItemInfo}=useGetAllRMItemInformationQuery(undefined)
   const { data: purchaseInfoData } =
     useGetAllPurchaseOrderInformationQuery(undefined);
+
   const [deleteGRNInfo] = useDeleteGRNInformationMutation();
   const [selectSupplierPoNo, setSelectSupplierPoNo] = useState("");
   const [isTableDispaly, setIsTableDisplay] = useState(false);
@@ -63,263 +67,6 @@ const GRNInfoList = ({ permission }) => {
     setPOOptionsData(poOptions);
   }, [purchaseInfoData]);
 
-  const temp_data=[
-    {
-      "receivedDate": "2023-01-01",
-      "supplierName": "Supplier A",
-      "pONo": "PO12345",
-      "itemName": "Item 1",
-      "GRNNo": "GRN123",
-      "ChallanNo": "CH123",
-      "receivedQty": 10,
-      "Rate": 50,
-      "Amount": 500
-    },
-    {
-      "receivedDate": "2023-01-02",
-      "supplierName": "Supplier B",
-      "pONo": "PO12346",
-      "itemName": "Item 2",
-      "GRNNo": "GRN124",
-      "ChallanNo": "CH124",
-      "receivedQty": 20,
-      "Rate": 60,
-      "Amount": 1200
-    },
-    {
-      "receivedDate": "2023-01-03",
-      "supplierName": "Supplier C",
-      "pONo": "PO12347",
-      "itemName": "Item 3",
-      "GRNNo": "GRN125",
-      "ChallanNo": "CH125",
-      "receivedQty": 30,
-      "Rate": 70,
-      "Amount": 2100
-    },
-    {
-      "receivedDate": "2023-01-04",
-      "supplierName": "Supplier D",
-      "pONo": "PO12348",
-      "itemName": "Item 4",
-      "GRNNo": "GRN126",
-      "ChallanNo": "CH126",
-      "receivedQty": 40,
-      "Rate": 80,
-      "Amount": 3200
-    },
-    {
-      "receivedDate": "2023-01-05",
-      "supplierName": "Supplier E",
-      "pONo": "PO12349",
-      "itemName": "Item 5",
-      "GRNNo": "GRN127",
-      "ChallanNo": "CH127",
-      "receivedQty": 50,
-      "Rate": 90,
-      "Amount": 4500
-    },
-    {
-      "receivedDate": "2023-01-06",
-      "supplierName": "Supplier F",
-      "pONo": "PO12350",
-      "itemName": "Item 6",
-      "GRNNo": "GRN128",
-      "ChallanNo": "CH128",
-      "receivedQty": 60,
-      "Rate": 100,
-      "Amount": 6000
-    },
-    {
-      "receivedDate": "2023-01-07",
-      "supplierName": "Supplier G",
-      "pONo": "PO12351",
-      "itemName": "Item 7",
-      "GRNNo": "GRN129",
-      "ChallanNo": "CH129",
-      "receivedQty": 70,
-      "Rate": 110,
-      "Amount": 7700
-    },
-    {
-      "receivedDate": "2023-01-08",
-      "supplierName": "Supplier H",
-      "pONo": "PO12352",
-      "itemName": "Item 8",
-      "GRNNo": "GRN130",
-      "ChallanNo": "CH130",
-      "receivedQty": 80,
-      "Rate": 120,
-      "Amount": 9600
-    },
-    {
-      "receivedDate": "2023-01-09",
-      "supplierName": "Supplier I",
-      "pONo": "PO12353",
-      "itemName": "Item 9",
-      "GRNNo": "GRN131",
-      "ChallanNo": "CH131",
-      "receivedQty": 90,
-      "Rate": 130,
-      "Amount": 11700
-    },
-    {
-      "receivedDate": "2023-01-10",
-      "supplierName": "Supplier J",
-      "pONo": "PO12354",
-      "itemName": "Item 10",
-      "GRNNo": "GRN132",
-      "ChallanNo": "CH132",
-      "receivedQty": 100,
-      "Rate": 140,
-      "Amount": 14000
-    },
-    {
-      "receivedDate": "2023-01-11",
-      "supplierName": "Supplier K",
-      "pONo": "PO12355",
-      "itemName": "Item 11",
-      "GRNNo": "GRN133",
-      "ChallanNo": "CH133",
-      "receivedQty": 110,
-      "Rate": 150,
-      "Amount": 16500
-    },
-    {
-      "receivedDate": "2023-01-12",
-      "supplierName": "Supplier L",
-      "pONo": "PO12356",
-      "itemName": "Item 12",
-      "GRNNo": "GRN134",
-      "ChallanNo": "CH134",
-      "receivedQty": 120,
-      "Rate": 160,
-      "Amount": 19200
-    },
-    {
-      "receivedDate": "2023-01-13",
-      "supplierName": "Supplier M",
-      "pONo": "PO12357",
-      "itemName": "Item 13",
-      "GRNNo": "GRN135",
-      "ChallanNo": "CH135",
-      "receivedQty": 130,
-      "Rate": 170,
-      "Amount": 22100
-    },
-    {
-      "receivedDate": "2023-01-14",
-      "supplierName": "Supplier N",
-      "pONo": "PO12358",
-      "itemName": "Item 14",
-      "GRNNo": "GRN136",
-      "ChallanNo": "CH136",
-      "receivedQty": 140,
-      "Rate": 180,
-      "Amount": 25200
-    },
-    {
-      "receivedDate": "2023-01-15",
-      "supplierName": "Supplier O",
-      "pONo": "PO12359",
-      "itemName": "Item 15",
-      "GRNNo": "GRN137",
-      "ChallanNo": "CH137",
-      "receivedQty": 150,
-      "Rate": 190,
-      "Amount": 28500
-    },
-    {
-      "receivedDate": "2023-01-16",
-      "supplierName": "Supplier P",
-      "pONo": "PO12360",
-      "itemName": "Item 16",
-      "GRNNo": "GRN138",
-      "ChallanNo": "CH138",
-      "receivedQty": 160,
-      "Rate": 200,
-      "Amount": 32000
-    },
-    {
-      "receivedDate": "2023-01-17",
-      "supplierName": "Supplier Q",
-      "pONo": "PO12361",
-      "itemName": "Item 17",
-      "GRNNo": "GRN139",
-      "ChallanNo": "CH139",
-      "receivedQty": 170,
-      "Rate": 210,
-      "Amount": 35700
-    },
-    {
-      "receivedDate": "2023-01-18",
-      "supplierName": "Supplier R",
-      "pONo": "PO12362",
-      "itemName": "Item 18",
-      "GRNNo": "GRN140",
-      "ChallanNo": "CH140",
-      "receivedQty": 180,
-      "Rate": 220,
-      "Amount": 39600
-    },
-    {
-      "receivedDate": "2023-01-19",
-      "supplierName": "Supplier S",
-      "pONo": "PO12363",
-      "itemName": "Item 19",
-      "GRNNo": "GRN141",
-      "ChallanNo": "CH141",
-      "receivedQty": 190,
-      "Rate": 230,
-      "Amount": 43700
-    },
-    {
-      "receivedDate": "2023-01-20",
-      "supplierName": "Supplier T",
-      "pONo": "PO12364",
-      "itemName": "Item 20",
-      "GRNNo": "GRN142",
-      "ChallanNo": "CH142",
-      "receivedQty": 200,
-      "Rate": 240,
-      "Amount": 48000
-    },
-    {
-      "receivedDate": "2023-01-21",
-      "supplierName": "Supplier U",
-      "pONo": "PO12365",
-      "itemName": "Item 21",
-      "GRNNo": "GRN143",
-      "ChallanNo": "CH143",
-      "receivedQty": 210,
-      "Rate": 250,
-      "Amount": 52500
-    },
-    {
-      "receivedDate": "2023-01-22",
-      "supplierName": "Supplier V",
-      "pONo": "PO12366",
-      "itemName": "Item 22",
-      "GRNNo": "GRN144",
-      "ChallanNo": "CH144",
-      "receivedQty": 220,
-      "Rate": 260,
-      "Amount": 57200
-    },
-    {
-      "receivedDate": "2023-01-23",
-      "supplierName": "Supplier W",
-      "pONo": "PO12367",
-      "itemName": "Item 23",
-      "GRNNo": "GRN145",
-      "ChallanNo": "CH145",
-      "receivedQty": 230,
-      "Rate": 270,
-      "Amount": 62100
-    },
-   
-  ]
-  
   useEffect(() => {
     if (isFetchAfterDeleteData) {
       // setFilteredData(grnAllInformation);
@@ -328,8 +75,45 @@ const GRNInfoList = ({ permission }) => {
     }
   }, [isFetchAfterDeleteData, grnAllInformation]);
 
-  console.log(filteredData);
+  const handleFilter = async () => {
+    if (isGRNLoading) {
+      console.log("loading");
+    } else {
+      let filtered = grnAllInformation;
+      if (fromDate && toDate && selectSupplierPoNo !== "") {
+        filtered = await grnAllInformation.filter((item) => {
+          const itemDate = new Date(item.receiveDate);
+          const isDateInRange =
+            itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
+          const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
+          return isDateInRange && isPonumberMatch;
+        });
+      } else if (fromDate && toDate) {
+        filtered = await grnAllInformation?.filter((item) => {
+          const itemDate = new Date(item.receiveDate);
+          return itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
+        });
+      } else if (selectSupplierPoNo) {
+        filtered = await grnAllInformation.filter(
+          (item) => item.supplierPoNo === selectSupplierPoNo
+        );
+      }
 
+      setFilteredData(filtered);
+      if (filtered?.length !== 0) {
+        setIsTableDisplay(true);
+      } else {
+        setIsTableDisplay(false);
+        swal({
+          title: "Sorry!",
+          text: "No Data Available.",
+          icon: "warning",
+          button: "OK",
+        });
+      }
+      refetch();
+    }
+  };
   const columns = [
     {
       name: "Sl.",
@@ -559,7 +343,7 @@ const GRNInfoList = ({ permission }) => {
                     onClick={() => {
                       console.log(filteredData,companyinfo)
                       if (companyinfo?.length !== 0 || undefined) {
-                        downloadGRNPDF(temp_data,supplierInfo,{ companyinfo }, reportTitle);
+                        downloadGRNPDF(filteredData,supplierInfo,rawItemInfo,{ companyinfo }, reportTitle);
                       }
                     }}
                   >
@@ -595,49 +379,32 @@ const GRNInfoList = ({ permission }) => {
         </div>
       </div>
     );
-  }, [filterText, resetPaginationToggle, companyinfo, reportTitle]);
+  }, [filterText,filteredData,supplierInfo,rawItemInfo, resetPaginationToggle, companyinfo, reportTitle]);
 
-  const handleFilter = async () => {
-    if (isGRNLoading) {
-      console.log("loading");
-    } else {
-      let filtered = grnAllInformation;
-      if (fromDate && toDate && selectSupplierPoNo !== "") {
-        filtered = await grnAllInformation.filter((item) => {
-          const itemDate = new Date(item.receiveDate);
-          const isDateInRange =
-            itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
-          const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
-          return isDateInRange && isPonumberMatch;
-        });
-      } else if (fromDate && toDate) {
-        filtered = await grnAllInformation?.filter((item) => {
-          const itemDate = new Date(item.receiveDate);
-          return itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
-        });
-      } else if (selectSupplierPoNo) {
-        filtered = await grnAllInformation.filter(
-          (item) => item.supplierPoNo === selectSupplierPoNo
-        );
-      }
-
-      setFilteredData(filtered);
-      if (filtered?.length !== 0) {
-        setIsTableDisplay(true);
-      } else {
-        setIsTableDisplay(false);
-        swal({
-          title: "Sorry!",
-          text: "No Data Available.",
-          icon: "warning",
-          button: "OK",
-        });
-      }
-      // setFilteredData(filtered);
-      refetch();
-    }
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    return date.toLocaleDateString("en-US", options);
   };
-
+  const totalQuantitys = filteredData.reduce((accumulator, currentValue) => {
+    const quantity = parseFloat(currentValue.grandTotalQuantity);
+    return accumulator + (isNaN(quantity) ? 0 : quantity);
+  }, 0);
+  const totalAmounts = filteredData.reduce((accumulator, currentValue) => {
+    const amount = parseFloat(currentValue.grandTotalAmount);
+    return accumulator + (isNaN(amount) ? 0 : amount);
+  }, 0);
+  const groupData = (filteredData) => {
+    return filteredData.reduce((acc, row) => {
+      const key = `${row.makeDate}`;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(row);
+      return acc;
+    }, {});
+  };
+  
   return (
     <div className="row px-5 mx-4 ">
       <div
@@ -807,6 +574,61 @@ const GRNInfoList = ({ permission }) => {
           </div>
         ) : null}
       </div>
+  
+      <table id="my-grn-table" className="d-none">
+        <thead>
+          <tr>
+            <th>Sl.</th>
+            <th>Opening Date</th>
+            <th>RM Item Name</th>
+            <th>Category Name</th>
+            <th>Unit Info</th>
+            <th>Opening Stock</th>
+            <th>Status</th>
+
+          </tr>
+        </thead>
+        <tbody>
+  {filteredData?.map((item, index) => {
+    const formattedDate = formatDate(item.makeDate);
+    const itemNames = rawItemInfo
+      ?.filter(items =>
+        item?.detailsData?.some(detail => detail?.itemId === items?._id)
+      )
+      .map(filteredItem => filteredItem?.itemName)
+      .join(",");
+    const supplierName=  supplierInfo
+        ?.filter((rawItem) => rawItem._id === item.supplierId)
+        .map((filteredItem) => filteredItem.supplierName)
+        .join(", ")
+
+       
+    return (
+      <tr key={index}>
+        <td>{formattedDate}</td>
+        <td>{supplierName}</td>
+        <td>{item.supplierPoNo}</td>
+        <td>{itemNames}</td>
+        <td>{item.grnSerialNo}</td>
+        <td>{item.challanNo}</td>
+        <td>{item.grandTotalReceivedQuantity.toLocaleString()}</td>
+        <td>{item.detailsData.map((item) => item.unitPrice).join(", ")}</td>
+        <td>{item.detailsData.map((item) => (item.amount).toLocaleString())}</td>
+        <td>{}</td>
+        <td>{item.grandTotalReceivedQuantity.toLocaleString()}</td>
+      </tr>
+    );
+  })}
+</tbody>
+<tfoot>
+    <tr>
+      <td colSpan="6" style={{ textAlign: 'right', fontWeight: 'bold' }}>Grand Total</td>
+      <td>{totalQuantitys.toLocaleString()}</td>
+      <td>{totalAmounts.toLocaleString()}</td>
+    </tr>
+  </tfoot>
+
+      </table>
     </div>
   );
 };
