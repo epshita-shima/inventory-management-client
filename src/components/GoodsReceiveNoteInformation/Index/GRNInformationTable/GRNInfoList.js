@@ -25,6 +25,7 @@ import { useGetAllPurchaseOrderInformationQuery } from "../../../../redux/featur
 import { downloadGRNPDF } from "../../../ReportProperties/handleGRNReport";
 import { useGetAllRMItemInformationQuery } from "../../../../redux/features/iteminformation/rmItemInfoApi";
 import { useGetAllItemInformationQuery } from "../../../../redux/features/iteminformation/iteminfoApi";
+import { supplierDropdown } from "../../../Common/CommonDropdown/CommonDropdown";
 
 const GRNInfoList = ({ permission }) => {
   const [filterText, setFilterText] = useState("");
@@ -36,7 +37,7 @@ const GRNInfoList = ({ permission }) => {
   } = useGetAllGRNInformationQuery(undefined);
   const { data: supplierInfo } = useGetAllSupplierInformationQuery(undefined);
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
-  const {data:rawItemInfo}=useGetAllRMItemInformationQuery(undefined)
+  const { data: rawItemInfo } = useGetAllRMItemInformationQuery(undefined);
   const { data: purchaseInfoData } =
     useGetAllPurchaseOrderInformationQuery(undefined);
 
@@ -51,7 +52,7 @@ const GRNInfoList = ({ permission }) => {
   const [filteredData, setFilteredData] = useState([]);
   const [isFetchAfterDeleteData, setIsFetchAfterDeleteData] = useState(false);
   const reportTitle = "GOODS RECEIPT REPORT";
-
+  
   useEffect(() => {
     const createPODropdown = (options) => {
       let result = [];
@@ -66,6 +67,21 @@ const GRNInfoList = ({ permission }) => {
     const poOptions = createPODropdown(purchaseInfoData);
     setPOOptionsData(poOptions);
   }, [purchaseInfoData]);
+
+  const supplierOptions=supplierDropdown(supplierInfo)
+  console.log(supplierOptions)
+
+  const groupData = (filteredData) => {
+    return filteredData.reduce((acc, row) => {
+      const key = `${row.makeDate}`;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(row);
+      return acc;
+    }, {});
+  };
+  const groupedData = groupData(filteredData);
 
   useEffect(() => {
     if (isFetchAfterDeleteData) {
@@ -240,7 +256,7 @@ const GRNInfoList = ({ permission }) => {
                     "Because already posted in accounting system",
                     "error"
                   );
-                }else{
+                } else {
                   swal({
                     title: "Are you sure to delete this item?",
                     text: "If once deleted, this item will not recovery.",
@@ -254,11 +270,15 @@ const GRNInfoList = ({ permission }) => {
                       ).unwrap();
                       console.log(response);
                       if (response.status === 200) {
-                        swal("Deleted!", "Your selected item has been deleted!", {
-                          icon: "success",
-                        });
+                        swal(
+                          "Deleted!",
+                          "Your selected item has been deleted!",
+                          {
+                            icon: "success",
+                          }
+                        );
                         await refetch();
-  
+
                         setIsFetchAfterDeleteData(true);
                       } else {
                         swal(
@@ -272,7 +292,6 @@ const GRNInfoList = ({ permission }) => {
                     }
                   });
                 }
-                
               }}
             >
               <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
@@ -341,9 +360,17 @@ const GRNInfoList = ({ permission }) => {
                     class="dropdown-item"
                     href="#"
                     onClick={() => {
-                      console.log(filteredData,companyinfo)
+                      console.log(filteredData, companyinfo);
                       if (companyinfo?.length !== 0 || undefined) {
-                        downloadGRNPDF(filteredData,supplierInfo,rawItemInfo,{ companyinfo }, reportTitle);
+                        downloadGRNPDF(
+                          filteredData,
+                          supplierInfo,
+                          rawItemInfo,
+                          fromDate,
+                          toDate,
+                          { companyinfo },
+                          reportTitle
+                        );
                       }
                     }}
                   >
@@ -379,7 +406,17 @@ const GRNInfoList = ({ permission }) => {
         </div>
       </div>
     );
-  }, [filterText,filteredData,supplierInfo,rawItemInfo, resetPaginationToggle, companyinfo, reportTitle]);
+  }, [
+    filterText,
+    filteredData,
+    supplierInfo,
+    rawItemInfo,
+    resetPaginationToggle,
+    fromDate,
+    toDate,
+    companyinfo,
+    reportTitle,
+  ]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -387,24 +424,14 @@ const GRNInfoList = ({ permission }) => {
     return date.toLocaleDateString("en-US", options);
   };
   const totalQuantitys = filteredData.reduce((accumulator, currentValue) => {
-    const quantity = parseFloat(currentValue.grandTotalQuantity);
+    const quantity = parseFloat(currentValue.grandTotalReceivedQuantity);
     return accumulator + (isNaN(quantity) ? 0 : quantity);
   }, 0);
   const totalAmounts = filteredData.reduce((accumulator, currentValue) => {
     const amount = parseFloat(currentValue.grandTotalAmount);
     return accumulator + (isNaN(amount) ? 0 : amount);
   }, 0);
-  const groupData = (filteredData) => {
-    return filteredData.reduce((acc, row) => {
-      const key = `${row.makeDate}`;
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push(row);
-      return acc;
-    }, {});
-  };
-  
+
   return (
     <div className="row px-5 mx-4 ">
       <div
@@ -417,8 +444,102 @@ const GRNInfoList = ({ permission }) => {
         <div>
           <h3 className="fw-bold mt-2">Goods Receive Note (GRN) List</h3>
           <hr />
-          <div className="d-flex justify-content-between align-items-center w-75">
-            <div className="w-25">
+          <div className="d-flex justify-content-between align-items-center w-100">
+            <div style={{ width: "20%" }}>
+            <div className="w-100">
+                <label htmlFor="">Supplier PONo</label>
+                <br />
+                <div className="w-100">
+                  <Select
+                    class="form-select"
+                    className="w-100"
+                    aria-label="Default select example"
+                    name="poinfo"
+                    options={supplierOptions}
+                    defaultValue={{
+                      label: "Select Supplier PONo",
+                      value: 0,
+                    }}
+                    value={supplierOptions.filter(function (option) {
+                      return option.value === selectSupplierPoNo;
+                    })}
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        width: "100%",
+                        borderColor: state.isFocused ? "#fff" : "#fff",
+                        border: "1px solid #2DDC1B",
+                      }),
+                      menu: (provided) => ({
+                        ...provided,
+                        zIndex: 9999,
+                        height: "auto",
+                        // overflowY: "scroll",
+                      }),
+                    }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: "#B8FEB3",
+                        primary: "#2DDC1B",
+                      },
+                    })}
+                    onChange={(e) => {
+                      setSelectSupplierPoNo(e.value);
+                    }}
+                  ></Select>
+                </div>
+              </div>
+            </div>
+            <div style={{ width: "30%",marginLeft:'20px' }}>
+              <div className="w-100">
+                <label htmlFor="">Supplier PONo</label>
+                <br />
+                <div className="w-100">
+                  <Select
+                    class="form-select"
+                    className="w-100"
+                    aria-label="Default select example"
+                    name="poinfo"
+                    options={pOOptionsData}
+                    defaultValue={{
+                      label: "Select Supplier PONo",
+                      value: 0,
+                    }}
+                    value={pOOptionsData.filter(function (option) {
+                      return option.value === selectSupplierPoNo;
+                    })}
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        width: "100%",
+                        borderColor: state.isFocused ? "#fff" : "#fff",
+                        border: "1px solid #2DDC1B",
+                      }),
+                      menu: (provided) => ({
+                        ...provided,
+                        zIndex: 9999,
+                        height: "auto",
+                        // overflowY: "scroll",
+                      }),
+                    }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: "#B8FEB3",
+                        primary: "#2DDC1B",
+                      },
+                    })}
+                    onChange={(e) => {
+                      setSelectSupplierPoNo(e.value);
+                    }}
+                  ></Select>
+                </div>
+              </div>
+            </div>
+            <div className="w-25 ms-4">
               <label htmlFor="">From Date</label>
               <br />
               <DatePicker
@@ -466,53 +587,7 @@ const GRNInfoList = ({ permission }) => {
                 }}
               />
             </div>
-            <div style={{ width: "35%" }}>
-              <div className="w-100">
-                <label htmlFor="">Supplier PONo</label>
-                <br />
-                <div className="w-100">
-                  <Select
-                    class="form-select"
-                    className="w-100"
-                    aria-label="Default select example"
-                    name="poinfo"
-                    options={pOOptionsData}
-                    defaultValue={{
-                      label: "Select Supplier PONo",
-                      value: 0,
-                    }}
-                    value={pOOptionsData.filter(function (option) {
-                      return option.value === selectSupplierPoNo;
-                    })}
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        width: "100%",
-                        borderColor: state.isFocused ? "#fff" : "#fff",
-                        border: "1px solid #2DDC1B",
-                      }),
-                      menu: (provided) => ({
-                        ...provided,
-                        zIndex: 9999,
-                        height: "auto",
-                        // overflowY: "scroll",
-                      }),
-                    }}
-                    theme={(theme) => ({
-                      ...theme,
-                      colors: {
-                        ...theme.colors,
-                        primary25: "#B8FEB3",
-                        primary: "#2DDC1B",
-                      },
-                    })}
-                    onChange={(e) => {
-                      setSelectSupplierPoNo(e.value);
-                    }}
-                  ></Select>
-                </div>
-              </div>
-            </div>
+           
             <div>
               <button
                 className="border-0 "
@@ -574,60 +649,160 @@ const GRNInfoList = ({ permission }) => {
           </div>
         ) : null}
       </div>
-  
+
       <table id="my-grn-table" className="d-none">
         <thead>
           <tr>
-            <th>Sl.</th>
-            <th>Opening Date</th>
-            <th>RM Item Name</th>
-            <th>Category Name</th>
-            <th>Unit Info</th>
-            <th>Opening Stock</th>
-            <th>Status</th>
-
+            <th>Received Date</th>
+            <th>Supplier Name</th>
+            <th>Supplier PO No</th>
+            <th>Item Name</th>
+            <th>GRN No</th>
+            <th>Challan No</th>
+            <th>Currency</th>
+            <th>Reveive Qty</th>
+            <th>Rate</th>
+            <th>Amount</th>
           </tr>
         </thead>
         <tbody>
-  {filteredData?.map((item, index) => {
-    const formattedDate = formatDate(item.makeDate);
-    const itemNames = rawItemInfo
-      ?.filter(items =>
-        item?.detailsData?.some(detail => detail?.itemId === items?._id)
-      )
-      .map(filteredItem => filteredItem?.itemName)
-      .join(",");
-    const supplierName=  supplierInfo
-        ?.filter((rawItem) => rawItem._id === item.supplierId)
-        .map((filteredItem) => filteredItem.supplierName)
-        .join(", ")
+        {Object.keys(groupedData).map((key) => {
+          const group = groupedData[key];
+          const formattedDate = formatDate(group[0].makeDate);
+          const supplierPONo = group[0].supplierPoNo;
+          const rowSpan = group.length;
 
+          const totalGroupWaysQuantity = group.reduce((accumulator, currentValue) => {
+            const amount = parseFloat(currentValue.grandTotalReceivedQuantity);
+            return accumulator + (isNaN(amount) ? 0 : amount);
+          }, 0);
+          const totalGroupWaysAmount = group.reduce((accumulator, currentValue) => {
+            const amount = parseFloat(currentValue.grandTotalAmount);
+            return accumulator + (isNaN(amount) ? 0 : amount);
+          }, 0);
+
+          return (
+            <>
+              {group.map((row, rowIndex) => {
+                const itemNames = rawItemInfo
+                  ?.filter((item) =>
+                    row?.detailsData?.some(
+                      (detail) => detail?.itemId === item._id
+                    )
+                  )
+                  .map((filteredItem) => filteredItem.itemName)
+                  .join(", ");
+                const unitPrices = row.detailsData
+                  .map((detail) => detail.unitPrice)
+                  .join(", ");
+                const amounts = row.detailsData
+                  .map((detail) => detail.amount)
+                  .join(", ");
+                const supplierName = supplierInfo
+                  ?.filter((rawItem) => rawItem._id === row.supplierId)
+                  .map((filteredItem) => filteredItem.supplierName)
+                  .join(", ");
+                const currency = purchaseInfoData
+                  ?.filter((poItem) => poItem._id === row.pOSingleId)
+                  .map((filteredItem) => filteredItem.currencyId)
+                  .join(",");
+
+                return (
+                  <tr key={row._id}>
+                    {rowIndex === 0 && (
+                      <td
+                        rowSpan={rowSpan}
+                        style={{
+                          textAlign: "center",
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        {formattedDate}
+                      </td>
+                    )}
+                    <td>{supplierName}</td>
+                    <td>{supplierPONo}</td>
+                    <td>{itemNames}</td>
+                    <td>{row.grnSerialNo}</td>
+                    <td>{row.challanNo}</td>
+                    <td>{currency}</td>
+                    <td>{row.grandTotalReceivedQuantity}</td>
+                    <td>{unitPrices}</td>
+                    <td>{amounts}</td>
+                  </tr>
+                );
+              })}
+              {/* Grand total for each supplierPONo group */}
+              <tr>
+                <td
+                  colSpan={7}
+                  style={{
+                    textAlign: "right",
+                    fontWeight: "bold",
+                    padding: "8px",
+                    border: "1px solid black",
+                  }}
+                >
+                 Datewise Total
+                </td>
+                <td
+                  style={{
+                    textAlign: "center",
+                    verticalAlign: "middle",
+                    border: "1px solid black",
+                  }}
+                >
+                  {totalGroupWaysQuantity.toLocaleString()}
+                </td>
+                <td></td>
+                <td
+                  style={{
+                    textAlign: "center",
+                    verticalAlign: "middle",
+                    border: "1px solid black",
+                  }}
+                >
+                  {totalGroupWaysAmount.toLocaleString()}
+                </td>
+              </tr>
+            </>
+          );
+        })}
+        {/* Grand total for the entire dataset */}
+        <tr>
+          <td
+            colSpan={7}
+            style={{
+              textAlign: "right",
+              fontWeight: "bold",
+              padding: "8px",
+              border: "1px solid black",
+            }}
+          >
+            Grand Total
+          </td>
+          <td
+            style={{
+              textAlign: "center",
+              verticalAlign: "middle",
+              border: "1px solid black",
+            }}
+          >
+            {totalQuantitys.toLocaleString()}
+          </td>
+          <td></td>
+          <td
+            style={{
+              textAlign: "center",
+              verticalAlign: "middle",
+              border: "1px solid black",
+            }}
+          >
+            {totalAmounts.toLocaleString()}
+          </td>
+        </tr>
+      </tbody>
        
-    return (
-      <tr key={index}>
-        <td>{formattedDate}</td>
-        <td>{supplierName}</td>
-        <td>{item.supplierPoNo}</td>
-        <td>{itemNames}</td>
-        <td>{item.grnSerialNo}</td>
-        <td>{item.challanNo}</td>
-        <td>{item.grandTotalReceivedQuantity.toLocaleString()}</td>
-        <td>{item.detailsData.map((item) => item.unitPrice).join(", ")}</td>
-        <td>{item.detailsData.map((item) => (item.amount).toLocaleString())}</td>
-        <td>{}</td>
-        <td>{item.grandTotalReceivedQuantity.toLocaleString()}</td>
-      </tr>
-    );
-  })}
-</tbody>
-<tfoot>
-    <tr>
-      <td colSpan="6" style={{ textAlign: 'right', fontWeight: 'bold' }}>Grand Total</td>
-      <td>{totalQuantitys.toLocaleString()}</td>
-      <td>{totalAmounts.toLocaleString()}</td>
-    </tr>
-  </tfoot>
-
       </table>
     </div>
   );

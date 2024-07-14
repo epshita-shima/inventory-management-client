@@ -101,16 +101,12 @@ const CommonPurchaseOrderInfo = () => {
 
   const currencyOptions = [
     {
-      value: "euro",
-      label: "EURO",
+      value: "BDT",
+      label: "BDT",
     },
     {
-      value: "taka",
-      label: "TAKA",
-    },
-    {
-      value: "dollar",
-      label: "DOLLAR",
+      value: "USD",
+      label: "USD",
     },
   ];
 

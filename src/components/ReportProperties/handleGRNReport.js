@@ -4,26 +4,12 @@ const downloadGRNPDF = async (
   data,
   supplierInfo,
   rawItemInfo,
+  fromDate,
+  toDate,
   companyinfo,
   reportTitle
 ) => {
   const doc = new jsPDF();
-
-
-  const totalQuantity = data.reduce((accumulator, currentValue) => {
-    const quantity = parseFloat(currentValue.grandTotalQuantity);
-    return accumulator + (isNaN(quantity) ? 0 : quantity);
-  }, 0);
-  const totalAmount = data.reduce((accumulator, currentValue) => {
-    const amount = parseFloat(currentValue.grandTotalAmount);
-    return accumulator + (isNaN(amount) ? 0 : amount);
-  }, 0);
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const options = { year: "numeric", month: "short", day: "numeric" };
-    return date.toLocaleDateString("en-US", options);
-  };
 
   doc.setFontSize(10);
   doc.setFont("times", "bold");
@@ -31,170 +17,17 @@ const downloadGRNPDF = async (
   const labelWidth = 30; // Width allocated for labels
   let textY = 35;
 
-  const groupedData = data.reduce((acc, row) => {
-    const key = `${row.makeDate}_${row.supplierPoNo}`;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(row);
-    return acc;
-  }, {});
-
-  const finalRows = [];
-  console.log(finalRows);
-  Object.keys(groupedData).forEach((key, index) => {
-    const group = groupedData[key];
-    const formattedDate = formatDate(group[0].makeDate);
-    const supplierPONo = group[0].supplierPoNo;
-
-    group.forEach((row, rowIndex) => {
-      const itemNames = rawItemInfo
-        ?.filter((item) =>
-          row?.detailsData?.some((detail) => detail?.itemId === item._id)
-        )
-        .map((filteredItem) => filteredItem.itemName)
-        .join(", ");
-
-      const supplierName = supplierInfo
-        ?.filter((rawItem) => rawItem._id === row.supplierId)
-        .map((filteredItem) => filteredItem.supplierName)
-        .join(", ");
-
-      // Determine if it's the first row of the group
-      const isFirstRow = rowIndex === 0;
-
-      // Determine rowspan for receivedDate
-
-      let rowspan = group.reduce(
-        (acc, curr) => acc + curr.detailsData.length,
-        0
-      );
-      finalRows.push([
-        {
-          content: isFirstRow? formattedDate : "",
-          // rowSpan: isFirstRow? rowspan : 1,
-          styles: { valign: "middle", halign: "center" },
-        },
-        {
-          content:  supplierName,
-          rowSpan: rowIndex === 0 ? 1 : 1,
-        },
-        {
-          content:  supplierPONo ,
-          rowSpan: rowIndex === 0 ? 1 : 1,
-        },
-        {
-          content: itemNames,
-          rowSpan: 1,
-        },
-        {
-          content: row.grnSerialNo,
-          rowSpan: 1,
-        },
-        {
-          content: row.challanNo,
-          rowSpan:1,
-        },
-
-        {
-          content: row.grandTotalReceivedQuantity.toLocaleString(),
-          rowSpan: 1,
-        },
-        {
-          content: row.detailsData.map((item) => item.unitPrice).join(", "),
-          rowSpan: 1,
-        },
-        {
-          content: row.detailsData.map((item) => (item.amount).toLocaleString()).join(", "),
-          rowSpan: 1,
-        },
-      ]);
-    });
-  });
-
-  // const finalRows = data?.map((row, index) =>{
-  //     const formattedDate = formatDate(row.makeDate);
-  //   const itemNames = rawItemInfo
-  //   ?.filter(item =>
-  //     row?.detailsData?.some(detail => detail?.itemId === item?._id)
-  //   )
-  //   .map(filteredItem => filteredItem?.itemName)
-  //   .join(",");
-
-  //   return[
-  //     formattedDate,
-  //     supplierInfo
-  //       ?.filter((rawItem) => rawItem._id === row.supplierId)
-  //       .map((filteredItem) => filteredItem.supplierName)
-  //       .join(", "),
-  //     row.supplierPoNo,
-  //     rawItemInfo
-  //       ?.filter((item) =>
-  //         row?.detailsData?.some((detail) => detail?.itemId === item?._id)
-  //       )
-  //       .map((filteredItem) => filteredItem?.itemName)
-  //       .join(","),
-  //     row.grnSerialNo,
-  //     row.challanNo,
-  //     row.grandTotalReceivedQuantity,
-  //     row?.detailsData?.map((item) => {
-  //       return item.unitPrice;
-  //     }),
-  //     row.grandTotalAmount?.toLocaleString(),
-  //   ]
-  // }
-
-  // );
-
-  textY = addTableContent(doc, finalRows, textY + 10);
+  textY = addTableContent(doc, textY + 10);
   // Add totals to the rows with colSpan
 
-  function addTableContent(doc, finalRows, startY) {
-    finalRows.push([
-      {
-        content: "Grand Total",
-        colSpan: 6,
-        styles: { halign: "right", fontStyle: "bold" },
-      },
-      totalQuantity.toLocaleString(), // Grand total quantity
-      "", // Empty cell for Unit Price
-      totalAmount.toLocaleString(), // Grand total amount
-    ]);
-
+  function addTableContent(doc, startY) {
+    function extractTextFromHtml(htmlString) {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = htmlString;
+      return tempDiv.textContent || tempDiv.innerText || "";
+    }
     doc.autoTable({
-      // head: [
-      //   [
-      //     {
-      //       content: "Received Date",
-      //       styles: { valign: "middle", halign: "center" },
-      //     },
-      //     {
-      //       content: "Supplier Name",
-      //       styles: { valign: "middle", halign: "center" },
-      //     },
-      //     { content: "PO No", styles: { valign: "middle", halign: "center" } },
-      //     {
-      //       content: "Item Name",
-      //       styles: { valign: "middle", halign: "center" },
-      //     },
-      //     { content: "GRN No", styles: { valign: "middle", halign: "center" } },
-      //     {
-      //       content: "Challan No",
-      //       styles: { valign: "middle", halign: "center" },
-      //     },
-      //     {
-      //       content: "Received Qty",
-      //       styles: { valign: "middle", halign: "center" },
-      //     },
-      //     {
-      //       content: "Unit Price",
-      //       styles: { valign: "middle", halign: "center" },
-      //     },
-      //     { content: "Amount", styles: { valign: "middle", halign: "center" } },
-      //   ],
-      // ],
-      // body: finalRows,
-      html:"#my-grn-table",
+      html: "#my-grn-table",
       startY: startY,
       margin: { top: 50, bottom: 32, left: 10, right: 10 },
       headerStyles: {
@@ -212,27 +45,56 @@ const downloadGRNPDF = async (
         fontSize: 10,
         textAlign: "center",
         halign: "center",
+        valign: "middle",
+      },
+      columnStyles: {
+        0: { cellWidth: "auto" }, // Custom width for first column
+        1: { cellWidth: "auto" }, // Custom width for second column
+        2: { cellWidth: 25 }, // Custom width for third column
+        3: { cellWidth: "auto" }, // Auto width for fourth column
+        4: { cellWidth: "auto" }, // Custom width for first column
+        5: { cellWidth: "auto" }, // Custom width for second column
+        6: { cellWidth: "auto" }, // Custom width for third column
+        7: { cellWidth: "auto" }, // Auto width for fourth column
+        8: { cellWidth: "auto" }, // Auto width for fourth column
+        9: { cellWidth: 25 }, // Auto width for fourth column
       },
       didParseCell: function (data) {
-        // const rowIndex = data.row.index;
-        // const totalRows = data.table.body.length;
+        const rowIndex = data.row.index;
+        const totalRows = data.table.body.length;
+        const colIndex = data.column.index;
+        const totalCols = data.table.body[0].raw.length;
+        const cellContent = data.cell.raw;
+        // Extract text content from HTML string
+        const textContent = cellContent.innerText || cellContent.textContent;
+        console.log(textContent);
+        if (rowIndex === totalRows - 1) {
+          data.cell.styles.fontStyle = "bold";
+          data.cell.styles.fillColor = [138, 138, 138]; // Gray line color
+          data.cell.styles.textColor = [255, 255, 255];
+        }
 
-        // if (rowIndex === totalRows - 1) {
-        //   data.cell.styles.fontStyle = "bold";
-        // }
+        if (textContent.trim().toLowerCase() === "datewise total") {
+          Object.values(data.row.cells).forEach((cell) => {
+            cell.styles = cell.styles || {};
+            cell.styles.fontStyle = "bold";
+            cell.styles.fillColor = [138, 138, 138]; // Gray line color
+            cell.styles.textColor = [255, 255, 255];
+          });
+          data.cell.styles.halign = "right";
+        }
+        if (textContent.trim().toLowerCase() === "grand total"){
+          data.cell.styles.halign = "right";
+         
+        }
+        if (colIndex === totalCols - 1) {
+          data.cell.styles.halign = "right";
+        }
+
       },
-  //  didDrawCell: function (data) {
-  //     const rowIndex = data.row.index;
-  //     const colIndex = data.column.index;
 
-  //     // Adjust rowspan for Received Date cell
-  //     if (colIndex === 0 && data.row.raw[0] === "") {
-  //       const rowspan = finalRows[data.row.index].length;
-  //       data.cell.rowSpan = rowspan;
-  //     }
-  //   },
       didDrawPage: (data) => {
-        addFooterForPO(doc, companyinfo, reportTitle);
+        addFooterForPO(doc, companyinfo, reportTitle, fromDate, toDate);
       },
     });
     return doc.previousAutoTable.finalY;
@@ -288,7 +150,7 @@ const downloadGRNPDF = async (
   doc.save(`${reportTitle}.pdf`);
 };
 
-const addFooterForPO = (doc, companyinfo, reportTitle) => {
+const addFooterForPO = (doc, companyinfo, reportTitle, fromDate, toDate) => {
   const pageCount = doc.internal.getNumberOfPages(); // Get the total number of pages
   const detailsWidthPercentage = 0.8;
 
@@ -322,7 +184,7 @@ const addFooterForPO = (doc, companyinfo, reportTitle) => {
       maxWidth: companyDetailsWidth,
     });
     doc.setFont("times", "normal", "bold");
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setTextColor(0, 0, 0);
 
     doc.text(companyAddressUpper, pageWidth / 2, headerY + 14, {
@@ -330,12 +192,26 @@ const addFooterForPO = (doc, companyinfo, reportTitle) => {
       maxWidth: companyDetailsWidth,
     });
 
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setFont("times", "bold");
     doc.text(reportTitle, pageWidth / 2, headerY + 21, {
       align: "center",
       maxWidth: companyDetailsWidth,
     });
+
+    if (fromDate && toDate) {
+      doc.setFontSize(11);
+      doc.setFont("times", "bold");
+      doc.text(
+        `AS OF DATED ${fromDate} TO ${toDate}`,
+        pageWidth / 2,
+        headerY + 28,
+        {
+          align: "center",
+          maxWidth: companyDetailsWidth,
+        }
+      );
+    }
 
     // Footer content
     doc.setFontSize(10);
