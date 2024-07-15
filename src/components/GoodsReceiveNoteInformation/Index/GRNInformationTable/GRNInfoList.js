@@ -10,7 +10,6 @@ import swal from "sweetalert";
 import {
   faDownload,
   faPenToSquare,
-  faRefresh,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import "react-datepicker/dist/react-datepicker.css";
@@ -18,14 +17,13 @@ import DatePicker from "react-datepicker";
 import Select from "react-select";
 import { useGetAllSupplierInformationQuery } from "../../../../redux/features/supplierInformation/supplierInfoApi";
 import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterComponent";
-import { downloadPDF } from "../../../ReportProperties/HeaderFooter";
 import { useGetCompanyInfoQuery } from "../../../../redux/features/companyinfo/compayApi";
 import styles from "./GRNInfoList.css";
 import { useGetAllPurchaseOrderInformationQuery } from "../../../../redux/features/purchaseorderinformation/purchaseOrderInfoApi";
 import { downloadGRNPDF } from "../../../ReportProperties/handleGRNReport";
 import { useGetAllRMItemInformationQuery } from "../../../../redux/features/iteminformation/rmItemInfoApi";
-import { useGetAllItemInformationQuery } from "../../../../redux/features/iteminformation/iteminfoApi";
 import { supplierDropdown } from "../../../Common/CommonDropdown/CommonDropdown";
+import makeAnimated from "react-select/animated";
 
 const GRNInfoList = ({ permission }) => {
   const [filterText, setFilterText] = useState("");
@@ -43,6 +41,8 @@ const GRNInfoList = ({ permission }) => {
 
   const [deleteGRNInfo] = useDeleteGRNInformationMutation();
   const [selectSupplierPoNo, setSelectSupplierPoNo] = useState("");
+  const [selectSupplierName, setSelectSupplierName] = useState("");
+  const [selectMonth, setSelectMonth] = useState("");
   const [isTableDispaly, setIsTableDisplay] = useState(false);
   const [fromDate, setFromDate] = useState(
     new Date().toLocaleDateString("en-CA")
@@ -51,8 +51,11 @@ const GRNInfoList = ({ permission }) => {
   const [pOOptionsData, setPOOptionsData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [isFetchAfterDeleteData, setIsFetchAfterDeleteData] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const animatedComponents = makeAnimated();
   const reportTitle = "GOODS RECEIPT REPORT";
-  
+
   useEffect(() => {
     const createPODropdown = (options) => {
       let result = [];
@@ -68,8 +71,7 @@ const GRNInfoList = ({ permission }) => {
     setPOOptionsData(poOptions);
   }, [purchaseInfoData]);
 
-  const supplierOptions=supplierDropdown(supplierInfo)
-  console.log(supplierOptions)
+  const supplierOptions = supplierDropdown(supplierInfo);
 
   const groupData = (filteredData) => {
     return filteredData.reduce((acc, row) => {
@@ -81,7 +83,11 @@ const GRNInfoList = ({ permission }) => {
       return acc;
     }, {});
   };
+
   const groupedData = groupData(filteredData);
+  const getEndDate = (year, month) => {
+    return new Date(year, month, 0).getDate();
+  };
 
   useEffect(() => {
     if (isFetchAfterDeleteData) {
@@ -96,7 +102,26 @@ const GRNInfoList = ({ permission }) => {
       console.log("loading");
     } else {
       let filtered = grnAllInformation;
-      if (fromDate && toDate && selectSupplierPoNo !== "") {
+      if (selectSupplierName && selectSupplierPoNo) {
+        const filtered = grnAllInformation.filter((item) => {
+          const isSupplierNameMatch = item.supplierId === selectSupplierName;
+          const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
+          return isSupplierNameMatch && isPonumberMatch;
+        });
+
+        if (filtered.length !== 0) {
+          console.log(filtered);
+          setFilteredData(filtered);
+        } else {
+          swal({
+            title: "Sorry!",
+            text: `The PO not belogns for this Supplier `,
+            icon: "warning",
+            button: "OK",
+          });
+          setFilteredData([]);
+        }
+      } else if (fromDate && toDate && selectSupplierPoNo !== "") {
         filtered = await grnAllInformation.filter((item) => {
           const itemDate = new Date(item.receiveDate);
           const isDateInRange =
@@ -104,18 +129,30 @@ const GRNInfoList = ({ permission }) => {
           const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
           return isDateInRange && isPonumberMatch;
         });
+        setFilteredData(filtered);
+      } else if (selectMonth) {
+        console.log(selectMonth);
+        filtered = await grnAllInformation?.filter((item) => {
+          const itemDate = new Date(item.receiveDate);
+          return (
+            itemDate >= new Date(startDate) && itemDate <= new Date(endDate)
+          );
+        });
+        setFilteredData(filtered);
+        console.log(filtered);
       } else if (fromDate && toDate) {
         filtered = await grnAllInformation?.filter((item) => {
           const itemDate = new Date(item.receiveDate);
           return itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
         });
+        setFilteredData(filtered);
       } else if (selectSupplierPoNo) {
         filtered = await grnAllInformation.filter(
           (item) => item.supplierPoNo === selectSupplierPoNo
         );
+        setFilteredData(filtered);
       }
 
-      setFilteredData(filtered);
       if (filtered?.length !== 0) {
         setIsTableDisplay(true);
       } else {
@@ -130,6 +167,7 @@ const GRNInfoList = ({ permission }) => {
       refetch();
     }
   };
+
   const columns = [
     {
       name: "Sl.",
@@ -423,6 +461,27 @@ const GRNInfoList = ({ permission }) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return date.toLocaleDateString("en-US", options);
   };
+  const generateMonths = (year) => {
+    const getYear = year.getFullYear();
+    const months = [
+      { name: "Jan", num: "01" },
+      { name: "Feb", num: "02" },
+      { name: "Mar", num: "03" },
+      { name: "Apr", num: "04" },
+      { name: "May", num: "05" },
+      { name: "Jun", num: "06" },
+      { name: "Jul", num: "07" },
+      { name: "Aug", num: "08" },
+      { name: "Sep", num: "09" },
+      { name: "Oct", num: "10" },
+      { name: "Nov", num: "11" },
+      { name: "Dec", num: "12" },
+    ];
+    return months.map((month) => ({
+      value: `${getYear}-${month.num}-01`,
+      label: `${month.name} ${getYear}`,
+    }));
+  };
   const totalQuantitys = filteredData.reduce((accumulator, currentValue) => {
     const quantity = parseFloat(currentValue.grandTotalReceivedQuantity);
     return accumulator + (isNaN(quantity) ? 0 : quantity);
@@ -431,6 +490,7 @@ const GRNInfoList = ({ permission }) => {
     const amount = parseFloat(currentValue.grandTotalAmount);
     return accumulator + (isNaN(amount) ? 0 : amount);
   }, 0);
+  const formattedDate = generateMonths(new Date());
 
   return (
     <div className="row px-5 mx-4 ">
@@ -442,12 +502,12 @@ const GRNInfoList = ({ permission }) => {
         }}
       >
         <div>
-          <h3 className="fw-bold mt-2">Goods Receive Note (GRN) List</h3>
+          <h3 className="fw-bold mt-1">Goods Receive Note (GRN) List</h3>
           <hr />
           <div className="d-flex justify-content-between align-items-center w-100">
-            <div style={{ width: "20%" }}>
-            <div className="w-100">
-                <label htmlFor="">Supplier PONo</label>
+            <div style={{ width: "25%" }}>
+              <div className="w-100">
+                <label htmlFor="">Supplier Name</label>
                 <br />
                 <div className="w-100">
                   <Select
@@ -457,11 +517,11 @@ const GRNInfoList = ({ permission }) => {
                     name="poinfo"
                     options={supplierOptions}
                     defaultValue={{
-                      label: "Select Supplier PONo",
+                      label: "Select Supplier Name",
                       value: 0,
                     }}
                     value={supplierOptions.filter(function (option) {
-                      return option.value === selectSupplierPoNo;
+                      return option.value === selectSupplierName;
                     })}
                     styles={{
                       control: (baseStyles, state) => ({
@@ -486,15 +546,15 @@ const GRNInfoList = ({ permission }) => {
                       },
                     })}
                     onChange={(e) => {
-                      setSelectSupplierPoNo(e.value);
+                      setSelectSupplierName(e.value);
                     }}
                   ></Select>
                 </div>
               </div>
             </div>
-            <div style={{ width: "30%",marginLeft:'20px' }}>
+            <div style={{ width: "25%", marginLeft: "18px" }}>
               <div className="w-100">
-                <label htmlFor="">Supplier PONo</label>
+                <label htmlFor="">Supplier PO No</label>
                 <br />
                 <div className="w-100">
                   <Select
@@ -539,7 +599,7 @@ const GRNInfoList = ({ permission }) => {
                 </div>
               </div>
             </div>
-            <div className="w-25 ms-4">
+            <div className=" ms-4">
               <label htmlFor="">From Date</label>
               <br />
               <DatePicker
@@ -563,7 +623,7 @@ const GRNInfoList = ({ permission }) => {
                 }}
               />
             </div>
-            <div className="w-25">
+            <div className="ms-4">
               <label htmlFor="">To Date</label>
               <br />
               <DatePicker
@@ -587,50 +647,144 @@ const GRNInfoList = ({ permission }) => {
                 }}
               />
             </div>
-           
-            <div>
-              <button
-                className="border-0 "
-                style={{
-                  backgroundColor: "#2DDC1B",
-                  color: "white",
-                  padding: "5px 10px",
-                  fontSize: "14px",
-                  borderRadius: "5px",
-                  width: "100px",
-                  height: "38px",
-                  marginLeft: "10px",
-                  marginTop: "25px",
-                }}
-                onClick={handleFilter}
-              >
-                Show
-              </button>
+            <div style={{ width: "15%", marginLeft: "20px" }}>
+              <div className="w-100">
+                <label htmlFor="">Select Month</label>
+                <br />
+                <div className="w-100">
+                  <Select
+                    class="form-select"
+                    className="w-100"
+                    aria-label="Default select example"
+                    name="poinfo"
+                    components={animatedComponents}
+                    options={formattedDate}
+                    isMulti
+                    defaultValue={{
+                      label: "Select Supplier PONo",
+                      value: 0,
+                    }}
+                    // value={formattedDate.filter(function (option) {
+                    //   return option.value === selectMonth;
+                    // })}
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        width: "100%",
+                        borderColor: state.isFocused ? "#fff" : "#fff",
+                        border: "1px solid #2DDC1B",
+                      }),
+                      menu: (provided) => ({
+                        ...provided,
+                        zIndex: 9999,
+                        height: "auto",
+                        // overflowY: "scroll",
+                      }),
+                    }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: "#B8FEB3",
+                        primary: "#2DDC1B",
+                      },
+                    })}
+                    onChange={(e) => {
+                      const sortedSelectedMonths = e.slice().sort((a, b) => {
+                        if (a.value < b.value) {
+                          return -1;
+                        }
+                        if (a.value > b.value) {
+                          return 1;
+                        }
+                        return 0;
+                      });
+                      console.log(sortedSelectedMonths);
+
+                      const dates = e?.map((option) => {
+                        console.log(option);
+
+                        const [selectedYear, selectedMonthNum] = option.value
+                          .split("-")
+                          .map(Number);
+                        const start = `${selectedYear}-${String(
+                          selectedMonthNum
+                        ).padStart(2, "0")}-01`;
+                        const endDay = getEndDate(
+                          selectedYear,
+                          selectedMonthNum
+                        );
+                        const end = `${selectedYear}-${String(
+                          selectedMonthNum
+                        ).padStart(2, "0")}-${endDay}`;
+                        return { month: option, start, end };
+                      });
+                      console.log(dates);
+                      // setSelectMonth(e.value);
+                      // const [selectedYear, selectedMonthNum] = e.value
+                      //   .split("-")
+                      //   .map(Number);
+                      // setStartDate(
+                      //   `${selectedYear}-${String(selectedMonthNum).padStart(
+                      //     2,
+                      //     "0"
+                      //   )}-01`
+                      // );
+                      // const endDay = getEndDate(selectedYear, selectedMonthNum);
+                      // setEndDate(
+                      //   `${selectedYear}-${String(selectedMonthNum).padStart(
+                      //     2,
+                      //     "0"
+                      //   )}-${endDay}`
+                      // );
+                    }}
+                  ></Select>
+                </div>
+              </div>
             </div>
-            <div>
-              <button
-                className="border-0 "
-                style={{
-                  backgroundColor: "red",
-                  color: "white",
-                  padding: "5px 10px",
-                  fontSize: "14px",
-                  borderRadius: "5px",
-                  width: "100px",
-                  height: "38px",
-                  marginLeft: "10px",
-                  marginTop: "25px",
-                }}
-                onClick={() => {
-                  setFromDate(new Date()?.toLocaleDateString("en-CA"));
-                  setToDate(new Date()?.toLocaleDateString("en-CA"));
-                  setSelectSupplierPoNo("");
-                  setIsTableDisplay(false);
-                }}
-              >
-                Clear
-              </button>
-            </div>
+          </div>
+          <div>
+            <button
+              className="border-0 "
+              style={{
+                backgroundColor: "#2DDC1B",
+                color: "white",
+                padding: "5px 10px",
+                fontSize: "14px",
+                borderRadius: "5px",
+                width: "100px",
+                height: "38px",
+                marginTop: "25px",
+              }}
+              onClick={handleFilter}
+            >
+              Show
+            </button>
+
+            <button
+              className="border-0 "
+              style={{
+                backgroundColor: "red",
+                color: "white",
+                padding: "5px 10px",
+                fontSize: "14px",
+                borderRadius: "5px",
+                width: "100px",
+                height: "38px",
+                marginLeft: "10px",
+                marginTop: "25px",
+              }}
+              onClick={() => {
+                setFromDate(new Date()?.toLocaleDateString("en-CA"));
+                setToDate(new Date()?.toLocaleDateString("en-CA"));
+                setSelectSupplierName("");
+                setSelectSupplierPoNo("");
+                setSelectMonth("");
+                setIsTableDisplay(false);
+              }}
+            >
+              Clear
+            </button>
           </div>
         </div>
 
@@ -666,143 +820,150 @@ const GRNInfoList = ({ permission }) => {
           </tr>
         </thead>
         <tbody>
-        {Object.keys(groupedData).map((key) => {
-          const group = groupedData[key];
-          const formattedDate = formatDate(group[0].makeDate);
-          const supplierPONo = group[0].supplierPoNo;
-          const rowSpan = group.length;
+          {Object.keys(groupedData).map((key) => {
+            const group = groupedData[key];
+            const formattedDate = formatDate(group[0].makeDate);
+            const supplierPONo = group[0].supplierPoNo;
+            const rowSpan = group.length;
 
-          const totalGroupWaysQuantity = group.reduce((accumulator, currentValue) => {
-            const amount = parseFloat(currentValue.grandTotalReceivedQuantity);
-            return accumulator + (isNaN(amount) ? 0 : amount);
-          }, 0);
-          const totalGroupWaysAmount = group.reduce((accumulator, currentValue) => {
-            const amount = parseFloat(currentValue.grandTotalAmount);
-            return accumulator + (isNaN(amount) ? 0 : amount);
-          }, 0);
-
-          return (
-            <>
-              {group.map((row, rowIndex) => {
-                const itemNames = rawItemInfo
-                  ?.filter((item) =>
-                    row?.detailsData?.some(
-                      (detail) => detail?.itemId === item._id
-                    )
-                  )
-                  .map((filteredItem) => filteredItem.itemName)
-                  .join(", ");
-                const unitPrices = row.detailsData
-                  .map((detail) => detail.unitPrice)
-                  .join(", ");
-                const amounts = row.detailsData
-                  .map((detail) => detail.amount)
-                  .join(", ");
-                const supplierName = supplierInfo
-                  ?.filter((rawItem) => rawItem._id === row.supplierId)
-                  .map((filteredItem) => filteredItem.supplierName)
-                  .join(", ");
-                const currency = purchaseInfoData
-                  ?.filter((poItem) => poItem._id === row.pOSingleId)
-                  .map((filteredItem) => filteredItem.currencyId)
-                  .join(",");
-
-                return (
-                  <tr key={row._id}>
-                    {rowIndex === 0 && (
-                      <td
-                        rowSpan={rowSpan}
-                        style={{
-                          textAlign: "center",
-                          verticalAlign: "middle",
-                        }}
-                      >
-                        {formattedDate}
-                      </td>
-                    )}
-                    <td>{supplierName}</td>
-                    <td>{supplierPONo}</td>
-                    <td>{itemNames}</td>
-                    <td>{row.grnSerialNo}</td>
-                    <td>{row.challanNo}</td>
-                    <td>{currency}</td>
-                    <td>{row.grandTotalReceivedQuantity}</td>
-                    <td>{unitPrices}</td>
-                    <td>{amounts}</td>
-                  </tr>
+            const totalGroupWaysQuantity = group.reduce(
+              (accumulator, currentValue) => {
+                const amount = parseFloat(
+                  currentValue.grandTotalReceivedQuantity
                 );
-              })}
-              {/* Grand total for each supplierPONo group */}
-              <tr>
-                <td
-                  colSpan={7}
-                  style={{
-                    textAlign: "right",
-                    fontWeight: "bold",
-                    padding: "8px",
-                    border: "1px solid black",
-                  }}
-                >
-                 Datewise Total
-                </td>
-                <td
-                  style={{
-                    textAlign: "center",
-                    verticalAlign: "middle",
-                    border: "1px solid black",
-                  }}
-                >
-                  {totalGroupWaysQuantity.toLocaleString()}
-                </td>
-                <td></td>
-                <td
-                  style={{
-                    textAlign: "center",
-                    verticalAlign: "middle",
-                    border: "1px solid black",
-                  }}
-                >
-                  {totalGroupWaysAmount.toLocaleString()}
-                </td>
-              </tr>
-            </>
-          );
-        })}
-        {/* Grand total for the entire dataset */}
-        <tr>
-          <td
-            colSpan={7}
-            style={{
-              textAlign: "right",
-              fontWeight: "bold",
-              padding: "8px",
-              border: "1px solid black",
-            }}
-          >
-            Grand Total
-          </td>
-          <td
-            style={{
-              textAlign: "center",
-              verticalAlign: "middle",
-              border: "1px solid black",
-            }}
-          >
-            {totalQuantitys.toLocaleString()}
-          </td>
-          <td></td>
-          <td
-            style={{
-              textAlign: "center",
-              verticalAlign: "middle",
-              border: "1px solid black",
-            }}
-          >
-            {totalAmounts.toLocaleString()}
-          </td>
-        </tr>
-      </tbody>
-       
+                return accumulator + (isNaN(amount) ? 0 : amount);
+              },
+              0
+            );
+            const totalGroupWaysAmount = group.reduce(
+              (accumulator, currentValue) => {
+                const amount = parseFloat(currentValue.grandTotalAmount);
+                return accumulator + (isNaN(amount) ? 0 : amount);
+              },
+              0
+            );
+
+            return (
+              <>
+                {group.map((row, rowIndex) => {
+                  const itemNames = rawItemInfo
+                    ?.filter((item) =>
+                      row?.detailsData?.some(
+                        (detail) => detail?.itemId === item._id
+                      )
+                    )
+                    .map((filteredItem) => filteredItem.itemName)
+                    .join(", ");
+                  const unitPrices = row.detailsData
+                    .map((detail) => detail.unitPrice)
+                    .join(", ");
+                  const amounts = row.detailsData
+                    .map((detail) => detail.amount)
+                    .join(", ");
+                  const supplierName = supplierInfo
+                    ?.filter((rawItem) => rawItem._id === row.supplierId)
+                    .map((filteredItem) => filteredItem.supplierName)
+                    .join(", ");
+                  const currency = purchaseInfoData
+                    ?.filter((poItem) => poItem._id === row.pOSingleId)
+                    .map((filteredItem) => filteredItem.currencyId)
+                    .join(",");
+
+                  return (
+                    <tr key={row._id}>
+                      {rowIndex === 0 && (
+                        <td
+                          rowSpan={rowSpan}
+                          style={{
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                          }}
+                        >
+                          {formattedDate}
+                        </td>
+                      )}
+                      <td>{supplierName}</td>
+                      <td>{supplierPONo}</td>
+                      <td>{itemNames}</td>
+                      <td>{row.grnSerialNo}</td>
+                      <td>{row.challanNo}</td>
+                      <td>{currency}</td>
+                      <td>{row.grandTotalReceivedQuantity}</td>
+                      <td>{unitPrices}</td>
+                      <td>{amounts}</td>
+                    </tr>
+                  );
+                })}
+                {/* Grand total for each supplierPONo group */}
+                <tr>
+                  <td
+                    colSpan={7}
+                    style={{
+                      textAlign: "right",
+                      fontWeight: "bold",
+                      padding: "8px",
+                      border: "1px solid black",
+                    }}
+                  >
+                    Datewise Total
+                  </td>
+                  <td
+                    style={{
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                      border: "1px solid black",
+                    }}
+                  >
+                    {totalGroupWaysQuantity.toLocaleString()}
+                  </td>
+                  <td></td>
+                  <td
+                    style={{
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                      border: "1px solid black",
+                    }}
+                  >
+                    {totalGroupWaysAmount.toLocaleString()}
+                  </td>
+                </tr>
+              </>
+            );
+          })}
+          {/* Grand total for the entire dataset */}
+          <tr>
+            <td
+              colSpan={7}
+              style={{
+                textAlign: "right",
+                fontWeight: "bold",
+                padding: "8px",
+                border: "1px solid black",
+              }}
+            >
+              Grand Total
+            </td>
+            <td
+              style={{
+                textAlign: "center",
+                verticalAlign: "middle",
+                border: "1px solid black",
+              }}
+            >
+              {totalQuantitys.toLocaleString()}
+            </td>
+            <td></td>
+            <td
+              style={{
+                textAlign: "center",
+                verticalAlign: "middle",
+                border: "1px solid black",
+              }}
+            >
+              {totalAmounts.toLocaleString()}
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   );
