@@ -1,37 +1,45 @@
 import { api } from "../../api/apiSlice";
 
-const grninfoApi= api.injectEndpoints({
+const grninfoApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    
     getAllGRNInformation: builder.query({
-        query: () => "/grninfo",
-        providesTags: ["insertgrninfo","updategrninfo,deletegrninfo"],
-        refetchOnReconnect: true,
-        refetchOnFocus: true,
-      }),
+      query: () => "/grninfo",
+      providesTags: ["insertgrninfo", "updategrninfo,deletegrninfo"],
+      refetchOnReconnect: true,
+      refetchOnFocus: true,
+    }),
 
-      getSingleGRNInformation: builder.query({
-        query: (id) => {
-          if (id) {
-            return `/grninfo/${id}`;
-          } else {
-            throw new Error("GRN id is required");
-          }
-        },
+    getSingleGRNInformation: builder.query({
+      query: (id) => {
+        if (id) {
+          return `/grninfo/${id}`;
+        } else {
+          throw new Error("GRN id is required");
+        }
+      },
+    }),
+    getFilteredGRN: builder.query({
+      query: (queryParams) => ({
+        url: 'grninfo/filtered',
+        params: queryParams,
+        providesTags: ["insertgrninfo", "updategrninfo,deletegrninfo"],
+      refetchOnReconnect: true,
+      refetchOnFocus: true,
       }),
+    }),
 
-      updateGRNInformation: builder.mutation({
-        query: (payload) => ({
-          url: `/grninfo/${payload._id}`,
-          method: "PUT",
-          body: payload,
-        }),
-        invalidatesTags: ["updategrninfo"],
-        transformResponse: (response, meta) => ({
-          data: response,
-          status: meta.response.status,
-        }),
+    updateGRNInformation: builder.mutation({
+      query: (payload) => ({
+        url: `/grninfo/${payload._id}`,
+        method: "PUT",
+        body: payload,
       }),
+      invalidatesTags: ["updategrninfo"],
+      transformResponse: (response, meta) => ({
+        data: response,
+        status: meta.response.status,
+      }),
+    }),
 
     insertGRNInformation: builder.mutation({
       query: (payload) => ({
@@ -54,10 +62,17 @@ const grninfoApi= api.injectEndpoints({
       invalidatesTags: ["deletegrninfo"],
       transformResponse: (response, meta) => ({
         data: response,
-        status: meta.response.status
-      })
+        status: meta.response.status,
+      }),
     }),
   }),
 });
 
-export const {useGetAllGRNInformationQuery,useInsertGRNInformationMutation,useGetSingleGRNInformationQuery,useUpdateGRNInformationMutation,useDeleteGRNInformationMutation}=grninfoApi
+export const {
+  useGetAllGRNInformationQuery,
+  useGetFilteredGRNQuery,
+  useInsertGRNInformationMutation,
+  useGetSingleGRNInformationQuery,
+  useUpdateGRNInformationMutation,
+  useDeleteGRNInformationMutation,
+} = grninfoApi;

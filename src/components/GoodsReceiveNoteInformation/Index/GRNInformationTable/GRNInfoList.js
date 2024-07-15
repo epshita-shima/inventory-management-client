@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   useDeleteGRNInformationMutation,
   useGetAllGRNInformationQuery,
+  useGetFilteredGRNQuery,
 } from "../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -42,7 +43,7 @@ const GRNInfoList = ({ permission }) => {
   const [deleteGRNInfo] = useDeleteGRNInformationMutation();
   const [selectSupplierPoNo, setSelectSupplierPoNo] = useState("");
   const [selectSupplierName, setSelectSupplierName] = useState("");
-  const [selectMonth, setSelectMonth] = useState("");
+  const [selectMonth, setSelectMonth] = useState([]);
   const [isTableDispaly, setIsTableDisplay] = useState(false);
   const [fromDate, setFromDate] = useState(
     new Date().toLocaleDateString("en-CA")
@@ -55,7 +56,19 @@ const GRNInfoList = ({ permission }) => {
   const [endDate, setEndDate] = useState(null);
   const animatedComponents = makeAnimated();
   const reportTitle = "GOODS RECEIPT REPORT";
+  const [executeQuery, setExecuteQuery] = useState(false);
+  const [filters, setFilters] = useState({
+    supplierPONo: "",
+    supplierId: "",
+    fromDate: "",
+    toDate: "",
+    selectMonth: [],
+  });
+  const { data: filteredDatas, error } = useGetFilteredGRNQuery(filters, {
+    enabled: executeQuery // Control when the query should execute
+  });
 
+  
   useEffect(() => {
     const createPODropdown = (options) => {
       let result = [];
@@ -74,7 +87,7 @@ const GRNInfoList = ({ permission }) => {
   const supplierOptions = supplierDropdown(supplierInfo);
 
   const groupData = (filteredData) => {
-    return filteredData.reduce((acc, row) => {
+    return filteredData?.reduce((acc, row) => {
       const key = `${row.makeDate}`;
       if (!acc[key]) {
         acc[key] = [];
@@ -84,90 +97,111 @@ const GRNInfoList = ({ permission }) => {
     }, {});
   };
 
-  const groupedData = groupData(filteredData);
+  const groupedData = groupData(filteredDatas);
+
   const getEndDate = (year, month) => {
     return new Date(year, month, 0).getDate();
   };
 
-  useEffect(() => {
-    if (isFetchAfterDeleteData) {
-      // setFilteredData(grnAllInformation);
-      handleFilter();
-      setIsFetchAfterDeleteData(false);
-    }
-  }, [isFetchAfterDeleteData, grnAllInformation]);
+  // useEffect(() => {
+  //   if (isFetchAfterDeleteData) {
+  //     // setFilteredData(grnAllInformation);
+  //     handleApplyFilters();
+  //     setIsFetchAfterDeleteData(false);
+  //   }
+  // }, [isFetchAfterDeleteData]);
 
-  const handleFilter = async () => {
-    if (isGRNLoading) {
-      console.log("loading");
+  // const handleFilter = async () => {
+  //   if (isGRNLoading) {
+  //     console.log("loading");
+  //   } else {
+  //     let filtered = grnAllInformation;
+  //     if (selectSupplierName && selectSupplierPoNo) {
+  //       const filtered = grnAllInformation.filter((item) => {
+  //         const isSupplierNameMatch = item.supplierId === selectSupplierName;
+  //         const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
+  //         return isSupplierNameMatch && isPonumberMatch;
+  //       });
+
+  //       if (filtered.length !== 0) {
+  //         console.log(filtered);
+  //         setFilteredData(filtered);
+  //       } else {
+  //         swal({
+  //           title: "Sorry!",
+  //           text: `The PO not belogns for this Supplier `,
+  //           icon: "warning",
+  //           button: "OK",
+  //         });
+  //         setFilteredData([]);
+  //       }
+  //     } else if (fromDate && toDate && selectSupplierPoNo !== "") {
+  //       filtered = await grnAllInformation.filter((item) => {
+  //         const itemDate = new Date(item.receiveDate);
+  //         const isDateInRange =
+  //           itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
+  //         const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
+  //         return isDateInRange && isPonumberMatch;
+  //       });
+  //       setFilteredData(filtered);
+  //     } else if (selectMonth) {
+  //       console.log(selectMonth);
+  //       const filtered = grnAllInformation?.filter((item) => {
+  //         const itemDate = new Date(item.receiveDate);
+
+  //         // Check if itemDate is within any selected range
+  //         return selectMonth.some(({ start, end }) => {
+  //           const startDate = new Date(start);
+  //           const endDate = new Date(end);
+  //           return itemDate >= startDate && itemDate <= endDate;
+  //         });
+  //       });
+  //       setFilteredData(filtered);
+  //       console.log(filtered);
+  //     } else if (fromDate && toDate) {
+  //       filtered = await grnAllInformation?.filter((item) => {
+  //         const itemDate = new Date(item.receiveDate);
+  //         return itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
+  //       });
+  //       setFilteredData(filtered);
+  //     } else if (selectSupplierPoNo) {
+  //       filtered = await grnAllInformation.filter(
+  //         (item) => item.supplierPoNo === selectSupplierPoNo
+  //       );
+  //       setFilteredData(filtered);
+  //     }
+
+  //     if (filtered?.length !== 0) {
+  //       setIsTableDisplay(true);
+  //     } else {
+  //       setIsTableDisplay(false);
+  //       swal({
+  //         title: "Sorry!",
+  //         text: "No Data Available.",
+  //         icon: "warning",
+  //         button: "OK",
+  //       });
+  //     }
+  //     refetch();
+  //   }
+  // };
+ 
+  const handleApplyFilters = () => {
+    setExecuteQuery(true)
+    if (filteredDatas?.length === 0) {
+      setIsTableDisplay(false);
+      swal({
+        title: "Sorry!",
+        text: "No data found for the selected filters",
+        icon: "warning",
+        button: "OK",
+      });
     } else {
-      let filtered = grnAllInformation;
-      if (selectSupplierName && selectSupplierPoNo) {
-        const filtered = grnAllInformation.filter((item) => {
-          const isSupplierNameMatch = item.supplierId === selectSupplierName;
-          const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
-          return isSupplierNameMatch && isPonumberMatch;
-        });
-
-        if (filtered.length !== 0) {
-          console.log(filtered);
-          setFilteredData(filtered);
-        } else {
-          swal({
-            title: "Sorry!",
-            text: `The PO not belogns for this Supplier `,
-            icon: "warning",
-            button: "OK",
-          });
-          setFilteredData([]);
-        }
-      } else if (fromDate && toDate && selectSupplierPoNo !== "") {
-        filtered = await grnAllInformation.filter((item) => {
-          const itemDate = new Date(item.receiveDate);
-          const isDateInRange =
-            itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
-          const isPonumberMatch = item.supplierPoNo === selectSupplierPoNo;
-          return isDateInRange && isPonumberMatch;
-        });
-        setFilteredData(filtered);
-      } else if (selectMonth) {
-        console.log(selectMonth);
-        filtered = await grnAllInformation?.filter((item) => {
-          const itemDate = new Date(item.receiveDate);
-          return (
-            itemDate >= new Date(startDate) && itemDate <= new Date(endDate)
-          );
-        });
-        setFilteredData(filtered);
-        console.log(filtered);
-      } else if (fromDate && toDate) {
-        filtered = await grnAllInformation?.filter((item) => {
-          const itemDate = new Date(item.receiveDate);
-          return itemDate >= new Date(fromDate) && itemDate <= new Date(toDate);
-        });
-        setFilteredData(filtered);
-      } else if (selectSupplierPoNo) {
-        filtered = await grnAllInformation.filter(
-          (item) => item.supplierPoNo === selectSupplierPoNo
-        );
-        setFilteredData(filtered);
-      }
-
-      if (filtered?.length !== 0) {
-        setIsTableDisplay(true);
-      } else {
-        setIsTableDisplay(false);
-        swal({
-          title: "Sorry!",
-          text: "No Data Available.",
-          icon: "warning",
-          button: "OK",
-        });
-      }
-      refetch();
+      setIsTableDisplay(true);
+      console.log(filteredDatas)
+      setFilteredData(filteredDatas);
     }
   };
-
   const columns = [
     {
       name: "Sl.",
@@ -482,16 +516,17 @@ const GRNInfoList = ({ permission }) => {
       label: `${month.name} ${getYear}`,
     }));
   };
-  const totalQuantitys = filteredData.reduce((accumulator, currentValue) => {
+  const totalQuantitys = filteredData?.reduce((accumulator, currentValue) => {
     const quantity = parseFloat(currentValue.grandTotalReceivedQuantity);
     return accumulator + (isNaN(quantity) ? 0 : quantity);
   }, 0);
-  const totalAmounts = filteredData.reduce((accumulator, currentValue) => {
+  const totalAmounts = filteredData?.reduce((accumulator, currentValue) => {
     const amount = parseFloat(currentValue.grandTotalAmount);
     return accumulator + (isNaN(amount) ? 0 : amount);
   }, 0);
   const formattedDate = generateMonths(new Date());
 
+ 
   return (
     <div className="row px-5 mx-4 ">
       <div
@@ -546,6 +581,10 @@ const GRNInfoList = ({ permission }) => {
                       },
                     })}
                     onChange={(e) => {
+                      setFilters((prevFilters) => ({
+                        ...prevFilters,
+                        supplierId:e.value,
+                      }));
                       setSelectSupplierName(e.value);
                     }}
                   ></Select>
@@ -593,6 +632,10 @@ const GRNInfoList = ({ permission }) => {
                       },
                     })}
                     onChange={(e) => {
+                      setFilters((prevFilters) => ({
+                        ...prevFilters,
+                        supplierPONo:e.value,
+                      }));
                       setSelectSupplierPoNo(e.value);
                     }}
                   ></Select>
@@ -618,6 +661,10 @@ const GRNInfoList = ({ permission }) => {
                       button: "OK",
                     });
                   } else {
+                    setFilters((prevFilters) => ({
+                      ...prevFilters,
+                      fromDate: fromDate?.toLocaleDateString("en-CA"),
+                    }));
                     setFromDate(fromDate?.toLocaleDateString("en-CA"));
                   }
                 }}
@@ -642,6 +689,10 @@ const GRNInfoList = ({ permission }) => {
                       button: "OK",
                     });
                   } else {
+                    setFilters((prevFilters) => ({
+                      ...prevFilters,
+                      toDate: toDate?.toLocaleDateString("en-CA"),
+                    }));
                     setToDate(toDate?.toLocaleDateString("en-CA"));
                   }
                 }}
@@ -690,53 +741,43 @@ const GRNInfoList = ({ permission }) => {
                       },
                     })}
                     onChange={(e) => {
-                      const sortedSelectedMonths = e.slice().sort((a, b) => {
-                        if (a.value < b.value) {
-                          return -1;
-                        }
-                        if (a.value > b.value) {
-                          return 1;
-                        }
-                        return 0;
-                      });
-                      console.log(sortedSelectedMonths);
+                      // const sortedSelectedMonths = e.slice().sort((a, b) => {
+                      //   if (a.value < b.value) {
+                      //     return -1;
+                      //   }
+                      //   if (a.value > b.value) {
+                      //     return 1;
+                      //   }
+                      //   return 0;
+                      // });
 
-                      const dates = e?.map((option) => {
-                        console.log(option);
+                      // const dates = sortedSelectedMonths?.map((option) => {
+                      //   console.log(option);
 
-                        const [selectedYear, selectedMonthNum] = option.value
-                          .split("-")
-                          .map(Number);
-                        const start = `${selectedYear}-${String(
-                          selectedMonthNum
-                        ).padStart(2, "0")}-01`;
-                        const endDay = getEndDate(
-                          selectedYear,
-                          selectedMonthNum
-                        );
-                        const end = `${selectedYear}-${String(
-                          selectedMonthNum
-                        ).padStart(2, "0")}-${endDay}`;
-                        return { month: option, start, end };
-                      });
-                      console.log(dates);
-                      // setSelectMonth(e.value);
-                      // const [selectedYear, selectedMonthNum] = e.value
-                      //   .split("-")
-                      //   .map(Number);
-                      // setStartDate(
-                      //   `${selectedYear}-${String(selectedMonthNum).padStart(
-                      //     2,
-                      //     "0"
-                      //   )}-01`
-                      // );
-                      // const endDay = getEndDate(selectedYear, selectedMonthNum);
-                      // setEndDate(
-                      //   `${selectedYear}-${String(selectedMonthNum).padStart(
-                      //     2,
-                      //     "0"
-                      //   )}-${endDay}`
-                      // );
+                      //   const [selectedYear, selectedMonthNum] = option.value
+                      //     .split("-")
+                      //     .map(Number);
+                      //   const start = `${selectedYear}-${String(
+                      //     selectedMonthNum
+                      //   ).padStart(2, "0")}-01`;
+                      //   const endDay = getEndDate(
+                      //     selectedYear,
+                      //     selectedMonthNum
+                      //   );
+                      //   const end = `${selectedYear}-${String(
+                      //     selectedMonthNum
+                      //   ).padStart(2, "0")}-${endDay}`;
+                      //   return { start, end };
+                      // });
+                      // // setSelectMonth(dates);
+                      // setFilters((prevFilters) => ({
+                      //   ...prevFilters,
+                      //   selectMonth: JSON.stringify(dates.map((month) => ({
+                      //     start: month.start,
+                      //     end: month.end,
+                      //   })))
+                      // }));
+               
                     }}
                   ></Select>
                 </div>
@@ -756,7 +797,7 @@ const GRNInfoList = ({ permission }) => {
                 height: "38px",
                 marginTop: "25px",
               }}
-              onClick={handleFilter}
+              onClick={handleApplyFilters}
             >
               Show
             </button>
@@ -820,13 +861,13 @@ const GRNInfoList = ({ permission }) => {
           </tr>
         </thead>
         <tbody>
-          {Object.keys(groupedData).map((key) => {
+          {/* {Object.keys(groupedData)?.map((key) => {
             const group = groupedData[key];
             const formattedDate = formatDate(group[0].makeDate);
             const supplierPONo = group[0].supplierPoNo;
             const rowSpan = group.length;
 
-            const totalGroupWaysQuantity = group.reduce(
+            const totalGroupWaysQuantity = group?.reduce(
               (accumulator, currentValue) => {
                 const amount = parseFloat(
                   currentValue.grandTotalReceivedQuantity
@@ -835,7 +876,7 @@ const GRNInfoList = ({ permission }) => {
               },
               0
             );
-            const totalGroupWaysAmount = group.reduce(
+            const totalGroupWaysAmount = group?.reduce(
               (accumulator, currentValue) => {
                 const amount = parseFloat(currentValue.grandTotalAmount);
                 return accumulator + (isNaN(amount) ? 0 : amount);
@@ -894,7 +935,7 @@ const GRNInfoList = ({ permission }) => {
                     </tr>
                   );
                 })}
-                {/* Grand total for each supplierPONo group */}
+               
                 <tr>
                   <td
                     colSpan={7}
@@ -929,8 +970,8 @@ const GRNInfoList = ({ permission }) => {
                 </tr>
               </>
             );
-          })}
-          {/* Grand total for the entire dataset */}
+          })} */}
+         
           <tr>
             <td
               colSpan={7}
@@ -950,7 +991,7 @@ const GRNInfoList = ({ permission }) => {
                 border: "1px solid black",
               }}
             >
-              {totalQuantitys.toLocaleString()}
+              {totalQuantitys?.toLocaleString()}
             </td>
             <td></td>
             <td
@@ -960,7 +1001,7 @@ const GRNInfoList = ({ permission }) => {
                 border: "1px solid black",
               }}
             >
-              {totalAmounts.toLocaleString()}
+              {totalAmounts?.toLocaleString()}
             </td>
           </tr>
         </tbody>
