@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   useDeleteGRNInformationMutation,
   useGetAllGRNInformationQuery,
-  useGetFilteredGRNQuery,
+  useLazyGetFilteredGRNQuery,
 } from "../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
 import DataTable from "react-data-table-component";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,6 +25,8 @@ import { downloadGRNPDF } from "../../../ReportProperties/handleGRNReport";
 import { useGetAllRMItemInformationQuery } from "../../../../redux/features/iteminformation/rmItemInfoApi";
 import { supplierDropdown } from "../../../Common/CommonDropdown/CommonDropdown";
 import makeAnimated from "react-select/animated";
+import handleDownload from "../../../ReportProperties/HandelExcelDownload";
+import handleGRNDownload from "../../../ReportProperties/handleGRNExcel";
 
 const GRNInfoList = ({ permission }) => {
   const [filterText, setFilterText] = useState("");
@@ -64,11 +66,12 @@ const GRNInfoList = ({ permission }) => {
     toDate: "",
     selectMonth: [],
   });
-  const { data: filteredDatas, error } = useGetFilteredGRNQuery(filters, {
-    enabled: executeQuery // Control when the query should execute
-  });
 
-  
+  const [trigger, { data: filteredDatas, error, isFetching }] =
+    useLazyGetFilteredGRNQuery();
+
+ console.log(JSON.stringify(filteredData))
+
   useEffect(() => {
     const createPODropdown = (options) => {
       let result = [];
@@ -97,19 +100,40 @@ const GRNInfoList = ({ permission }) => {
     }, {});
   };
 
-  const groupedData = groupData(filteredDatas);
+  const groupedData = groupData(filteredData);
 
-  const getEndDate = (year, month) => {
-    return new Date(year, month, 0).getDate();
-  };
 
-  // useEffect(() => {
-  //   if (isFetchAfterDeleteData) {
-  //     // setFilteredData(grnAllInformation);
-  //     handleApplyFilters();
-  //     setIsFetchAfterDeleteData(false);
-  //   }
-  // }, [isFetchAfterDeleteData]);
+  useEffect(() => {
+    if (executeQuery) {
+      setIsTableDisplay(true);
+      trigger(filters); // Trigger the query
+      setExecuteQuery(false); // Reset executeQuery after triggering the query
+    }
+  }, [executeQuery, trigger, filters]);
+
+  useEffect(() => {
+    // Check if filteredDatas has been updated
+    if (filteredDatas && filteredDatas.length === 0) {
+      setIsTableDisplay(false);
+      swal({
+        title: "Sorry!",
+        text: "No data found for the selected filters",
+        icon: "warning",
+        button: "OK",
+      });
+    } else {
+     
+      setFilteredData(filteredDatas || []); // Ensure filteredDatas is not null/undefined
+    }
+  }, [filteredDatas]);
+
+  useEffect(() => {
+    if (isFetchAfterDeleteData) {
+      // setFilteredData(grnAllInformation);
+      handleApplyFilters();
+      setIsFetchAfterDeleteData(false);
+    }
+  }, [isFetchAfterDeleteData]);
 
   // const handleFilter = async () => {
   //   if (isGRNLoading) {
@@ -185,23 +209,11 @@ const GRNInfoList = ({ permission }) => {
   //     refetch();
   //   }
   // };
- 
-  const handleApplyFilters = () => {
-    setExecuteQuery(true)
-    if (filteredDatas?.length === 0) {
-      setIsTableDisplay(false);
-      swal({
-        title: "Sorry!",
-        text: "No data found for the selected filters",
-        icon: "warning",
-        button: "OK",
-      });
-    } else {
-      setIsTableDisplay(true);
-      console.log(filteredDatas)
-      setFilteredData(filteredDatas);
-    }
+
+  const handleApplyFilters = async () => {
+    setExecuteQuery(true);
   };
+
   const columns = [
     {
       name: "Sl.",
@@ -404,6 +416,7 @@ const GRNInfoList = ({ permission }) => {
       -1
   );
 
+
   const subHeaderComponent = useMemo(() => {
     const handleClear = () => {
       if (filterText) {
@@ -414,6 +427,7 @@ const GRNInfoList = ({ permission }) => {
 
     return (
       <div className="d-block d-sm-flex justify-content-between align-items-center">
+      
         <div className="d-flex justify-content-end align-items-center">
           <div className="table-head-icon d-flex">
             <div class="dropdown">
@@ -454,11 +468,11 @@ const GRNInfoList = ({ permission }) => {
                     class="dropdown-item"
                     href="#"
                     onClick={() => {
-                      //   handleDownload(
-                      //     extractedAllData,
-                      //     companyinfo,
-                      //     reportTitle
-                      //   );
+                      handleGRNDownload(
+                          filteredData,
+                          companyinfo,
+                          reportTitle
+                        );
                     }}
                   >
                     Excel
@@ -495,6 +509,7 @@ const GRNInfoList = ({ permission }) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return date.toLocaleDateString("en-US", options);
   };
+
   const generateMonths = (year) => {
     const getYear = year.getFullYear();
     const months = [
@@ -516,6 +531,7 @@ const GRNInfoList = ({ permission }) => {
       label: `${month.name} ${getYear}`,
     }));
   };
+
   const totalQuantitys = filteredData?.reduce((accumulator, currentValue) => {
     const quantity = parseFloat(currentValue.grandTotalReceivedQuantity);
     return accumulator + (isNaN(quantity) ? 0 : quantity);
@@ -526,7 +542,6 @@ const GRNInfoList = ({ permission }) => {
   }, 0);
   const formattedDate = generateMonths(new Date());
 
- 
   return (
     <div className="row px-5 mx-4 ">
       <div
@@ -540,7 +555,7 @@ const GRNInfoList = ({ permission }) => {
           <h3 className="fw-bold mt-1">Goods Receive Note (GRN) List</h3>
           <hr />
           <div className="d-flex justify-content-between align-items-center w-100">
-            <div style={{ width: "25%" }}>
+            <div style={{ width: "23%" }}>
               <div className="w-100">
                 <label htmlFor="">Supplier Name</label>
                 <br />
@@ -583,7 +598,7 @@ const GRNInfoList = ({ permission }) => {
                     onChange={(e) => {
                       setFilters((prevFilters) => ({
                         ...prevFilters,
-                        supplierId:e.value,
+                        supplierId: e.value,
                       }));
                       setSelectSupplierName(e.value);
                     }}
@@ -591,7 +606,7 @@ const GRNInfoList = ({ permission }) => {
                 </div>
               </div>
             </div>
-            <div style={{ width: "25%", marginLeft: "18px" }}>
+            <div style={{ width: "23%", marginLeft: "18px" }}>
               <div className="w-100">
                 <label htmlFor="">Supplier PO No</label>
                 <br />
@@ -634,7 +649,7 @@ const GRNInfoList = ({ permission }) => {
                     onChange={(e) => {
                       setFilters((prevFilters) => ({
                         ...prevFilters,
-                        supplierPONo:e.value,
+                        supplierPONo: e.value,
                       }));
                       setSelectSupplierPoNo(e.value);
                     }}
@@ -681,24 +696,16 @@ const GRNInfoList = ({ permission }) => {
                 required
                 onChange={(toDate) => {
                   console.log(toDate);
-                  if (toDate > new Date()) {
-                    swal({
-                      title: "Select Valid Date",
-                      text: "Date should be equal or earlier than today",
-                      icon: "warning",
-                      button: "OK",
-                    });
-                  } else {
-                    setFilters((prevFilters) => ({
-                      ...prevFilters,
-                      toDate: toDate?.toLocaleDateString("en-CA"),
-                    }));
-                    setToDate(toDate?.toLocaleDateString("en-CA"));
-                  }
+
+                  setFilters((prevFilters) => ({
+                    ...prevFilters,
+                    toDate: toDate?.toLocaleDateString("en-CA"),
+                  }));
+                  setToDate(toDate?.toLocaleDateString("en-CA"));
                 }}
               />
             </div>
-            <div style={{ width: "15%", marginLeft: "20px" }}>
+            <div style={{ width: "16%", marginLeft: "20px" }}>
               <div className="w-100">
                 <label htmlFor="">Select Month</label>
                 <br />
@@ -707,17 +714,10 @@ const GRNInfoList = ({ permission }) => {
                     class="form-select"
                     className="w-100"
                     aria-label="Default select example"
-                    name="poinfo"
+                    name="monthinfo"
                     components={animatedComponents}
                     options={formattedDate}
                     isMulti
-                    defaultValue={{
-                      label: "Select Supplier PONo",
-                      value: 0,
-                    }}
-                    // value={formattedDate.filter(function (option) {
-                    //   return option.value === selectMonth;
-                    // })}
                     styles={{
                       control: (baseStyles, state) => ({
                         ...baseStyles,
@@ -741,43 +741,45 @@ const GRNInfoList = ({ permission }) => {
                       },
                     })}
                     onChange={(e) => {
-                      // const sortedSelectedMonths = e.slice().sort((a, b) => {
-                      //   if (a.value < b.value) {
-                      //     return -1;
-                      //   }
-                      //   if (a.value > b.value) {
-                      //     return 1;
-                      //   }
-                      //   return 0;
-                      // });
+                      const sortedSelectedMonths = e.slice().sort((a, b) => {
+                        if (a.value < b.value) {
+                          return -1;
+                        }
+                        if (a.value > b.value) {
+                          return 1;
+                        }
+                        return 0;
+                      });
+                      const getEndDate = (year, month) => {
+                        return new Date(year, month, 0).getDate();
+                      };
+                      const dates = sortedSelectedMonths?.map((option) => {
+                        console.log(option);
 
-                      // const dates = sortedSelectedMonths?.map((option) => {
-                      //   console.log(option);
-
-                      //   const [selectedYear, selectedMonthNum] = option.value
-                      //     .split("-")
-                      //     .map(Number);
-                      //   const start = `${selectedYear}-${String(
-                      //     selectedMonthNum
-                      //   ).padStart(2, "0")}-01`;
-                      //   const endDay = getEndDate(
-                      //     selectedYear,
-                      //     selectedMonthNum
-                      //   );
-                      //   const end = `${selectedYear}-${String(
-                      //     selectedMonthNum
-                      //   ).padStart(2, "0")}-${endDay}`;
-                      //   return { start, end };
-                      // });
-                      // // setSelectMonth(dates);
-                      // setFilters((prevFilters) => ({
-                      //   ...prevFilters,
-                      //   selectMonth: JSON.stringify(dates.map((month) => ({
-                      //     start: month.start,
-                      //     end: month.end,
-                      //   })))
-                      // }));
-               
+                        const [selectedYear, selectedMonthNum] = option.value
+                          .split("-")
+                          .map(Number);
+                        const start = `${selectedYear}-${String(
+                          selectedMonthNum
+                        ).padStart(2, "0")}-01`;
+                        const endDay = getEndDate(
+                          selectedYear,
+                          selectedMonthNum
+                        );
+                        const end = `${selectedYear}-${String(
+                          selectedMonthNum
+                        ).padStart(2, "0")}-${endDay}`;
+                        return { start, end };
+                      });
+                      setFilters((prevFilters) => ({
+                        ...prevFilters,
+                        selectMonth: JSON.stringify(
+                          dates.map((month) => ({
+                            start: month.start,
+                            end: month.end,
+                          }))
+                        ),
+                      }));
                     }}
                   ></Select>
                 </div>
@@ -818,6 +820,14 @@ const GRNInfoList = ({ permission }) => {
               onClick={() => {
                 setFromDate(new Date()?.toLocaleDateString("en-CA"));
                 setToDate(new Date()?.toLocaleDateString("en-CA"));
+                setFilters((prevFilters) => ({
+                  ...prevFilters,
+                  supplierPONo: "",
+                  supplierId: "",
+                  fromDate: "",
+                  toDate: "",
+                  selectMonth: [],
+                }));
                 setSelectSupplierName("");
                 setSelectSupplierPoNo("");
                 setSelectMonth("");
@@ -861,7 +871,7 @@ const GRNInfoList = ({ permission }) => {
           </tr>
         </thead>
         <tbody>
-          {/* {Object.keys(groupedData)?.map((key) => {
+           {Object.keys(groupedData)?.map((key) => {
             const group = groupedData[key];
             const formattedDate = formatDate(group[0].makeDate);
             const supplierPONo = group[0].supplierPoNo;
@@ -970,8 +980,8 @@ const GRNInfoList = ({ permission }) => {
                 </tr>
               </>
             );
-          })} */}
-         
+          })} 
+
           <tr>
             <td
               colSpan={7}

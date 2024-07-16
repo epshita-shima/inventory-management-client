@@ -70,7 +70,7 @@ const grninfoApi = api.injectEndpoints({
 
 export const {
   useGetAllGRNInformationQuery,
-  useGetFilteredGRNQuery,
+  useLazyGetFilteredGRNQuery,
   useInsertGRNInformationMutation,
   useGetSingleGRNInformationQuery,
   useUpdateGRNInformationMutation,
