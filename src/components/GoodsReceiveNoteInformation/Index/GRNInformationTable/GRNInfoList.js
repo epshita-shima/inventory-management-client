@@ -470,6 +470,9 @@ const GRNInfoList = ({ permission }) => {
                     onClick={() => {
                       handleGRNDownload(
                           filteredData,
+                          rawItemInfo,
+                          supplierInfo,
+                          purchaseInfoData,
                           companyinfo,
                           reportTitle
                         );
@@ -499,6 +502,7 @@ const GRNInfoList = ({ permission }) => {
     rawItemInfo,
     resetPaginationToggle,
     fromDate,
+    purchaseInfoData,
     toDate,
     companyinfo,
     reportTitle,

@@ -1,10 +1,19 @@
 import * as ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
-const handleGRNDownload = (data, companyinfo, reportTitle) => {
+const handleGRNDownload = (
+  data,
+  rawItemInfo,
+  supplierInfo,
+  purchaseInfoData,
+  companyinfo,
+  reportTitle
+) => {
   const fileName = reportTitle.toLowerCase().replace(/\s+/g, "");
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet("Userlist Report");
+  const worksheet = workbook.addWorksheet("GRNlist Report");
+  console.log(rawItemInfo);
+
   const columnsToInclude = [
     "receiveDate",
     "supplierId",
@@ -15,12 +24,13 @@ const handleGRNDownload = (data, companyinfo, reportTitle) => {
     "currency",
     "receiveQty",
     "unitPrice",
-    "totalAmount"
+    "totalAmount",
   ];
 
   // Merge and center header information
-  const headerLength = columnsToInclude.length > 0 ? Object.keys(columnsToInclude).length : 0;
-  console.log(headerLength);
+  const headerLength =
+    columnsToInclude.length > 0 ? Object.keys(columnsToInclude).length : 0;
+ 
   worksheet.mergeCells(`A1:${String.fromCharCode(65 + headerLength - 1)}1`);
   worksheet.getCell("A1").value = `${companyinfo[0].companyName}`;
   worksheet.getCell("A1").font = {
@@ -59,6 +69,7 @@ const handleGRNDownload = (data, companyinfo, reportTitle) => {
     size: 12,
     bold: true,
   };
+
   worksheet.getCell("A3").border = {
     top: { style: "thin" },
     left: { style: "thin" },
@@ -66,11 +77,7 @@ const handleGRNDownload = (data, companyinfo, reportTitle) => {
     right: { style: "thin" },
   };
 
- 
-
   const headerRow = worksheet.addRow(columnsToInclude);
-
-  console.log(headerRow.values);
 
   headerRow.eachCell((cell) => {
     cell.border = {
@@ -79,56 +86,95 @@ const handleGRNDownload = (data, companyinfo, reportTitle) => {
       bottom: { style: "thin" },
       right: { style: "thin" },
     };
-    cell.alignment = { horizontal: "center"};
+    cell.alignment = { horizontal: "center" };
     cell.font = { bold: true };
   });
 
   worksheet.columns = columnsToInclude.map((col) => ({
     header: col,
     key: col,
-    width: 20
+    width: 20,
   }));
-
+let totalReceivedQuantity=0;
   let totalQuantity = 0;
   let totalAmount = 0;
-  
-  data.forEach(item => {
-      totalQuantity += item.grandTotalQuantity;
-      totalAmount += item.grandTotalAmount;
-  });
+
   data.forEach((item) => {
-    const itemName =
-      item.detailsData.length > 0 ? item.detailsData[0].itemName : ""; // Extract itemName from detailsData
+    totalReceivedQuantity +=item.grandTotalReceivedQuantity
+    totalQuantity += item.grandTotalQuantity;
+    totalAmount += item.grandTotalAmount;
+  });
+console.log(totalReceivedQuantity,totalQuantity,totalAmount)
+  data.forEach((item) => {
+    const itemName = rawItemInfo
+      ?.filter((items) =>
+        item?.detailsData?.some((detail) => detail?.itemId === items._id)
+      )
+      .map((filteredItem) => filteredItem.itemName)
+      .join(", ");
+    const supplierName = supplierInfo
+      ?.filter((rawItem) => rawItem._id === item.supplierId)
+      .map((filteredItem) => filteredItem.supplierName)
+      .join(", ");
+    const unitPrice = item.detailsData
+      .map((detail) => detail.unitPrice)
+      .join(", ");
+    const currency = purchaseInfoData
+      ?.filter((poItem) => poItem._id === item.pOSingleId)
+      .map((filteredItem) => filteredItem.currencyId)
+      .join(",");
+
     const values = {
       receiveDate: item.receiveDate,
-      supplierId: item.supplierId,
+      supplierId: supplierName,
       supplierPoNo: item.supplierPoNo,
       itemName: itemName,
       grnSerialNo: item.grnSerialNo,
       challanNo: item.challanNo,
-      currency:item.currency,
-      receiveQty:item.grandTotalReceivedQuantity,
-      unitPrice:item.unitPrice,
-      totalAmount:item.grandTotalAmount
+      currency: currency,
+      receiveQty: item.grandTotalReceivedQuantity,
+      unitPrice: unitPrice,
+      totalAmount: item.grandTotalAmount,
     };
-    const footerValues = columnsToInclude.reduce((acc, col) => {
-        if (col.key === 'grandTotalQuantity') {
-            acc[col.key] = totalQuantity;
-        } else if (col.key === 'grandTotalAmount') {
-            acc[col.key] = totalAmount;
-        } else {
-            acc[col.key] = ''; // Leave other cells empty
-        }
-        return acc;
-    }, {});
-    
-    const footerRow = worksheet.addRow(footerValues);
 
-    
-    // Add the row with values in the same order as columnsToInclude
-    worksheet.addRow(columnsToInclude.map((col) => values[col]));
+    const singleRow = worksheet.addRow(values);
+    singleRow.eachCell((cell) => {
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+      cell.alignment = { horizontal: "center" };
+    });
+
+    // worksheet.addRow(columnsToInclude.map((col) =>
+    //     values[col]
+    // ));
   });
-
+  const datas = {
+    receiveDate: "",
+    supplierId: "",
+    supplierPoNo: "",
+    itemName: "",
+    grnSerialNo: "",
+    challanNo: "",
+    currency: "Grand Total",
+    receiveQty: 900,
+    unitPrice: 580,
+    totalAmount: 12000,
+  };
+  const footerRow = worksheet.addRow(datas);
+  footerRow.eachCell((cell) => {
+    cell.border = {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" },
+    };
+    cell.alignment = { horizontal: "center" };
+    cell.font = { bold: true };
+  });
   // Generate buffer
   workbook.xlsx.writeBuffer().then((buffer) => {
     // Save the Excel file
