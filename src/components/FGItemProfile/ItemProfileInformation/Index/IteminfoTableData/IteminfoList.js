@@ -400,10 +400,10 @@ const [selectedData, setSelectedData] = useState([]);
       ></ListHeading>
       <div
         className="col userlist-table mt-4"
-        style={{
-          overflow: "scroll",
-          height: "420px",
-        }}
+        // style={{
+        //   overflow: "scroll",
+        //   height: "420px",
+        // }}
       >
         <div className="shadow-lg ">
           <DataTable

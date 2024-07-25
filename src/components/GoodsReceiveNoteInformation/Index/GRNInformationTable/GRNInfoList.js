@@ -57,7 +57,7 @@ const GRNInfoList = ({ permission }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const animatedComponents = makeAnimated();
-  const reportTitle = "GOODS RECEIPT REPORT";
+  const reportTitle = "GOODS RECEIVE REPORT";
   const [executeQuery, setExecuteQuery] = useState(false);
   const [filters, setFilters] = useState({
     supplierPONo: "",

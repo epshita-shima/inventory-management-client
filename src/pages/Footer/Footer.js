@@ -12,6 +12,7 @@ const Footer = () => {
     fontWeight: "bold",
     letterSpacing: "0.5px",
     height: "50px",
+    zIndex:'-1'
   };
 
   return (

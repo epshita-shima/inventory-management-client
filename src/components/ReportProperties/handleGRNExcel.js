@@ -12,7 +12,8 @@ const handleGRNDownload = (
   const fileName = reportTitle.toLowerCase().replace(/\s+/g, "");
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("GRNlist Report");
-  console.log(rawItemInfo);
+  let totalReceivedQuantity = 0;
+  let totalAmount = 0;
 
   const columnsToInclude = [
     "receiveDate",
@@ -27,10 +28,37 @@ const handleGRNDownload = (
     "totalAmount",
   ];
 
+  console.log(columnsToInclude)
+  let dynamicColumns = [
+    { header: "Receive Date", key: "receiveDate", width: 15 },
+    { header: "Supplier Id", key: "supplierId", width: 15 },
+    { header: "Supplier Po No", key: "supplierPoNo", width: 20 },
+    { header: 'Item Name', key: 'itemName', width: 20 },
+    { header: 'GRN SerialNo', key: 'grnSerialNo', width: 20 },
+    { header: 'Challan No', key: 'challanNo', width: 20 },
+    { header: 'Currency', key: 'currency', width: 20 },
+    { header: 'Receive Qty', key: 'receiveQty', width: 20 },
+    { header: 'Unit Price', key: 'unitPrice', width: 20 },
+    { header: 'Total Amount', key: 'totalAmount', width: 20 },
+  ];
+  columnsToInclude.forEach((item, index) => {
+    let customFieldName = item.replace(/\s/g, '_');
+    let customFieldValue = item;
+    const found = dynamicColumns.some(col => col.key === customFieldValue);
+    
+    if (!found) {
+      dynamicColumns.push({
+        header: item.field_name,
+        key: customFieldName,
+        width: 15
+      });
+    }
+  });
+  console.log(dynamicColumns)
   // Merge and center header information
   const headerLength =
-    columnsToInclude.length > 0 ? Object.keys(columnsToInclude).length : 0;
- 
+  dynamicColumns.length > 0 ? Object.keys(dynamicColumns).length : 0;
+
   worksheet.mergeCells(`A1:${String.fromCharCode(65 + headerLength - 1)}1`);
   worksheet.getCell("A1").value = `${companyinfo[0].companyName}`;
   worksheet.getCell("A1").font = {
@@ -77,7 +105,7 @@ const handleGRNDownload = (
     right: { style: "thin" },
   };
 
-  const headerRow = worksheet.addRow(columnsToInclude);
+  const headerRow = worksheet.addRow(dynamicColumns.map((item)=>item.header));
 
   headerRow.eachCell((cell) => {
     cell.border = {
@@ -90,21 +118,19 @@ const handleGRNDownload = (
     cell.font = { bold: true };
   });
 
-  worksheet.columns = columnsToInclude.map((col) => ({
-    header: col,
-    key: col,
-    width: 20,
-  }));
-let totalReceivedQuantity=0;
-  let totalQuantity = 0;
-  let totalAmount = 0;
+  // worksheet.columns = columnsToInclude.map((col) => ({
+  //   header: col,
+  //   key: col,
+  //   width: 20,
+  // }));
+
 
   data.forEach((item) => {
-    totalReceivedQuantity +=item.grandTotalReceivedQuantity
-    totalQuantity += item.grandTotalQuantity;
-    totalAmount += item.grandTotalAmount;
+    totalReceivedQuantity += parseFloat(item.grandTotalReceivedQuantity);
+    totalAmount += parseFloat(item.grandTotalAmount);
   });
-console.log(totalReceivedQuantity,totalQuantity,totalAmount)
+
+
   data.forEach((item) => {
     const itemName = rawItemInfo
       ?.filter((items) =>
@@ -136,8 +162,10 @@ console.log(totalReceivedQuantity,totalQuantity,totalAmount)
       unitPrice: unitPrice,
       totalAmount: item.grandTotalAmount,
     };
-
-    const singleRow = worksheet.addRow(values);
+ 
+  const singleRow = worksheet.addRow(dynamicColumns.map((col) =>
+        values[col.key]
+  ));
     singleRow.eachCell((cell) => {
       cell.border = {
         top: { style: "thin" },
@@ -152,6 +180,7 @@ console.log(totalReceivedQuantity,totalQuantity,totalAmount)
     //     values[col]
     // ));
   });
+
   const datas = {
     receiveDate: "",
     supplierId: "",
@@ -160,11 +189,13 @@ console.log(totalReceivedQuantity,totalQuantity,totalAmount)
     grnSerialNo: "",
     challanNo: "",
     currency: "Grand Total",
-    receiveQty: 900,
-    unitPrice: 580,
-    totalAmount: 12000,
+    receiveQty: totalReceivedQuantity,
+    unitPrice: "",
+    totalAmount: totalAmount,
   };
-  const footerRow = worksheet.addRow(datas);
+  const footerRow = worksheet.addRow(columnsToInclude.map((col) =>
+    datas[col]
+));
   footerRow.eachCell((cell) => {
     cell.border = {
       top: { style: "thin" },
@@ -175,9 +206,8 @@ console.log(totalReceivedQuantity,totalQuantity,totalAmount)
     cell.alignment = { horizontal: "center" };
     cell.font = { bold: true };
   });
-  // Generate buffer
+  
   workbook.xlsx.writeBuffer().then((buffer) => {
-    // Save the Excel file
     saveAs(new Blob([buffer]), `${fileName}.xlsx`);
   });
 };

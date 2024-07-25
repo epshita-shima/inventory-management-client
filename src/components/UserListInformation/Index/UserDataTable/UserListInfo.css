@@ -54,7 +54,7 @@
     color:black !important
 }
 @media only screen and (max-width: 575px){
-    .userlist-table{
+    /* .userlist-table{
         height: 600px !important;
-    }
+    } */
 }
