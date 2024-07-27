@@ -19,6 +19,7 @@ import FilterComponent from "../../../Common/ListDataSearchBoxDesign/FilterCompo
 import ListHeading from "../../../Common/ListHeading/ListHeading";
 import ActiveListDataModal from "../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
 import { useDeleteCFTInfoMutation } from "../../../../redux/features/cftinformation/cftInfosApi";
+import '../../Insert/InsertCFTInfo.css'
 const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
   console.log(cftInfosData);
@@ -37,13 +38,12 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
   const [deleteCFTInfoData] = useDeleteCFTInfoMutation();
   const [cftInfoActiveStatus, setCFTInfoActiveStaus] = useState([]);
   const [cftInfoInActiveStatus, setCFTInfoInActiveStatus] = useState([]);
-  const [isExisting, setIsExisting] = useState([]);
   var reportTitle = "All CFT Info List";
   var reportTitleActiveImage = "All CFT All Active Image";
   var reportTitleInActiveImage = "All CFT All InActive Image";
   var reportTitleForAllImage = "All CFT All Image";
 
-  console.log(cftInfosData);
+
 
   useEffect(() => {
     const cftInfoActiveStatus = cftInfosData?.filter(
@@ -501,12 +501,9 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
       ></ListHeading>
       <div
         className="col userlist-table mt-4"
-        style={{
-          overflow: "scroll",
-          height: "420px",
-        }}
+        style={{ height: 'calc(80vh - 120px)', overflowY: 'scroll' }}
       >
-        <div className="shadow-lg ">
+        <div className="shadow-lg">
           <DataTable
             columns={columns}
             data={filteredItems}

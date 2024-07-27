@@ -429,10 +429,7 @@ const PurchaseOderList = ({ permission }) => {
       ></ListHeading>
       <div
         className="col userlist-table mt-4"
-        style={{
-          overflow: "scroll",
-          height: "420px",
-        }}
+        // style={{ height: 'calc(90vh - 120px)', overflowY: 'scroll' }}
       >
         <div className="shadow-lg ">
           <DataTable

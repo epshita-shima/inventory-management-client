@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import MenuIdCollection from "../MenuIdCollection/MenuIdCollection";
 
 const ListHeading = ({
@@ -74,7 +74,10 @@ const ListHeading = ({
       setTotalActiveTitle(`Total Active ${searchItem[0]?.headerLabelName}`);
       setTotalInActiveTitle(`Total InActive ${searchItem[0]?.headerLabelName}`);
 
-      if (searchItem[0]?.menuId === MenuIdCollection.purchaseorderlist || searchItem[0]?.menuId === MenuIdCollection.purchaseorderapprove) {
+      if (
+        searchItem[0]?.menuId === MenuIdCollection.purchaseorderlist ||
+        searchItem[0]?.menuId === MenuIdCollection.purchaseorderapprove
+      ) {
         setTotalTitle(`Total PO`);
         setTotalActiveTitle(`Total PO in Cash`);
         setTotalInActiveTitle(`Total PO in LC`);
@@ -112,8 +115,9 @@ const ListHeading = ({
         grandTotal = purchaseInfoData?.length;
         totalActive = purchaseInCash?.length;
         totalInActive = purchaseInLCAtSight?.length;
-      }
-      else if (searchItem[0]?.menuId === MenuIdCollection.purchaseorderapprove) {
+      } else if (
+        searchItem[0]?.menuId === MenuIdCollection.purchaseorderapprove
+      ) {
         grandTotal = purchaseInfoData?.length;
         totalActive = purchaseInCash?.length;
         totalInActive = purchaseInLCAtSight?.length;
@@ -152,13 +156,20 @@ const ListHeading = ({
   return (
     <div>
       <div class="row">
-        <div class={purchaseOrderList ? "col" : "col-md-3"}>
+        <div
+          class={
+            purchaseOrderList
+              ? " col-lg col-sm-12 col-md-4"
+              : "col-md-4 col-lg-3"
+          }
+        >
           <div
             class="cardbox shadow-lg"
             style={{
               borderLeft: "12px solid #2DDC1B",
               borderRadius: "10px",
               height: "80px",
+              width: "100%",
             }}
           >
             <div
@@ -185,13 +196,20 @@ const ListHeading = ({
             </div>
           </div>
         </div>
-        <div class={purchaseOrderList ? "col" : "col-md-3 mt-4 mt-sm-0"}>
+        <div
+          class={
+            purchaseOrderList
+              ? " col-lg col-sm-12 col-md-4 mt-4 mt-sm-4 mt-md-4 mt-lg-0 mt-xl-0"
+              : "col-md-4 col-lg-3 mt-4  mt-sm-4 mt-md-0 mt-lg-0 mt-xl-0"
+          }
+        >
           <div
             class="cardbox shadow-lg"
             style={{
               borderLeft: "12px solid  #B8FEB3",
               borderRadius: "10px",
               height: "80px",
+              width: "100%",
             }}
           >
             <div
@@ -226,13 +244,20 @@ const ListHeading = ({
             </div>
           </div>
         </div>
-        <div class={purchaseOrderList ? "col" : "col-md-3 mt-4 mt-sm-0"}>
+        <div
+          class={
+            purchaseOrderList
+              ? " col-lg col-sm-12 col-md-4 mt-4  mt-sm-4 mt-md-4 mt-lg-0 mt-xl-0"
+              : "col-md-4 col-lg-3 mt-4  mt-sm-4 mt-md-0 mt-lg-0 mt-xl-0"
+          }
+        >
           <div
             class="cardbox shadow-lg"
             style={{
               borderLeft: "12px solid red",
               borderRadius: "10px",
               height: "80px",
+              width: "100%",
             }}
           >
             <div
@@ -269,13 +294,14 @@ const ListHeading = ({
         </div>
         {purchaseOrderList ? (
           <>
-            <div class="col mt-4 mt-sm-0">
+            <div class=" col-lg col-sm-12 col-md-4 mt-4  mt-sm-4 mt-md-4 mt-lg-0 mt-xl-0 mt-4 mt-sm-0">
               <div
                 class="cardbox shadow-lg"
                 style={{
                   borderLeft: "12px solid #2DDC1B",
                   borderRadius: "10px",
                   height: "80px",
+                  width: "100%",
                 }}
               >
                 <div
@@ -307,7 +333,7 @@ const ListHeading = ({
                 </div>
               </div>
             </div>
-            <div class="col mt-4 mt-sm-0">
+            <div class=" col-lg col-sm-12 col-md-4 mt-4  mt-sm-4 mt-md-4 mt-lg-0 mt-xl-0">
               <div
                 class="cardbox shadow-lg"
                 style={{

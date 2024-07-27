@@ -550,10 +550,10 @@ const GRNInfoList = ({ permission }) => {
     <div className="row px-5 mx-4 ">
       <div
         className="col userlist-table mt-4"
-        style={{
-          overflow: "scroll",
-          height: "480px",
-        }}
+        // style={{
+        //   overflow: "scroll",
+        //   height: "480px",
+        // }}
       >
         <div>
           <h3 className="fw-bold mt-1">Goods Receive Note (GRN) List</h3>

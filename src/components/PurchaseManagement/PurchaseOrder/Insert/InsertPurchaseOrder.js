@@ -20,7 +20,7 @@ const InsertPurchaseOrder = ({
   arrayHelpers,
 }) => {
   return (
-      <div style={{ height: "300px", overflowY: "auto" }}>
+      <div style={{ height: 'calc(50vh - 120px)', overflowY: "auto" }}>
         <table className="table w-full table-bordered">
           <thead className="w-100">
             <tr>
