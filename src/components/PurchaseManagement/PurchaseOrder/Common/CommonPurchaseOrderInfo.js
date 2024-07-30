@@ -187,7 +187,7 @@ const CommonPurchaseOrderInfo = () => {
     <div
       className=" row px-4 mx-4"
       style={{
-        overflowY: "hidden",
+        overflow: "hidden",
         height: "calc(98vh - 120px)",
         zIndex:'9999'
       }}
@@ -234,61 +234,65 @@ const CommonPurchaseOrderInfo = () => {
                     ArrayHelperRef.current = arrayHelpers;
                     const details = values.detailsData;
                     return (
-                      <div className=" flex-1 items-center d-flex-nowrap mt-3 shadow-lg py-2 px-5">
-                        <div>
-                          <div className="d-flex justify-content-between align-items-center">
-                            <h2
-                              style={{ fontSize: "24px", fontWeight: "bold" }}
+                      <div
+                        className=" flex-1 items-center d-flex-nowrap mt-2 shadow-lg py-2 px-5"
+                        style={{
+                          overflowY: "hidden",
+                          height: "calc(95vh - 120px)",
+                          zIndex: "9999",
+                        }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center">
+                          <h2 style={{ fontSize: "24px", fontWeight: "bold" }}>
+                            Purchase Order Form
+                          </h2>
+                          <div>
+                            <button
+                              style={{
+                                backgroundColor: "#E55566",
+                                outline: "none",
+                                border: "none",
+                                color: "white",
+                                height: "25px",
+                              }}
+                              onClick={() => {
+                                navigate("/main-view/po-list");
+                              }}
                             >
-                              Purchase Order Form
-                            </h2>
-                            <div>
-                              <button
-                                style={{
-                                  backgroundColor: "#E55566",
-                                  outline: "none",
-                                  border: "none",
-                                  color: "white",
-                                  height: "25px",
-                                }}
-                                onClick={() => {
-                                  navigate("/main-view/po-list");
-                                }}
-                              >
-                                <FontAwesomeIcon
-                                  icon={faArrowAltCircleLeft}
-                                ></FontAwesomeIcon>
-                                Back to ItemList
-                              </button>
-                            </div>
+                              <FontAwesomeIcon
+                                icon={faArrowAltCircleLeft}
+                              ></FontAwesomeIcon>
+                              Back to ItemList
+                            </button>
                           </div>
-
-                          <PurchaseOrderSingleInfo
-                            id={id}
-                            supplierOptions={supplierOptions}
-                            values={values}
-                            setFieldValue={setFieldValue}
-                            serialValue={serialValue}
-                            touched={touched}
-                            errors={errors}
-                            setActiveSupplierModal={setActiveSupplierModal}
-                            setAcivePaymentModal={setAcivePaymentModal}
-                            setActiveItemInfoModal={setActiveItemInfoModal}
-                            setAciveBankInfoModal={setAciveBankInfoModal}
-                            paymentTypeOptions={paymentTypeOptions}
-                            bankInfoOptions={bankInfoOptions}
-                            startDate={startDate}
-                            setStartDate={setStartDate}
-                            currencyOptions={currencyOptions}
-                            purchaseOrderAllInformation={
-                              purchaseOrderAllInformation
-                            }
-                            setPurchaseOrderAllInformation={
-                              setPurchaseOrderAllInformation
-                            }
-                            makebyUser={makebyUser}
-                          ></PurchaseOrderSingleInfo>
                         </div>
+
+                        <PurchaseOrderSingleInfo
+                          id={id}
+                          supplierOptions={supplierOptions}
+                          values={values}
+                          setFieldValue={setFieldValue}
+                          serialValue={serialValue}
+                          touched={touched}
+                          errors={errors}
+                          setActiveSupplierModal={setActiveSupplierModal}
+                          setAcivePaymentModal={setAcivePaymentModal}
+                          setActiveItemInfoModal={setActiveItemInfoModal}
+                          setAciveBankInfoModal={setAciveBankInfoModal}
+                          paymentTypeOptions={paymentTypeOptions}
+                          bankInfoOptions={bankInfoOptions}
+                          startDate={startDate}
+                          setStartDate={setStartDate}
+                          currencyOptions={currencyOptions}
+                          purchaseOrderAllInformation={
+                            purchaseOrderAllInformation
+                          }
+                          setPurchaseOrderAllInformation={
+                            setPurchaseOrderAllInformation
+                          }
+                          makebyUser={makebyUser}
+                        ></PurchaseOrderSingleInfo>
+
                         <div>
                           <h2 style={{ fontSize: "20px", fontWeight: "bold" }}>
                             Details Information
@@ -370,7 +374,7 @@ const CommonPurchaseOrderInfo = () => {
                                 Add Row
                               </div>
                             </div>
-                            <div className="d-flex justify-content-between align-items-center">
+                            <div className="d-lg-flex justify-content-between align-items-center">
                               <div>
                                 <label
                                   htmlFor="grandTotalQuantity"
@@ -399,7 +403,7 @@ const CommonPurchaseOrderInfo = () => {
                                   }}
                                 />
                               </div>
-                              <div>
+                              <div className="mt-md-2">
                                 <label
                                   htmlFor="grandTotalAmount"
                                   style={{ fontSize: "16px" }}

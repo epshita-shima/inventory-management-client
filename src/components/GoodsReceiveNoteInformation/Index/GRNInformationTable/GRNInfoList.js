@@ -558,8 +558,8 @@ const GRNInfoList = ({ permission }) => {
         <div>
           <h3 className="fw-bold mt-1">Goods Receive Note (GRN) List</h3>
           <hr />
-          <div className="d-flex justify-content-between align-items-center w-100">
-            <div style={{ width: "23%" }}>
+          <div className="d-lg-flex justify-content-lg-between align-items-lg-center w-lg-100 d-md-block">
+            <div className="width-lg-23 width-md-23">
               <div className="w-100">
                 <label htmlFor="">Supplier Name</label>
                 <br />
@@ -610,7 +610,7 @@ const GRNInfoList = ({ permission }) => {
                 </div>
               </div>
             </div>
-            <div style={{ width: "23%", marginLeft: "18px" }}>
+            <div className="width-lg-23 width-md-23" style={{ marginLeft: "18px" }}>
               <div className="w-100">
                 <label htmlFor="">Supplier PO No</label>
                 <br />
@@ -661,7 +661,7 @@ const GRNInfoList = ({ permission }) => {
                 </div>
               </div>
             </div>
-            <div className=" ms-4">
+            <div className="ms-lg-4 margin-md">
               <label htmlFor="">From Date</label>
               <br />
               <DatePicker
@@ -689,7 +689,7 @@ const GRNInfoList = ({ permission }) => {
                 }}
               />
             </div>
-            <div className="ms-4">
+            <div className="ms-lg-4 margin-md">
               <label htmlFor="">To Date</label>
               <br />
               <DatePicker
@@ -709,7 +709,7 @@ const GRNInfoList = ({ permission }) => {
                 }}
               />
             </div>
-            <div style={{ width: "16%", marginLeft: "20px" }}>
+            <div className="width-lg-16 margin-md" style={{  marginLeft: "20px" }}>
               <div className="w-100">
                 <label htmlFor="">Select Month</label>
                 <br />
@@ -844,7 +844,9 @@ const GRNInfoList = ({ permission }) => {
         </div>
 
         {isTableDispaly ? (
-          <div className=" ">
+          <div className=" " 
+          style={{ height: 'calc(65vh - 120px)', overflowY: 'scroll' }}
+          >
             <DataTable
               columns={columns}
               data={filteredItems}

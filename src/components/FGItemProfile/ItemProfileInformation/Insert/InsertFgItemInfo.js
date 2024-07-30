@@ -121,12 +121,12 @@ const InsertFgItemInfo = () => {
     <div
       className=" row px-4 mx-4"
       style={{
-        overflowY: "scroll",
-        height: "500px",
+        overflowY: "hidden",
+        height: "calc(98vh - 120px)",
       }}
     >
       <div class="overflow-hidden">
-        <div className="shadow-lg mt-2 mt-sm-5 mt-md-5 mt-lg-5 p-5 rounded-4">
+        <div className="shadow-lg p-5 rounded-4">
           <div className="d-flex justify-content-between align-items-center ">
             <div className="d-flex align-items-center">
               <FontAwesomeIcon
@@ -205,7 +205,7 @@ const InsertFgItemInfo = () => {
                     handleSubmit(e, values, resetForm);
                   }}
                 >
-                  <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-lg-flex justify-content-between align-items-center">
                     <div className="mt-2 mb-4">
                       <label htmlFor="">Opening Stock Date</label>
                       <DatePicker
@@ -292,8 +292,8 @@ const InsertFgItemInfo = () => {
                       console.log(values)
                       return (
                         <div
-                          className=" flex-1 items-center d-flex-nowrap"
-                          style={{ height: "300px", overflowY: "auto" }}
+                          className=" flex-1 items-center d-flex-nowrap py-2"
+                          style={{height: "calc(75vh - 120px)", overflowY: "auto" }}
                         >
                           <table className="table w-full table-bordered">
                             <thead className="w-100">

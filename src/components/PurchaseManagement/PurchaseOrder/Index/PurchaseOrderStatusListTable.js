@@ -29,7 +29,7 @@ const PurchaseOrderStatusListTable = ({
       const userSingleId = JSON.parse(getUserId);
       const userIdFromSession = userSingleId[0]?._id;
       const permidionData = user?.filter(
-        (user) => user._id == userIdFromSession
+        (user) => user._id === userIdFromSession
       );
       const extractUserListForCurrentUser = (userData, userId) => {
         let userList = null;

@@ -4,7 +4,6 @@ import React from "react";
 import Select from "react-select";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
-import swal from "sweetalert";
 
 const PurchaseOrderSingleInfo = ({
   id,
@@ -32,7 +31,7 @@ const PurchaseOrderSingleInfo = ({
     <div class="row row-cols-2 row-cols-lg-3">
       <div class="col-6 col-lg-4">
         <label htmlFor="supplierId">Supplier Name</label>
-        <div className="w-75 d-flex justify-content-between mt-2">
+        <div className="w-lg-75 w-md-100 w-sm-100 d-flex justify-content-between mt-2">
           <div className="w-100">
             <Select
               class="form-select"
@@ -133,7 +132,7 @@ const PurchaseOrderSingleInfo = ({
       </div>
       <div class="col-6 col-lg-4">
         <label htmlFor="paymentId">Payment</label>
-        <div className="w-75 d-flex justify-content-between mt-2">
+        <div className="w-lg-75  w-md-100 w-sm-100 d-flex justify-content-between mt-2">
           <div className="w-100">
             <Select
               class="form-select"
@@ -199,7 +198,7 @@ const PurchaseOrderSingleInfo = ({
           </div>
           <div className="ms-2 mt-2">
             <FontAwesomeIcon
-              className="border  align-items-center text-center p-2 fs-3 rounded-5 text-light "
+              className="border align-items-center text-center p-2 fs-3 rounded-5 text-light "
               style={{
                 background: "#2DDC1B",
               }}
@@ -339,7 +338,7 @@ const PurchaseOrderSingleInfo = ({
       <div class="col-6 col-lg-4">
         <label htmlFor="Currency">Currency</label>
         <br />
-        <div className="w-75">
+        <div className="w-lg-75 w-md-100">
           <Select
             class="form-select"
             className="w-100 mb-3"

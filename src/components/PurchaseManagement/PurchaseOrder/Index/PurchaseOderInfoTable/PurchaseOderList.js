@@ -19,7 +19,6 @@ import { useGetAllSupplierInformationQuery } from "../../../../../redux/features
 import { useGetAllPaymentInformationQuery } from "../../../../../redux/features/paymnetinformation/paymentInfoApi";
 import { downloadPOPDF } from "../../../../ReportProperties/handlePurchaseOrderReport";
 import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
-import numberToWords from "number-to-words";
 import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/iteminformation/rmItemInfoApi";
 import { useGetAllBankInformationQuery } from "../../../../../redux/features/bankinformation/bankInfoAPi";
 import { useGetAllGRNInformationQuery } from "../../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
@@ -57,15 +56,16 @@ const PurchaseOderList = ({ permission }) => {
       })
       .filter((match) => match !== undefined);
 
-    const categorizedData = matches?.reduce((acc, curr) => {
+    const purchaseMatchedLCData = matches?.reduce((acc, curr) => {
       if (!acc[curr.paymentType]) {
         acc[curr.paymentType] = [];
       }
       acc[curr.paymentType].push(curr);
       return acc;
     }, {});
-    setPurchaseInCash(categorizedData?.cash);
-    setPurchaseInInLCAtSight(categorizedData?.lcatsight);
+    console.log(purchaseMatchedLCData)
+    setPurchaseInCash(purchaseMatchedLCData?.cash);
+    setPurchaseInInLCAtSight(purchaseMatchedLCData?.lcatsight);
 
     const approvePurchaseData = purchaseInfoData?.filter(
       (x) => x.approveStatus == true
@@ -394,7 +394,7 @@ const PurchaseOderList = ({ permission }) => {
         </div>
       </div>
     );
-  }, [filterText, resetPaginationToggle, refetch]);
+  }, [filterText, resetPaginationToggle, grnRefetch,refetch]);
 
   if (isPurchaseloading) {
     return (
@@ -415,6 +415,7 @@ const PurchaseOderList = ({ permission }) => {
       </div>
     );
   }
+  console.log(purchaseInLCAtSight)
 
   return (
     <div className="row px-5 mx-4">
@@ -431,7 +432,7 @@ const PurchaseOderList = ({ permission }) => {
         className="col userlist-table mt-4"
         // style={{ height: 'calc(90vh - 120px)', overflowY: 'scroll' }}
       >
-        <div className="shadow-lg ">
+        <div className="shadow-lg">
           <DataTable
             columns={columns}
             data={filteredItems}

@@ -1,18 +1,18 @@
 .custom-datepicker {
-    border: 1px solid #2DDC1B;
-    padding: 5px;
-    border-radius: 5px;
-    outline: #2DDC1B;
-    width: 290px;
-    height: 38px;
-  }
-  .custom-datepicker-update{
-    border: 1px solid #2DDC1B;
-    padding: 8px;
-    border-radius: 5px;
-    outline: #2DDC1B;
-    width:220px;
-  }
+  border: 1px solid #2ddc1b;
+  padding: 5px;
+  border-radius: 5px;
+  outline: #2ddc1b;
+  width: 290px;
+  height: 38px;
+}
+.custom-datepicker-update {
+  border: 1px solid #2ddc1b;
+  padding: 8px;
+  border-radius: 5px;
+  outline: #2ddc1b;
+  width: 220px;
+}
 .custom-calendar .react-datepicker__current-month,
 .custom-calendar .react-datepicker__day,
 .custom-calendar .react-datepicker__day-name,
@@ -28,19 +28,18 @@
 .custom-calendar .react-datepicker__day--keyboard-selected {
   font-size: 14px; /* Change the selected day text size */
 }
-  .custom-calendar {
-    background-color: #B8FEB3;
-    width: 260px;
-  }
-  .custom-calendar .react-datepicker__month-container {
-    width: 100%; /* Ensure the month container takes the full width */
+.custom-calendar {
+  background-color: #b8feb3;
+  width: 260px;
+}
+.custom-calendar .react-datepicker__month-container {
+  width: 100%; /* Ensure the month container takes the full width */
+}
+.custom-calendar .react-datepicker__header {
+  width: 100%;
+}
 
-  }
-  .custom-calendar .react-datepicker__header {
-    width: 100%;
-  }
-  
-  .custom-calendar .react-datepicker__day,
+.custom-calendar .react-datepicker__day,
 .custom-calendar .react-datepicker__day-name {
   width: 13.28%; /* Each day takes 1/7th of the width */
   display: inline-block;
@@ -50,12 +49,36 @@
   white-space: nowrap; /* Prevent text from wrapping */
 }
 
-
-input[type="number"]::-webkit-outer-spin-button, 
+input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 input[type="number"] {
-    -moz-appearance: textfield;
+  -moz-appearance: textfield;
+}
+@media (min-width: 1400px) {
+  .custom-datepicker {
+    width: 380px;
+  }
+  .custom-datepicker-update {
+    width: 380px;
+  }
+}
+@media (max-width: 768px) {
+  .custom-datepicker {
+    width: 200px;
+  }
+  .custom-datepicker-update {
+    width: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-datepicker {
+    width: 150px;
+  }
+  .custom-datepicker-update {
+    width: 150px;
+  }
 }

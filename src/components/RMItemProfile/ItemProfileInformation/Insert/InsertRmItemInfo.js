@@ -102,12 +102,13 @@ console.log(categoryInfoConvertedOptions)
     <div
       className=" row px-4 mx-4"
       style={{
-        overflowY: "scroll",
-        height: "500px",
+        height: "calc(98vh - 120px)",
+        overflowY: "hidden",
+        
       }}
     >
       <div class="overflow-hidden">
-        <div className="shadow-lg mt-2 mt-sm-5 mt-md-5 mt-lg-5 p-5 rounded-4">
+        <div className="shadow-lg p-5 rounded-4">
           <div className="d-flex justify-content-between align-items-center ">
             <div className="d-flex align-items-center">
               <FontAwesomeIcon
@@ -277,10 +278,10 @@ console.log(categoryInfoConvertedOptions)
                       const details = values.detailsData;
                       return (
                         <div
-                          className=" flex-1 items-center d-flex-nowrap"
-                          style={{ height: "300px", overflowY: "auto" }}
+                          className=" flex-1 items-center d-flex-nowrap py-2"
+                          style={{  height: "calc(80vh - 120px)", overflowY: "auto" }}
                         >
-                          <table className="table w-full table-bordered shadow-lg" >
+                          <table className="table w-full table-bordered">
                             <thead className="w-100">
                               <tr>
                                 <th className="bg-white text-center align-middle  ">
@@ -337,7 +338,7 @@ console.log(categoryInfoConvertedOptions)
                                         <td className="text-center align-middle">
                                           {index + 1}
                                         </td>
-                                        <td style={{width:'20%'}}>
+                                        <td className="width-sm-20 width-md-20 width-lg-20">
                                           <div className="w-100 d-flex justify-content-between mt-2">
                                             <div className="w-100">
                                               <Select

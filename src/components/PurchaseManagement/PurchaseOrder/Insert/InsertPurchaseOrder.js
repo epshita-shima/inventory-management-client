@@ -24,7 +24,7 @@ const InsertPurchaseOrder = ({
         <table className="table w-full table-bordered">
           <thead className="w-100">
             <tr>
-              <th className="bg-white text-center  align-items-center  ">Sl</th>
+              <th className="bg-white text-center  align-items-center">Sl</th>
 
               <th
                 className="bg-white text-center  align-items-center"

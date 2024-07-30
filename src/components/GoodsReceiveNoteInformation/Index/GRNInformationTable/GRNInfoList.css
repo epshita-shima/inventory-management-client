@@ -59,3 +59,26 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
     -moz-appearance: textfield;
 }
+
+@media (min-width: 992px) {
+  .width-lg-23 {
+    width: 23%;
+  }
+  .width-lg-16{
+    width: 16%;
+  }
+}
+@media (max-width: 768px) {
+  .width-md-23 {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-top: 5px;
+  }
+  .width-lg-16{
+    width: 100%;
+  }
+  .margin-md{
+    margin-top: 5px;
+    margin-left: 0 !important;
+  }
+}

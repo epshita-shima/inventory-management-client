@@ -250,14 +250,11 @@ const InsertGRNInfo = () => {
 
   return (
     <div
-      className=" row  mx-4"
-      style={{
-        overflowY: "scroll",
-        height: "500px",
-      }}
+      className=" row mx-4"
+      style={{ height: 'calc(100vh - 120px)', overflowY: 'scroll' }}
     >
       <div class="overflow-hidden">
-        <div className="shadow-lg mt-2 mt-sm-4 mt-md-4 mt-lg-4 rounded-4">
+        <div className="shadow-lg  rounded-4">
           <Formik
             initialValues={initialValues}
             validationSchema={Yup.object({
@@ -424,7 +421,7 @@ const InsertGRNInfo = () => {
                                   )}
                             </div>
 
-                            <div class="col-6 col-lg-3 mt-2">
+                            <div class="col-6 col-lg-3">
                               <label htmlFor="supplierId" className="ms-3">
                                 Supplier Name
                               </label>
@@ -506,7 +503,7 @@ const InsertGRNInfo = () => {
                                 </div>
                               )}
                             </div>
-                            <div class="col-6 col-lg-3 mt-1">
+                            <div class="col-6 col-lg-3">
                               <label htmlFor="supplierId" className="ms-3">
                                 Supplier PO Number
                               </label>

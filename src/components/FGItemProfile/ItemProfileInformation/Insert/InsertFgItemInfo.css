@@ -28,7 +28,7 @@
 }
   .custom-calendar {
     background-color: #B8FEB3;
-    width: 280px;
+    width: 260px;
   }
   .custom-calendar .react-datepicker__month-container {
     width: 100%; /* Ensure the month container takes the full width */
@@ -49,3 +49,11 @@
 }
 
 
+@media (min-width: 992px) {
+ 
+}
+@media (max-width: 768px) {
+  .custom-calendar {
+    width: 200px;
+  }
+}

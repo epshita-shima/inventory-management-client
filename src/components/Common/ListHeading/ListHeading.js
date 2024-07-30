@@ -43,6 +43,8 @@ const ListHeading = ({
   const getUserFromLocalConvert = JSON.parse(getUserFromLocal);
   const getMenuListFromLOcalUser = getUserFromLocalConvert[0]?.menulist;
 
+  console.log(purchaseInLCAtSight)
+
   const traverse = (items) => {
     const urls = [];
     items.forEach((item) => {
@@ -114,13 +116,14 @@ const ListHeading = ({
       } else if (searchItem[0]?.menuId === MenuIdCollection.purchaseorderlist) {
         grandTotal = purchaseInfoData?.length;
         totalActive = purchaseInCash?.length;
-        totalInActive = purchaseInLCAtSight?.length;
+        totalInActive = purchaseInLCAtSight?.length== undefined ? 0 :  purchaseInLCAtSight?.length;
+        console.log(totalInActive)
       } else if (
         searchItem[0]?.menuId === MenuIdCollection.purchaseorderapprove
       ) {
         grandTotal = purchaseInfoData?.length;
         totalActive = purchaseInCash?.length;
-        totalInActive = purchaseInLCAtSight?.length;
+        totalInActive = purchaseInLCAtSight?.length == undefined ? 0 :  purchaseInLCAtSight?.length;
       }
 
       setGrandTotal(grandTotal);

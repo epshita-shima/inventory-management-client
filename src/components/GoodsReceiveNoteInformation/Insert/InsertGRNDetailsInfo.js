@@ -36,12 +36,12 @@ const InsertGRNDetailsInfo = ({
 
     setFieldValue("grandTotalQuantity", calGrandTotalQuantity);
     setFieldValue("grandTotalAmount", calTotalAmount);
-  }, [details, setFieldValue]);
+  }, [details,setTotalGrandAmount,setTotalGrandQuantity, setFieldValue]);
 
   return (
     <div
       className="shadow-lg p-4"
-      style={{ height: "300px", overflowY: "auto" }}
+      // style={{ height: "300px", overflowY: "auto" }}
     >
       <table className="table w-full table-bordered">
         <thead className="w-100">
