@@ -15,6 +15,7 @@ import handleDownload from "../../../../ReportProperties/HandelExcelDownload";
 import handleCheckboxClick from "../../../../Common/ListHeadingModal/Function/handleCheckboxClick";
 import ActiveListDataModal from "../../../../Common/ListHeadingModal/ActiveListModal/ActiveListDataModal";
 import FilterComponent from "../../../../Common/ListDataSearchBoxDesign/FilterComponent";
+import './IteminfoList.css'
 
 const IteminfoList = ({ permission, finishGoodInItemInfoData ,refetch}) => {
   const { data: itemSizeInfo } = useGetAllItemSizeQuery(undefined);
@@ -399,7 +400,7 @@ const [selectedData, setSelectedData] = useState([]);
         setInActiveDataModal={setInActiveFinishGoodItemModal}
       ></ListHeading>
       <div
-        className="col userlist-table mt-4"
+        className="col userlist-table mt-4 finishdata-main-view"
         // style={{
         //   overflow: "scroll",
         //   height: "420px",

@@ -293,9 +293,16 @@ const InsertFgItemInfo = () => {
                       return (
                         <div
                           className=" flex-1 items-center d-flex-nowrap py-2"
-                          style={{height: "calc(75vh - 120px)", overflowY: "auto" }}
+                          // style={{height: "calc(75vh - 120px)", overflowY: "auto" }}
                         >
-                          <table className="table w-full table-bordered">
+                          <div class="container-fluid ">
+                            <div class="row justify-content-center">
+                              <div class="col-12 col-md-12 col-lg-12 fixed-column py-2">
+                                <div
+                                  class="table-responsive table-responsive-custom"
+                                 
+                                >
+                                  <table className="table w-full table-bordered">
                             <thead className="w-100">
                               <tr>
                                 <th className="bg-white text-center align-middle  ">
@@ -596,6 +603,11 @@ const InsertFgItemInfo = () => {
                                 : null}
                             </tbody>
                           </table>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                          
                         </div>
                       );
                     }}

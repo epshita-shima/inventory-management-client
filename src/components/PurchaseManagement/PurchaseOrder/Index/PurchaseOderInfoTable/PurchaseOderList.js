@@ -22,7 +22,7 @@ import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinf
 import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/iteminformation/rmItemInfoApi";
 import { useGetAllBankInformationQuery } from "../../../../../redux/features/bankinformation/bankInfoAPi";
 import { useGetAllGRNInformationQuery } from "../../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
-
+import './PurchaseOderList.css'
 const PurchaseOderList = ({ permission }) => {
   const { data: companyinfo } = useGetCompanyInfoQuery(undefined);
   const { data: bankInformation } = useGetAllBankInformationQuery(undefined);
@@ -429,7 +429,7 @@ const PurchaseOderList = ({ permission }) => {
         setPurchaseOrderList={setPurchaseOrderList}
       ></ListHeading>
       <div
-        className="col userlist-table mt-4"
+        className="col userlist-table mt-4 podata-main-view "
         // style={{ height: 'calc(90vh - 120px)', overflowY: 'scroll' }}
       >
         <div className="shadow-lg">

@@ -13,6 +13,7 @@ import {
   useUpdateClientDetailsInfoMutation,
 } from "../../../redux/features/clientinformation/clientInfoApi";
 import swal from "sweetalert";
+import './InsertClientInformation.css'
 
 const InsertClientInformation = () => {
   const ArrayHelperRef = useRef();
@@ -95,13 +96,13 @@ const InsertClientInformation = () => {
   return (
     <div
       className=" row px-4 mx-4"
-      style={{
-        overflowY: "scroll",
-        height: "500px",
-      }}
+      // style={{
+      //   height: "90%"
+      // }}
+
     >
-      <div class="overflow-hidden">
-        <div className="shadow-lg mt-2 mt-sm-4 mt-md-4 mt-lg-4 p-4 rounded-4">
+      <div class="">
+        <div className="">
           <div className="d-flex justify-content-between align-items-center ">
             <div className="d-flex align-items-center">
               <FontAwesomeIcon
@@ -201,7 +202,7 @@ const InsertClientInformation = () => {
                       const details = values.detailsData;
                       console.log(values, !(isValid && dirty));
                       return (
-                        <div className="row shadow-lg pt-5 pb-3 w-75 d-flex justify-content-center mx-auto">
+                        <div className="row shadow-lg pt-5 pb-3 w-75 d-flex justify-content-center mx-auto rounded-4">
                           <div className="col-md-12">
                             {details && details.length > 0
                               ? details.map((detail, index) => {
@@ -209,7 +210,7 @@ const InsertClientInformation = () => {
                                   return (
                                     <div key={index}>
                                       <div>
-                                        <div className="col-md-6">
+                                        <div className="col-md-12 col-lg-6 col-xl-6">
                                           <div className="mb-2">
                                             <label htmlFor="email">
                                               Client Name
@@ -469,7 +470,7 @@ const InsertClientInformation = () => {
                                           </div>
                                         </div>
 
-                                        <div className="col-md-6">
+                                        <div className="col-md-12 col-lg-6 col-xl-6">
                                           <div className="mb-2 mt-2">
                                             <label htmlFor="tradeLicenceNo">
                                               Trade Licence Number

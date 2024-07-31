@@ -500,8 +500,8 @@ const CFTInfosList = ({ permission, cftInfosData, refetch }) => {
         setInActiveDataModal={setInActiveCFTInfosModal}
       ></ListHeading>
       <div
-        className="col userlist-table mt-4"
-        style={{ height: 'calc(80vh - 120px)', overflowY: 'scroll' }}
+        className="col userlist-table mt-4 cftdata-main-view"
+        // style={{ height: 'calc(80vh - 120px)', overflowY: 'scroll' }}
       >
         <div className="shadow-lg">
           <DataTable

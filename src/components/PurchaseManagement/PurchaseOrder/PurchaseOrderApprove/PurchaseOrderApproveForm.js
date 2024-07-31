@@ -134,12 +134,12 @@ const PurchaseOrderApproveForm = () => {
   return (
     <div
       className=" row px-4 mx-4"
-      style={{
-        overflowY: "scroll",
-        height: "500px",
-      }}
+      // style={{
+      //   overflowY: "scroll",
+      //   height: "500px",
+      // }}
     >
-      <div class="overflow-hidden">
+      <div class="">
         <h2
           style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}
         >
