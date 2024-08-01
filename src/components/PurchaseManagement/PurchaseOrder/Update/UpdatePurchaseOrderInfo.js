@@ -2,7 +2,7 @@ import { faPlus, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field } from "formik";
 import Select from "react-select";
-
+import '../Insert/InsertPurchaseOrder.css'
 const UpdatePurchaseOrderInfo = ({
   arrayHelpers,
   purchaseOrderAllInformation,
@@ -53,7 +53,9 @@ const UpdatePurchaseOrderInfo = ({
     });
   };
   return (
-    <div style={{ height: "300px", overflowY: "auto" }}>
+    <div className="insertpo-responsive-custom" 
+    // style={{ height: "300px", overflowY: "auto" }}
+    >
       <table className="table w-full table-bordered">
         <thead className="w-100">
           <tr>

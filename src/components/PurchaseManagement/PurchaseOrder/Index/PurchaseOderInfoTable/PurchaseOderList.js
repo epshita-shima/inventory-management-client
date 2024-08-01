@@ -418,7 +418,8 @@ const PurchaseOderList = ({ permission }) => {
   console.log(purchaseInLCAtSight)
 
   return (
-    <div className="row px-5 mx-4">
+    <div className="row px-5 mx-4"
+     style={{ height: 'calc(100vh - 120px)', overflowY: 'auto' }}>
       <ListHeading
         purchaseInCash={purchaseInCash}
         purchaseInLCAtSight={purchaseInLCAtSight}
@@ -429,7 +430,7 @@ const PurchaseOderList = ({ permission }) => {
         setPurchaseOrderList={setPurchaseOrderList}
       ></ListHeading>
       <div
-        className="col userlist-table mt-4 podata-main-view "
+        className="col userlist-table mt-4 podata-main-view"
         // style={{ height: 'calc(90vh - 120px)', overflowY: 'scroll' }}
       >
         <div className="shadow-lg">

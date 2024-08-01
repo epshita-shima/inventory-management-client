@@ -189,10 +189,10 @@ const CommonPurchaseOrderInfo = () => {
       style={{
         overflow: "hidden",
         height: "calc(98vh - 120px)",
-        zIndex:'9999'
+        zIndex: "9999",
       }}
     >
-      <div class="overflow-hidden">
+      <div class="">
         <div className="px-4 rounded-4">
           <Formik
             initialValues={initialValues}
@@ -235,14 +235,17 @@ const CommonPurchaseOrderInfo = () => {
                     const details = values.detailsData;
                     return (
                       <div
-                        className=" flex-1 items-center d-flex-nowrap mt-2 shadow-lg py-2 px-5"
-                        style={{
-                          overflowY: "hidden",
-                          height: "calc(95vh - 120px)",
-                          zIndex: "9999",
-                        }}
+                        className=" shadow-lg py-2 px-5"
+                        // style={{
+                        //   overflowY: "hidden",
+                        //   height: "calc(95vh - 120px)",
+                        //   zIndex: "9999",
+                        // }}
                       >
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div class="container-fluid">
+                          <div class="row justify-content-center">
+                            <div class="col-12 col-md-12 col-lg-12 fixed-column py-2">
+                            <div className="d-flex justify-content-between align-items-center">
                           <h2 style={{ fontSize: "24px", fontWeight: "bold" }}>
                             Purchase Order Form
                           </h2>
@@ -476,6 +479,10 @@ const CommonPurchaseOrderInfo = () => {
                             arrayHelpers={arrayHelpers}
                           ></InsertPurchaseOrder>
                         )}
+                            </div>
+                          </div>
+                        </div>
+                        
                       </div>
                     );
                   }}

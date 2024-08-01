@@ -19,9 +19,12 @@ const InsertPurchaseOrder = ({
   totalGrandTotalAmount,
   arrayHelpers,
 }) => {
+  console.log(window.screen)
   return (
-      <div style={{ height: 'calc(50vh - 120px)', overflowY: "auto" }}>
-        <table className="table w-full table-bordered">
+      <div className="insertpo-responsive-custom"
+      //  style={{ height: 'calc(42vh - 120px)', overflowY: "auto" }}
+       >
+        <table className="table table-bordered">
           <thead className="w-100">
             <tr>
               <th className="bg-white text-center  align-items-center">Sl</th>

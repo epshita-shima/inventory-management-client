@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Field } from "formik";
 import React, { useEffect } from "react";
 import { useGetAllGRNInformationQuery } from "../../../redux/features/goodsreceivenoteinfo/grninfoApi";
-
+import '../Update/UpdateGRNInfo.css'
 const InsertGRNDetailsInfo = ({
   details,
   values,
@@ -40,10 +40,15 @@ const InsertGRNDetailsInfo = ({
 
   return (
     <div
-      className="shadow-lg p-4"
+      className="shadow-lg p-4 grninsertdata-main-view"
       // style={{ height: "300px", overflowY: "auto" }}
+
     >
-      <table className="table w-full table-bordered">
+      <div class="container-fluid">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-12 col-lg-12 fixed-column py-2">
+            <div class="table-responsive">
+            <table className="table table-bordered">
         <thead className="w-100">
           <tr>
             <th className="bg-white text-center  align-items-center">Sl</th>
@@ -220,6 +225,11 @@ const InsertGRNDetailsInfo = ({
             : null}
         </tbody>
       </table>
+            </div>
+            </div>
+            </div>
+            </div>
+      
     </div>
   );
 };

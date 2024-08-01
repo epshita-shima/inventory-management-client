@@ -251,7 +251,7 @@ const InsertGRNInfo = () => {
   return (
     <div
       className=" row mx-4"
-      style={{ height: 'calc(100vh - 120px)', overflowY: 'scroll' }}
+      style={{ height: 'calc(98vh - 120px)', overflowY: 'hidden' }}
     >
       <div class="overflow-hidden">
         <div className="shadow-lg  rounded-4">
@@ -298,8 +298,8 @@ const InsertGRNInfo = () => {
                       <div className=" flex-1 items-center d-flex-nowrap mt-3 py-2 px-5">
                         <div>
                           <div className="d-flex justify-content-between align-items-center">
-                            <h2
-                              style={{ fontSize: "24px", fontWeight: "bold" }}
+                            <h2 className="fs-sm fw-bold"
+                              // style={{ fontSize: "24px", fontWeight: "bold" }}
                             >
                               {id
                                 ? "Goods Receive Note (GRN) Form"
@@ -326,8 +326,8 @@ const InsertGRNInfo = () => {
                             </div>
                           </div>
 
-                          <div class="row row-cols-2 row-cols-lg-4">
-                            <div class="col-6 col-lg-3 mt-2">
+                          <div class="row row-cols-1  row-cols-md-2 row-cols-lg-4">
+                            <div class="col col-md-6 col-lg-3 mt-2">
                               <label htmlFor="">Received Date</label>
                               <br />
                               <DatePicker
@@ -370,12 +370,13 @@ const InsertGRNInfo = () => {
                               />
                             </div>
 
-                            <div class="col-6 col-lg-3 mt-2">
+                            <div class="col col-md-6 col-lg-3 mt-2">
                               <label
                                 htmlFor="challanNo"
-                                style={{
-                                  marginLeft: "10px",
-                                }}
+                                className="ml-sm-0 ml-md-0 ml-lg-4" 
+                                // style={{
+                                //   marginLeft: "10px",
+                                // }}
                               >
                                 Challan No
                               </label>
@@ -395,9 +396,10 @@ const InsertGRNInfo = () => {
                                   width: "100%",
                                   borderRadius: "5px",
                                   textAlign: "center",
-                                  marginLeft: "10px",
+                                  // marginLeft: "10px",
                                   height: "38px",
                                 }}
+                                className="ml-sm-0 ml-md-0 ml-lg-4" 
                                 onChange={(e) => {
                                   if (id) {
                                     setGRNSingleData((prevData) => ({
@@ -421,8 +423,8 @@ const InsertGRNInfo = () => {
                                   )}
                             </div>
 
-                            <div class="col-6 col-lg-3">
-                              <label htmlFor="supplierId" className="ms-3">
+                            <div class="col col-md-6 col-lg-3">
+                              <label htmlFor="supplierId"  className="ml-sm-0 ml-md-0 ml-lg-4 mt-sm-2 mt-md-2 mt-lg-0" >
                                 Supplier Name
                               </label>
                               {id ? (
@@ -438,7 +440,7 @@ const InsertGRNInfo = () => {
                                     width: "100%",
                                     borderRadius: "5px",
                                     textAlign: "center",
-                                    marginLeft: "10px",
+                                    // marginLeft: "10px",
                                     height: "38px",
                                   }}
                                 />
@@ -503,8 +505,8 @@ const InsertGRNInfo = () => {
                                 </div>
                               )}
                             </div>
-                            <div class="col-6 col-lg-3">
-                              <label htmlFor="supplierId" className="ms-3">
+                            <div class="col col-md-6 col-lg-3">
+                              <label htmlFor="supplierId" className="ml-sm-0 ml-md-0 ml-lg-4 mt-sm-2 mt-md-2 mt-lg-0">
                                 Supplier PO Number
                               </label>
                               {id ? (
@@ -514,13 +516,14 @@ const InsertGRNInfo = () => {
                                   placeholder="Supplier Po No"
                                   value={grnSingleData?.supplierPoNo}
                                   disabled
+                                  className="ml-sm-0 ml-md-0 ml-lg-4 w-sm-100 w-md-100 w-lg-92"
                                   style={{
                                     border: "1px solid #2DDC1B",
                                     padding: "5px",
-                                    width: "92%",
+                                    // width: "92%",
                                     borderRadius: "5px",
                                     textAlign: "center",
-                                    marginLeft: "10px",
+                                    // marginLeft: "10px",
                                     height: "38px",
                                   }}
                                 />

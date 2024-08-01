@@ -99,10 +99,10 @@ const InsertSupplierInformation = () => {
 
   return (
     <div
-      className=" row px-4 mx-4"
+      className=" row px-lg-4 mx-lg-4"
       // style={{
       //   overflowY: "scroll",
-      //   height: "500px",
+      //   height: "calc(80vh - 120px)",
       // }}
     >
       <div class="">
@@ -206,7 +206,7 @@ const InsertSupplierInformation = () => {
                       ArrayHelperRef.current = arrayHelpers;
                       const details = values.detailsData;
                       return (
-                        <div className="row shadow-lg pt-5 pb-3 w-75 d-flex justify-content-center mx-auto rounded-4">
+                        <div className="row shadow-lg pt-lg-5 pb-3 w-lg-75 d-flex justify-content-center mx-auto rounded-4">
                           <div className="col-md-12">
                             {details && details.length > 0
                               ? details.map((detail, index) => {

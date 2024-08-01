@@ -14,7 +14,7 @@ import { useGetAllRMItemInformationQuery } from "../../../../../redux/features/i
 import { useGetAllBankInformationQuery } from "../../../../../redux/features/bankinformation/bankInfoAPi";
 import { useGetCompanyInfoQuery } from "../../../../../redux/features/companyinfo/compayApi";
 import { useGetAllGRNInformationQuery } from "../../../../../redux/features/goodsreceivenoteinfo/grninfoApi";
-
+import '../../PurchaseOrderApprove/PurchaseOrderAproveForm.css'
 const PurchaseOrderApproveList = ({
   permission,
   purchaseFilterApproveAllData,
@@ -228,7 +228,7 @@ const PurchaseOrderApproveList = ({
 
   return (
     <div className="row">
-      <div className="col userlist-table">
+      <div className="col userlist-table podata-main-view">
         <div className="shadow-lg ">
           <DataTable
             columns={columns}

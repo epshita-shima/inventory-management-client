@@ -544,7 +544,7 @@ const CreateMenu = () => {
                         // style={{
                         //   height: "calc(60vh - 120px)",overflowY: "auto" }}
                         >
-                          <div class="container-fluid ">
+                          <div class="container-fluid">
                             <div class="row justify-content-center">
                               <div class="col-12 col-md-12 col-lg-12 fixed-column py-2">
                                 <div class="table-responsive table-responsive-design">
