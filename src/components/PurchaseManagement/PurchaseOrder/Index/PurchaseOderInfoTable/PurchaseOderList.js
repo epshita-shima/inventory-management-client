@@ -49,7 +49,7 @@ const PurchaseOderList = ({ permission }) => {
     []
   );
   const reportTitle = "PURCHASE ORDER";
-
+console.log(window.screen)
 
   useEffect(() => {
     const matches = purchaseInfoData
