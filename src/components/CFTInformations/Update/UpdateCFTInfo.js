@@ -30,28 +30,28 @@ const UpdateCFTInfo = () => {
   const updatebyUser = getUserParse[0].username;
   console.log(id);
   console.log(singleCFTInfosData);
-console.log(singleCFTInfoData)
+  console.log(singleCFTInfoData)
   useEffect(() => {
     if (singleCFTInfoData) {
       setSingleCFTInfosData({
-        _id:singleCFTInfoData._id,
-          openingDate: singleCFTInfoData.openingDate,
-          kgPerUnit: singleCFTInfoData.kgPerUnit,
-          isActive: singleCFTInfoData.isActive,
-          closingDate: singleCFTInfoData.closingDate,
-          makeBy: singleCFTInfoData.makeBy,
-          makeDate: singleCFTInfoData.makeDate,
-          updateBy: singleCFTInfoData.updateBy,
-          updateDate: singleCFTInfoData.updateDate,
-          image: null,
+        _id: singleCFTInfoData._id,
+        openingDate: singleCFTInfoData.openingDate,
+        kgPerUnit: singleCFTInfoData.kgPerUnit,
+        isActive: singleCFTInfoData.isActive,
+        closingDate: singleCFTInfoData.closingDate,
+        makeBy: singleCFTInfoData.makeBy,
+        makeDate: singleCFTInfoData.makeDate,
+        updateBy: singleCFTInfoData.updateBy,
+        updateDate: singleCFTInfoData.updateDate,
+        image: null,
       });
-  }
+    }
     setSingleCFTInfosData(singleCFTInfoData);
   }, [singleCFTInfoData]);
 
-    const handleFileChange = (e) => {
-      setFile(e.target.files[0]);
-    };
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -67,10 +67,10 @@ console.log(singleCFTInfoData)
     data.append("closingDate", singleCFTInfosData.closingDate);
     data.append("kgPerUnit", singleCFTInfosData.kgPerUnit);
     data.delete(singleCFTInfosData.image)
-  console.log(singleCFTInfosData?._id)
+    console.log(singleCFTInfosData?._id)
 
     try {
-      const response = await updateCFTInfoData({data,id});
+      const response = await updateCFTInfoData({ data, id });
       console.log(response.data.status);
       if (response.data.status === 200) {
         swal("Done", "Data Update Successfully", "success");
@@ -230,14 +230,14 @@ console.log(singleCFTInfoData)
                     htmlFor="inputPassword5"
                     style={{ color: "#032339", letterSpacing: "1px" }}
                   >
-                    Kg Per(Unit)
+                    CFT per KG
                   </Form.Label>
                   <InputGroup className="mb-3">
                     <Form.Control
-                      placeholder="kg per unit"
+                      placeholder="cft per kg"
                       name="kgperunit"
                       required
-                      aria-label="kg per unit"
+                      aria-label="cft per kg"
                       aria-describedby="basic-addon2"
                       value={singleCFTInfosData?.kgPerUnit}
                       autoComplete="off"

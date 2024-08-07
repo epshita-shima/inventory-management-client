@@ -134,7 +134,7 @@ const PurchaseOrderApproveForm = () => {
   return (
     <div
       className=" row px-4 mx-4"
-      style={{ height: 'calc(98vh - 120px)', overflowY: 'hidden'}}
+      style={{ height: 'calc(98vh - 120px)', overflowY: 'scroll'}}
     >
       <div class="">
         <h2
@@ -156,7 +156,7 @@ const PurchaseOrderApproveForm = () => {
 
         <div className="mt-2 mt-sm-4 mt-md-4 mt-lg-4 rounded-4 ">
           <div class="row row-cols-2 row-cols-lg-2 w-75">
-            <div className="col-6 col-lg-3 text-center mt-2">
+            <div className="col-12 col-lg-3 text-center mt-2">
               <label htmlFor="">Po Status</label>
               <div className="w-100">
                 <Select
@@ -251,7 +251,7 @@ const PurchaseOrderApproveForm = () => {
                 }}
               />
             </div>
-            <div className="col-6 col-lg-3 mt-2">
+            <div className="col-6 col-lg-3 ms-sm-2 ms-lg-0 mt-2">
               <label htmlFor=""></label>
               <br />
               <button
